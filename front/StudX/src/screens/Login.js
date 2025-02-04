@@ -1,12 +1,12 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity,Image } from "react-native";
 
 export default function Login({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.zonaLogo}>
-        <Text style={styles.Logo}>StudX</Text>
+        <Image source={require("../assets/logoIndividual.png")} style={styles.image} />
       </View>
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   zonaLogo: {
-    flex: 2,
+    flex: 3,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -80,5 +80,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textDecoration: "underline",
+  },
+  image: {
+    width: 150,
+    height: 150,
+    resizeMode: "contain",
   },
 });

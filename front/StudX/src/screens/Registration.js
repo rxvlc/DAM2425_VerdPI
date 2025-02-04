@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity,StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity,StyleSheet, Image } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function Registration() {
@@ -13,7 +13,7 @@ export default function Registration() {
     return (
        <View style={styles.container}>
       <View style={styles.zonaLogo}>
-        <Text style={styles.Logo}>StudX</Text>
+      <Image source={require("../assets/logoIndividual.png")} style={styles.image} />
       </View>
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />
@@ -30,7 +30,7 @@ export default function Registration() {
             <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888"  secureTextEntry />
       </View>
       <View style={styles.zonaBoton}>
-        <TouchableOpacity style={styles.boton}>
+        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("HomeScreen")}>
           <Text style={styles.botonTexto}>Registrar</Text>
         </TouchableOpacity>
       </View>
@@ -89,5 +89,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-  }
+  },
+  image: {
+    width: 150,
+    height: 150,
+    resizeMode: "contain",
+  },
 });
