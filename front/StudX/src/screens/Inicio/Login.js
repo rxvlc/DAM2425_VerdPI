@@ -1,12 +1,12 @@
 import React from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity,Image } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, StatusBar, Platform } from "react-native";
 
 export default function Login({ navigation }) {
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#000" />
       <View style={styles.zonaLogo}>
-        {/* <Image source={require("../assets/logoIndividual.png")} style={styles.image} /> */}
+        <Image source={require("../../assets/logoIndividual.png")} style={styles.image} />
       </View>
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />
@@ -17,7 +17,7 @@ export default function Login({ navigation }) {
           <Text style={styles.botonTexto}>Iniciar Sesión</Text>
         </TouchableOpacity>
         <Text style={styles.text}>
-          Si no tienes cuenta puedes
+          Si no tienes cuenta puedes{" "}
           <TouchableOpacity onPress={() => navigation.navigate("Registration")}>
             <Text style={{ color: "blue" }}> Registrarte</Text>
           </TouchableOpacity>
@@ -30,45 +30,46 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 20,
   },
   zonaLogo: {
-    flex: 3,
+    flex: 3, 
     alignItems: "center",
     justifyContent: "center",
+    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+
   },
   zonaUsuariContrasenya: {
-    flex: 3,
+    flex: 2, 
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    width: "80%",
   },
   zonaBoton: {
-    flex: 3,
+    flex: 2, 
     alignItems: "center",
-    justifyContent: "center",
-  },
-  Logo: {
-    fontSize: 50,
-    fontWeight: "bold",
-    marginBottom: 20,
+    justifyContent: "flex-start",
   },
   input: {
-    width: "100%",
+    width: "90%",
     height: 50,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
+    borderRadius: 8,
+    paddingHorizontal: 15,
     marginVertical: 10,
+    fontSize: 16,
   },
   boton: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 5,
+    backgroundColor: "#000000",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    width: "70%", 
+    alignItems: "center",
+    borderRadius: 8,
+    marginVertical: 10,
   },
   botonTexto: {
     color: "#fff",
@@ -76,14 +77,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   text: {
+    fontSize: 16,
     color: "black",
-    fontSize: 18,
-    fontWeight: "bold",
-    textDecoration: "underline",
+    textAlign: "center",
+    marginTop: 10,
   },
   image: {
-    width: 150,
-    height: 150,
+    width: 220,
+    height: 220,
     resizeMode: "contain",
+    alignSelf: "center",
   },
 });

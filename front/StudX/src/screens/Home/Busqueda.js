@@ -5,10 +5,10 @@ import React, { useState } from "react";
 
 export default function Busquedas() {
   const [query, setQuery] = useState("");
+  const [resultados, setResultados] = useState([]);
 
   return (
     <View style={styles.container}>
-      {/* Barra de búsqueda */}
       <View style={styles.zonaBusqueda}>
         <View style={styles.searchBar}>
           <Ionicons name="search" size={20} color="#A0A0A0" />
@@ -22,9 +22,16 @@ export default function Busquedas() {
         </View>
       </View>
 
-      {/* Zona de resultados */}
       <View style={styles.zonaResultados}>
-        <Text>Aquí van los resultados</Text>
+        {resultados.length > 0 ? (
+          resultados.map((item, index) => (
+            <Text key={index} style={styles.resultadoItem}>
+              {item}
+            </Text>
+          ))
+        ) : (
+          <Text>No hay resultados</Text>
+        )}
       </View>
     </View>
   );
@@ -54,7 +61,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingHorizontal: 15,
     height: 40,
-    width: "90%", // Se ajusta al ancho del contenedor
+    width: "90%",
   },
   input: {
     flex: 1,
@@ -62,4 +69,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
+  resultadoItem: {
+    fontSize: 16,
+    marginVertical: 5,
+    color: "#333",
+  }, 
 });
