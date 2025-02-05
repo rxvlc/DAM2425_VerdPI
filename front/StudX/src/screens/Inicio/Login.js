@@ -13,7 +13,7 @@ export default function Login({ navigation }) {
         <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" secureTextEntry />
       </View>
       <View style={styles.zonaBoton}>
-        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("HomeScreen")}>
+        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("Pantallas")}>
           <Text style={styles.botonTexto}>Iniciar Sesión</Text>
         </TouchableOpacity>
         <Text style={styles.text}>
