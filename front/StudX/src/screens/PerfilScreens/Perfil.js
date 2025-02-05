@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   Pressable,
   Text,
   TextInput,
@@ -16,9 +15,9 @@ import * as ImagePicker from 'expo-image-picker';
 
 const Perfil = () => {
   const [fotoPerfil, setFotoPerfil] = useState(
-    require('./assets/fotoPerfil.jpg')
+    require('../../images/fotoPerfil.jpg')
   );
-  const [fotoFondo, setFotoFondo] = useState(require('./assets/fotoFondo.jpg'));
+  const [fotoFondo, setFotoFondo] = useState(require('../../images/fotoFondo.jpg'));
   const [hasPermission, setHasPermission] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
   const [name, setName] = useState('Sergio Samper Calvo');
@@ -81,7 +80,6 @@ const Perfil = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.fotosContainer}>
         <Image source={fotoFondo} style={styles.coverImage} />
         <TouchableOpacity style={styles.cameraIconFondo} onPress={openGallery}>

@@ -6,14 +6,14 @@ export default function Login({ navigation }) {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       <View style={styles.zonaLogo}>
-        <Image source={require("../../assets/logoIndividual.png")} style={styles.image} />
+        <Image source={require("../images/logoIndividual.png")} style={styles.image} />
       </View>
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />
         <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" secureTextEntry />
       </View>
       <View style={styles.zonaBoton}>
-        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("Pantallas")}>
+        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("HomeScreen")}>
           <Text style={styles.botonTexto}>Iniciar Sesión</Text>
         </TouchableOpacity>
         <Text style={styles.text}>

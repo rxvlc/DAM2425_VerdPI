@@ -14,7 +14,7 @@ export default function Registration({ navigation }) {
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent" barStyle="dark-content" />
       <View style={styles.zonaLogo}>
-        <Image source={require("../../assets/logoIndividual.png")} style={styles.image} />
+        <Image source={require("../images/logoIndividual.png")} style={styles.image} />
       </View>
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />
