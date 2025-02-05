@@ -6,7 +6,7 @@ export default function Login({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.zonaLogo}>
-        <Image source={require("../assets/logoIndividual.png")} style={styles.image} />
+        {/* <Image source={require("../assets/logoIndividual.png")} style={styles.image} /> */}
       </View>
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />

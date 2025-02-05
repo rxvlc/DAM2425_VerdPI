@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider } from 'react-native-paper';
-import { Home, Busqueda, Chats, Perfil } from './screens'; // Asegúrate de importar las pantallas correctas
+// import { Home, Busqueda, Chats, Perfil } from './screens/Home'; // Asegúrate de importar las pantallas correctas
 import { HomeOutlined, SearchOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons-react-native';
 
 const Tab = createBottomTabNavigator();
