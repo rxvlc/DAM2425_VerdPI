@@ -135,11 +135,11 @@ const Perfil = () => {
               <IconButton icon="eye" size={25} color="grey" />
             </TouchableOpacity>
           </View>
+          <TouchableOpacity>
           <View style={styles.save}>
-            <TouchableOpacity>
               <Text style={styles.saveButt}>Save</Text>
-            </TouchableOpacity>
           </View>
+          </TouchableOpacity>
         </ScrollView>
       </View>
     </View>
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   fotosContainer: {
-    flex: 35,
+    flex: 40,
     backgroundColor: '#ecf0f1',
   },
   infoContainer: {
