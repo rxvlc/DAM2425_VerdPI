@@ -12,17 +12,32 @@ public class User {
 	private String name;
 	private String email;
 	private String hashPasswd;
-	private int role;
+	private String university;
+	
 	
 	
 
-	public User(String name, String email, String hashPasswd, int role) {
+	public User(String name, String email, String hashPasswd, String university) {
 		this.name = name;
 		this.email = email;
 		this.hashPasswd = hashPasswd;
-		this.role = role;
+		this.university = university;
 	}
 	
+	
+	
+	public String getUniversity() {
+		return university;
+	}
+
+
+
+	public void setUniversity(String university) {
+		this.university = university;
+	}
+
+
+
 	public String getId() {
 		return id;
 	}
@@ -71,15 +86,7 @@ public class User {
 
 
 
-	public int getRole() {
-		return role;
-	}
-
-
-
-	public void setRole(int role) {
-		this.role = role;
-	}
+	
 
 	
 	
