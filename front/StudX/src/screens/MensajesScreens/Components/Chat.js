@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useTheme } from "../../../context/ThemeContext";
 
-export default function Chat({ chat, onPress }) {
+export default function Chat({ chat, onPress, onLongPress }) {
   const { darkMode } = useTheme();
 
   const getImageSource = (imageName) => {
@@ -21,6 +21,7 @@ export default function Chat({ chat, onPress }) {
     <TouchableOpacity 
       style={[styles.chatContainer, { backgroundColor: darkMode ? '#222' : '#fff', borderBottomColor: darkMode ? '#555' : '#ccc' }]} 
       onPress={() => onPress(chat)}
+      onLongPress={() => onLongPress(chat)} 
     >
       <Image source={getImageSource(chat.image)} style={styles.profileImage} />
       <View style={styles.textContainer}>

@@ -1,12 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Text, TextInput } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity, Text, TextInput, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from "../../../context/ThemeContext";
 import { useNavigation } from '@react-navigation/native';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
-import Mensaje from './Mensaje';
-
-const Stack = createStackNavigator();
+import * as ImagePicker from 'expo-image-picker';
+import Mensaje from "../Components/Mensaje";
 
 export default function ChatScreen({ route }) {
   const { chat } = route.params;
@@ -26,12 +24,49 @@ export default function ChatScreen({ route }) {
     }, 100);
   };
 
+  const solicitarPermisos = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso necesario', 'Se requieren permisos para acceder a la galería');
+      return false;
+    }
+    return true;
+  };
+
+  const enviarFoto = async () => {
+    const tienePermiso = await solicitarPermisos();
+    if (!tienePermiso) return;
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
+    });
+    
+    if (!result.canceled && result.assets.length > 0) {
+      const nuevoMsj = { id: `m${Date.now()}`, image: result.assets[0].uri, isOwn: true };
+      setMensajes([...mensajes, nuevoMsj]);
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  };
+
+  const getImageSource = (imageName) => {
+    const images = {
+      'img1.jpg': require('../../../images/FotosPerfil/img2.jpg'),
+      'img2.jpg': require('../../../images/FotosPerfil/img1.jpg'),
+    };
+    return images[imageName] || require('../../../images/FotosPerfil/img1.jpg');
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: darkMode ? '#121212' : '#fff' }]}> 
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.botonVolver} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={darkMode ? "white" : "black"} />
         </TouchableOpacity>
+        <Image source={getImageSource(chat.image)} style={styles.profileImage} />
         <Text style={[styles.tituloChat, { color: darkMode ? "white" : "black" }]}>{chat.name}</Text>
       </View>
       <FlatList
@@ -41,6 +76,9 @@ export default function ChatScreen({ route }) {
         renderItem={({ item }) => <Mensaje mensaje={item} darkMode={darkMode} />}
       />
       <View style={[styles.inputContainer, { backgroundColor: darkMode ? '#1E1E1E' : '#fff', borderColor: darkMode ? "#555" : "#ccc" }]}> 
+        <TouchableOpacity onPress={enviarFoto} style={styles.botonAdjuntar}>
+          <Ionicons name="image" size={24} color={darkMode ? "white" : "black"} />
+        </TouchableOpacity>
         <TextInput
           style={[styles.input, { backgroundColor: darkMode ? '#333' : '#fff', borderColor: darkMode ? "#555" : "#ccc", color: darkMode ? "white" : "black" }]}
           placeholder="Escribe un mensaje..."
@@ -62,15 +100,20 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   headerContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 10,
   },
   botonVolver: {
     position: 'absolute',
     left: 10,
+    top: 10,
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 5,
   },
   tituloChat: {
     fontSize: 20,
@@ -88,11 +131,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 20,
-    marginRight: 10,
+    marginHorizontal: 10,
   },
   botonEnviar: {
     backgroundColor: 'orange',
     padding: 10,
     borderRadius: 20,
+  },
+  botonAdjuntar: {
+    padding: 10,
   },
 });
