@@ -17,18 +17,26 @@ public class Controller {
 	@Autowired
 	UserRepository userRepository;
 	
-	@PostMapping("/api/auth/register")
-	String paco() {
-		return "asssd";
-	}
 	
 	@RequestMapping("/api/auth/registera")
 	String pacoa() {
-		List<User> llista = userRepository.buscarUsuariNomUsuari("pepe") ;
+		List<User> llista = userRepository.findUserMail("pepe") ;
 //		return llista.get(0).getName();
 		System.out.println(llista.get(0).getName());
 		return "asd";
 	}
 	
+	@PostMapping("/api/auth/registerUser")
+	String registerUser() {
+		List<User> list = userRepository.findUserMail(inputMail);
+		String nameEmail = list.get(0).getEmail();
+		
+		if(inputMail == nameEmail) {
+			return "200";
+		} else {
+			return "401";
+		}
+
+	}
 	
 }
