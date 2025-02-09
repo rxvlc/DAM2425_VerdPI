@@ -12,4 +12,6 @@ public class Preferences {
 	boolean notifications;
 	String language;
 	
+	
+	
 }
