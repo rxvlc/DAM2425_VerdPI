@@ -27,8 +27,9 @@ export default function Home() {
             <ExchangeTarget
               centro={item.centro}
               profesor={item.nombre}
-              alumnos={"30"}
+              alumnos={item.alumnos}
               nivel={item.dificultad}
+              idioma={item.idioma}
               profesorImagen={profesorImagen}
               onChatPress={() => console.log(`Chat con ${item.nombre}`)}
               onSolicitudPress={() => console.log(`Solicitud a ${item.nombre}`)}

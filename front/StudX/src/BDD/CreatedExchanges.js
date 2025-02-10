@@ -5,6 +5,8 @@ const createdExchanges = [
       apellidos: "Gómez",
       centro: "Florida Universitaria",
       dificultad: "A1",
+      alumnos: 12,
+      idioma: "English",
       imagen: "JuanPerezGomez.webp",
     },
     {
@@ -13,6 +15,8 @@ const createdExchanges = [
       apellidos: "López",
       centro: "Berenguer Dalmau",
       dificultad: "A2",
+      alumnos: 22,
+      idioma: "Spanish",
       imagen: "MariaRodriguezLopez.webp",
     },
     {
@@ -21,6 +25,8 @@ const createdExchanges = [
       apellidos: "Martínez",
       centro: "Esteve Paluzie",
       dificultad: "C2",
+      alumnos: 7,
+      idioma: "French",
       imagen: "CarlosFernandezMartinez.webp",
     },
     {
@@ -29,6 +35,8 @@ const createdExchanges = [
       apellidos: "Ruiz",
       centro: "Penya Rotja",
       dificultad: "B2",
+      alumnos: 16,
+      idioma: "German",
       imagen: "AnaSanchezRuiz.webp",
     },
   ];
