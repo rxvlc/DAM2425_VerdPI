@@ -1,9 +1,14 @@
 import React from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import { 
+  View, 
+  FlatList, 
+  StyleSheet 
+} from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import ExchangeTarget from "./components/ExchangeTarget";
 import profesores from "../../BDD/Profesores";
 import createdExchanges from "../../BDD/CreatedExchanges";
+import { useNavigation } from "@react-navigation/native";
 
 const imagenesProfesores = {
   "JuanPerezGomez.webp": require("../../images/FotosPerfil/JuanPerezGomez.webp"),
@@ -14,6 +19,7 @@ const imagenesProfesores = {
 
 export default function Home() {
   const { darkMode } = useTheme();
+  const navigation = useNavigation();
 
   return (
     <View style={[styles.container, { backgroundColor: darkMode ? "#111" : "#ff5733" }]}>
@@ -31,14 +37,14 @@ export default function Home() {
               nivel={item.dificultad}
               idioma={item.idioma}
               profesorImagen={profesorImagen}
-              onChatPress={() => console.log(`Chat con ${item.nombre}`)}
+              onChatPress={() => navigation.navigate("Mensajes", { profesor: item.nombre })}
               onSolicitudPress={() => console.log(`Solicitud a ${item.nombre}`)}
             />
           );
         }}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false} 
-        keyboardShouldPersistTaps="handled" 
+        keyboardShouldPersistTaps="handled" // Evita que los toques sean bloqueados por el teclado
       />
     </View>
   );

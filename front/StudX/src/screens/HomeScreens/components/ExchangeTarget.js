@@ -1,65 +1,68 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, ImageBackground, Image, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+  Image,
+  Dimensions
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../../context/ThemeContext";
-import { useNavigation } from "@react-navigation/native"; 
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-// Importar todas las banderas de forma estática
 const banderas = {
-  Spanish: require("../../../images/Banderas/ES.png"),
-  English: require("../../../images/Banderas/GB.png"),
-  French: require("../../../images/Banderas/FR.png"),
-  German: require("../../../images/Banderas/DE.png"),
-  Italian: require("../../../images/Banderas/IT.png"),
-  Portuguese: require("../../../images/Banderas/PT.png"),
-  Dutch: require("../../../images/Banderas/NL.png"),
-  Russian: require("../../../images/Banderas/RU.png"),
-  Chinese: require("../../../images/Banderas/CN.png"),
-  Japanese: require("../../../images/Banderas/JP.png"),
-  Korean: require("../../../images/Banderas/KR.png"),
-  Arabic: require("../../../images/Banderas/SA.png"),
-  Turkish: require("../../../images/Banderas/TR.png"),
-  Greek: require("../../../images/Banderas/GR.png"),
-  Swedish: require("../../../images/Banderas/SE.png"),
-  Norwegian: require("../../../images/Banderas/NO.png"),
-  Danish: require("../../../images/Banderas/DK.png"),
-  Finnish: require("../../../images/Banderas/FI.png"),
-  Polish: require("../../../images/Banderas/PL.png"),
-  Czech: require("../../../images/Banderas/CZ.png"),
-  Hungarian: require("../../../images/Banderas/HU.png"),
-  Hebrew: require("../../../images/Banderas/IL.png"),
-  Thai: require("../../../images/Banderas/TH.png"),
-  Hindi: require("../../../images/Banderas/IN.png"),
-  Vietnamese: require("../../../images/Banderas/VN.png"),
-  Indonesian: require("../../../images/Banderas/ID.png"),
-  Ukrainian: require("../../../images/Banderas/UA.png"),
-  Romanian: require("../../../images/Banderas/RO.png"),
-  Bulgarian: require("../../../images/Banderas/BG.png"),
-  Malay: require("../../../images/Banderas/MY.png"),
-  Filipino: require("../../../images/Banderas/PH.png"),
-  Persian: require("../../../images/Banderas/IR.png"),
+  Spanish: { img: require("../../../images/Banderas/ES.png"), emoji: "🇪🇸" },
+  English: { img: require("../../../images/Banderas/GB.png"), emoji: "🇬🇧" },
+  French: { img: require("../../../images/Banderas/FR.png"), emoji: "🇫🇷" },
+  German: { img: require("../../../images/Banderas/DE.png"), emoji: "🇩🇪" },
+  Italian: { img: require("../../../images/Banderas/IT.png"), emoji: "🇮🇹" },
+  Portuguese: { img: require("../../../images/Banderas/PT.png"), emoji: "🇵🇹" },
+  Dutch: { img: require("../../../images/Banderas/NL.png"), emoji: "🇳🇱" },
+  Russian: { img: require("../../../images/Banderas/RU.png"), emoji: "🇷🇺" },
+  Chinese: { img: require("../../../images/Banderas/CN.png"), emoji: "🇨🇳" },
+  Japanese: { img: require("../../../images/Banderas/JP.png"), emoji: "🇯🇵" },
+  Korean: { img: require("../../../images/Banderas/KR.png"), emoji: "🇰🇷" },
+  Arabic: { img: require("../../../images/Banderas/SA.png"), emoji: "🇸🇦" },
+  Turkish: { img: require("../../../images/Banderas/TR.png"), emoji: "🇹🇷" },
 };
 
-export default function ExchangeTarget({ 
-  centro, 
-  profesor, 
-  alumnos, 
-  nivel, 
-  profesorImagen, 
+
+const nivelColors = {
+  A1: "#A5D6A7", // Verde claro
+  A2: "#4CAF50", // Verde más oscuro
+  B1: "#FFB74D", // Naranja claro
+  B2: "#FF9800", // Naranja fuerte
+  C1: "#E57373", // Rojo claro
+  C2: "#D32F2F", // Rojo fuerte
+};
+
+
+export default function ExchangeTarget({
+  centro,
+  profesor,
+  alumnos,
+  nivel,
+  profesorImagen,
   idioma,
-  onSolicitudPress 
+  onSolicitudPress,
+  onChatPress
 }) {
   const { darkMode } = useTheme();
   const navigation = useNavigation();
 
-  // Obtener la bandera correspondiente o una predeterminada
-  const banderaPath = banderas[idioma] || require("../../../images/Banderas/ES.png");
+  // Obtener la bandera y el emoji del idioma o usar valores predeterminados
+  const banderaInfo = banderas[idioma] || { img: require("../../../images/Banderas/ES.png"), emoji: "🌍" };
 
   return (
-    <ImageBackground source={banderaPath} style={[styles.card, { width: width * 0.9, maxWidth: 400 }]} resizeMode="cover">
-      
+    <ImageBackground
+      source={banderaInfo.img}
+      style={[styles.card, { width: width * 0.9, maxWidth: 400 }]}
+      resizeMode="cover"
+    >
       <View style={styles.overlay}>
         <Text style={[styles.title, { color: darkMode ? "white" : "black" }]} numberOfLines={1} ellipsizeMode="tail">
           {centro}
@@ -76,60 +79,45 @@ export default function ExchangeTarget({
           </Text>
         </View>
 
-        <Text style={[styles.text, { color: darkMode ? "lightgray" : "black" }]}>
-          🎓 Alumnos: {alumnos}
-        </Text>
-        <Text style={[styles.text, { color: darkMode ? "lightgray" : "black" }]}>
-          📚 Nivel: {nivel.toUpperCase()}
-        </Text>
 
-        <Text style={[styles.text, { color: darkMode ? "lightgray" : "black" }]}>
-          {idioma === "Spanish" ? "🇪🇸" : 
-          idioma === "English" ? "🇬🇧" : 
-          idioma === "French" ? "🇫🇷" : 
-          idioma === "German" ? "🇩🇪" : 
-          idioma === "Italian" ? "🇮🇹" : 
-          idioma === "Portuguese" ? "🇵🇹" : 
-          idioma === "Dutch" ? "🇳🇱" : 
-          idioma === "Russian" ? "🇷🇺" : 
-          idioma === "Chinese" ? "🇨🇳" : 
-          idioma === "Japanese" ? "🇯🇵" : 
-          idioma === "Korean" ? "🇰🇷" : 
-          idioma === "Arabic" ? "🇸🇦" : 
-          idioma === "Turkish" ? "🇹🇷" : 
-          idioma === "Greek" ? "🇬🇷" : 
-          idioma === "Swedish" ? "🇸🇪" : 
-          idioma === "Norwegian" ? "🇳🇴" : 
-          idioma === "Danish" ? "🇩🇰" : 
-          idioma === "Finnish" ? "🇫🇮" : 
-          idioma === "Polish" ? "🇵🇱" : 
-          idioma === "Czech" ? "🇨🇿" : 
-          idioma === "Hungarian" ? "🇭🇺" : 
-          idioma === "Hebrew" ? "🇮🇱" : 
-          idioma === "Thai" ? "🇹🇭" : 
-          idioma === "Hindi" ? "🇮🇳" : 
-          idioma === "Vietnamese" ? "🇻🇳" : 
-          idioma === "Indonesian" ? "🇮🇩" : 
-          idioma === "Ukrainian" ? "🇺🇦" : 
-          idioma === "Romanian" ? "🇷🇴" : 
-          idioma === "Bulgarian" ? "🇧🇬" : 
-          idioma === "Malay" ? "🇲🇾" : 
-          idioma === "Filipino" ? "🇵🇭" : 
-          idioma === "Persian" ? "🇮🇷" : "🌍"} Idioma: {idioma}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ color: "black", fontSize: 16 }}>🌍 Idioma: </Text>
+          <Text style={{ fontSize: 16, fontWeight: "bold" }}>{idioma} {banderaInfo.emoji}</Text>
+        </View>
+
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ color: "black", fontSize: 16 }}>📚 Nivel: </Text>
+          <View style={[styles.highlightContainer, { backgroundColor: nivelColors[nivel] || "#A5D6A7" }]}>
+            <Text style={styles.highlightText}>{nivel.toUpperCase()}</Text>
+          </View>
+        </View>
+
+
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={{ color: "black", fontSize: 16 }}>🎓 Alumnos: </Text>
+          <Text style={{ fontSize: 16, fontWeight: "bold" }}>{alumnos}</Text>
+        </View>
 
         <View style={styles.buttonContainer}>
-          <Pressable style={[styles.button, styles.chatButton]} onPress={() => navigation.navigate("Mensajes", { profesor })}>
+          <TouchableOpacity
+            style={[styles.button, styles.chatButton]}
+            onPress={onChatPress}
+            activeOpacity={0.7}
+          >
             <Ionicons name="chatbubble-outline" size={20} color="white" />
             <Text style={styles.buttonText}>Chatear</Text>
-          </Pressable>
-          <Pressable style={[styles.button, styles.solicitudButton]} onPress={onSolicitudPress}>
-            <Ionicons name="send-outline" size={20} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.solicitudButton]}
+            onPress={onSolicitudPress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="document-text-outline" size={20} color="white" />
             <Text style={styles.buttonText}>Solicitar</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
-
     </ImageBackground>
   );
 }
@@ -144,9 +132,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   overlay: {
-    backgroundColor: "white", 
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 12,
+    borderColor: "#cecfc7",
+    borderWidth: 0.5
   },
   title: {
     fontSize: 20,
@@ -167,11 +157,45 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     marginBottom: 5,
+    textAlign: "left"
+  },
+  highlightContainer: {
+    backgroundColor: "#A5D6A7", // Verde clarito
+    paddingVertical: 4,
+    paddingHorizontal: 7,
+    borderRadius: 8,
+    alignSelf: "flex-start", // Ajusta al tamaño del texto
+    marginBottom: 5,
+  },
+  highlightText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
   },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    elevation: 3,
+  },
+  chatButton: {
+    backgroundColor: "#1E88E5",
+  },
+  solicitudButton: {
+    backgroundColor: "#FF5722",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
 });
-
