@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, TouchableOpacity, Text, Dimensions, Image, PixelRatio, KeyboardAvoidingView, Platform } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { 
+  View, StyleSheet, TouchableOpacity, Text, Dimensions, Image, PixelRatio, KeyboardAvoidingView, Platform 
+} from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import Home from "../HomeScreens/Home";
 import Perfil from "../PerfilScreens/Perfil";
@@ -13,6 +16,7 @@ const { width, height } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const { darkMode, setDarkMode } = useTheme();
+  const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
   const modo = darkMode ? "Modo Claro" : "Modo Oscuro";
 
@@ -36,10 +40,17 @@ export default function HomeScreen() {
             </View>
           ),
           headerRight: () => (
-            <View style={styles.menuContainer}>
-              <TouchableOpacity onPress={() => setMenuVisible(!menuVisible)}>
+            <View style={styles.headerRightContainer}>
+              {/* Botón "+" más grande */}
+              <TouchableOpacity onPress={() => navigation.navigate("CrearIntercambio")} style={styles.addButton}>
+                <Ionicons name="add-circle-outline" size={PixelRatio.getPixelSizeForLayoutSize(12)} color={darkMode ? "white" : "black"} />
+              </TouchableOpacity>
+
+              {/* Menú de opciones */}
+              <TouchableOpacity onPress={() => setMenuVisible(!menuVisible)} style={styles.menuButton}>
                 <Ionicons name="ellipsis-vertical" size={PixelRatio.getPixelSizeForLayoutSize(8)} color={darkMode ? "white" : "black"} />
               </TouchableOpacity>
+
               {menuVisible && (
                 <View style={[styles.menuDropdown, { backgroundColor: darkMode ? "#333" : "white", right: 0 }]}> 
                   <TouchableOpacity style={styles.menuItem} onPress={() => { setDarkMode(!darkMode); setMenuVisible(false); }}>
@@ -84,8 +95,18 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerRightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: width * 0.03,
+  },
+  addButton: {
+    marginRight: width * 0.05, // Espacio entre "+" y el menú
+  },
+  menuButton: {
+    padding: width * 0.015, // Aumenta el área táctil sin afectar diseño
+  },
   menuContainer: {
-    marginRight: 0,
     position: "relative",
     alignItems: "flex-end",
   },
@@ -119,3 +140,4 @@ const styles = StyleSheet.create({
     paddingVertical: height * 0.015,
   },
 });
+
