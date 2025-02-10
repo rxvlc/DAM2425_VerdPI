@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import ExchangeTarget from "./components/ExchangeTarget";
 import profesores from "../../BDD/Profesores";
+import createdExchanges from "../../BDD/CreatedExchanges";
 
 const imagenesProfesores = {
   "JuanPerezGomez.webp": require("../../images/FotosPerfil/JuanPerezGomez.webp"),
@@ -17,7 +18,7 @@ export default function Home() {
   return (
     <View style={[styles.container, { backgroundColor: darkMode ? "#111" : "#ff5733" }]}>
       <FlatList
-        data={profesores}
+        data={createdExchanges}
         keyExtractor={(profesor) => profesor.id.toString()}
         renderItem={({ item }) => {
           const profesorImagen = imagenesProfesores[item.imagen] || require("../../images/FotosPerfil/img1.jpg");
@@ -27,7 +28,7 @@ export default function Home() {
               centro={item.centro}
               profesor={item.nombre}
               alumnos={"30"}
-              nivel={item.materia}
+              nivel={item.dificultad}
               profesorImagen={profesorImagen}
               onChatPress={() => console.log(`Chat con ${item.nombre}`)}
               onSolicitudPress={() => console.log(`Solicitud a ${item.nombre}`)}
