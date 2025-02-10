@@ -10,6 +10,8 @@ public class Token {
 	@Id
 	private String id;
 	String userId;
+	
+
 	private String token;
 	private Instant expirationDate;
 
@@ -26,5 +28,12 @@ public class Token {
 
 	public void setExpirationDate(Instant expirationDate) {
 		this.expirationDate = expirationDate;
+	}
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

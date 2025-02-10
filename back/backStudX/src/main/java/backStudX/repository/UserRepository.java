@@ -9,7 +9,7 @@ import backStudX.model.User;
 public interface UserRepository extends MongoRepository<User, String> {
 
 	@Query(value = "{ 'email' : ?0 }")
-	List<User> findUserMail(String email);
+	User findUserMail(String email);
 
 }
 	

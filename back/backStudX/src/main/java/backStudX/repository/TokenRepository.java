@@ -9,8 +9,11 @@ import backStudX.model.Token;
 
 public interface TokenRepository extends MongoRepository<Token, String> {
 
-	@Query(value = "{'emailUser' : ?0, 'token' : ?1 }")
-	List<Token> findUserTokens(String emailUser, String token);
-
+	@Query(value = "{'userId' : ?0")
+	List<Token> findUserTokens(String emailUser);
+	
+	@Query(value = "{token : ?0}")
+	Token findToken(String token);
+	
 	
 }
