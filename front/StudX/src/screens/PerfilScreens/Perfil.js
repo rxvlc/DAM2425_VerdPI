@@ -14,13 +14,15 @@ import {
 import { Avatar, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Dimensions } from 'react-native';
+import { useTheme } from "../../context/ThemeContext";
 
-const { width } = Dimensions.get('window'); // Obtiene el ancho de la pantalla
+const { width } = Dimensions.get('window'); 
 
 const Perfil = () => {
   const [fotoPerfil, setFotoPerfil] = useState(
     require('../../images/fotoPerfil.jpg')
   );
+  const { darkMode } = useTheme();
   const [fotoFondo, setFotoFondo] = useState(require('../../images/fotoFondo.jpg'));
   const [hasPermission, setHasPermission] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -72,7 +74,7 @@ const Perfil = () => {
   if (!hasPermission) {
     return (
       <View style={styles.container}>
-        <Text style={{ textAlign: 'center' }}>
+        <Text style={{ textAlign: 'center'}}>
           We need your permission to show the camera
         </Text>
         <Pressable onPress={openCamera} style={styles.buttonText}>
@@ -115,9 +117,9 @@ const Perfil = () => {
 
 
 
-      <View style={styles.infoContainer}>
+      <View style={[styles.infoContainer, {backgroundColor: darkMode? "#111":"#fff"}]}>
         <ScrollView>
-          <Text style={styles.label}>Nombre</Text>
+          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Nombre</Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
             value={name}
@@ -125,7 +127,7 @@ const Perfil = () => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <Text style={styles.label}>Correo</Text>
+          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Correo</Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
             value={email}
@@ -133,7 +135,7 @@ const Perfil = () => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <Text style={styles.label}>Rol</Text>
+          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Rol</Text>
           <Picker
             selectedValue={rol}
             onValueChange={(itemValue) => setRol(itemValue)}
@@ -142,7 +144,7 @@ const Perfil = () => {
             <Picker.Item label="Profesor" value="Profesor" />
           </Picker>
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Password</Text>
           <View style={styles.passwordContainer}>
             <TextInput
               style={[styles.textInput, isFocused && styles.inputFocused]}
@@ -178,13 +180,12 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 65,
-    backgroundColor: '#ecf0f1',
     paddingHorizontal: 15,
   },
   coverImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover', // Ajusta la imagen para que cubra sin deformarse
+    resizeMode: 'cover',
     justifyContent: 'center',
   },
   avatarContainer: {
@@ -193,11 +194,11 @@ const styles = StyleSheet.create({
     borderColor: '#4CAF50',
   },
   avatarWrapper: {
-    position: 'absolute', // Permite colocarlo sobre la imagen de fondo
-    left: 0, // Lo alinea a la izquierda
-    bottom: 0, // Lo alinea completamente abajo
-    alignItems: 'flex-start', // Asegura que el contenido esté alineado a la izquierda
-    padding: 10, // Espacio opcional para que no quede pegado al borde
+    position: 'absolute', 
+    left: 0, 
+    bottom: 0,
+    alignItems: 'flex-start', 
+    padding: 10, 
 },
 
   cameraIconPerfil: {
@@ -208,23 +209,23 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'grey',
-    elevation: 3, // Sombra en Android
-    shadowColor: '#000', // Sombra en iOS
+    elevation: 3, 
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
   cameraIconFondo: {
-    position: 'absolute', // Permite posicionarlo libremente
-    top: 10, // Lo mueve hacia la parte superior
-    right: 10, // Lo mueve hacia la derecha
+    position: 'absolute',
+    top: 10, 
+    right: 10, 
     backgroundColor: 'white',
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'grey',
-    padding: 5, // Opcional: Agrega algo de espacio interno
-    elevation: 5, // Sombra en Android
-    shadowColor: '#000', // Sombra en iOS
+    padding: 5, 
+    elevation: 5, 
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,

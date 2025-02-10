@@ -4,16 +4,16 @@ import { useTheme } from '../../../context/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const screenWidth = Dimensions.get('window').width;
-const maxImageWidth = screenWidth * 0.6; // La imagen ocupará hasta el 60% del ancho de la pantalla
+const maxImageWidth = screenWidth * 0.6; 
 
 export default function Mensaje({ mensaje }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const { darkMode } = useTheme(); // Obtener modo oscuro
+  const { darkMode } = useTheme(); 
 
   return (
     <View
       style={[
-        mensaje.image || mensaje.document ? styles.fileContainer : styles.messageContainer, // Aplica estilos distintos
+        mensaje.image? styles.fileContainer : styles.messageContainer,
         darkMode
           ? mensaje.isOwn
             ? styles.darkOwnMessage
@@ -33,7 +33,6 @@ export default function Mensaje({ mensaje }) {
             <Image source={{ uri: mensaje.image }} style={styles.messageImage} />
           </TouchableOpacity>
 
-          {/* Modal para ver la imagen en pantalla completa */}
           <Modal visible={modalVisible} transparent={true} animationType="fade">
             <View style={styles.modalContainer}>
               <TouchableOpacity

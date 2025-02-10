@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { 
   View, 
   FlatList, 
@@ -6,45 +6,74 @@ import {
   TouchableOpacity, 
   Text, 
   TouchableWithoutFeedback, 
-  Dimensions, 
   Image 
 } from 'react-native';
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
+import profesores from "../../BDD/Profesores"; // Importamos la lista de profesores
 
-const screenWidth = Dimensions.get('window').width;
-
-const getImageSource = (imageName) => {
-  const images = {
-    'img1.jpg': require('../../images/FotosPerfil/img2.jpg'),
-    'img2.jpg': require('../../images/FotosPerfil/img1.jpg'),
-  };
-  return images[imageName] || require('../../images/FotosPerfil/img2.jpg');
+// Función para obtener la imagen correcta del profesor
+const images = {
+  "JuanPerezGomez.webp": require("../../images/FotosPerfil/JuanPerezGomez.webp"),
+  "MariaRodriguezLopez.webp": require("../../images/FotosPerfil/MariaRodriguezLopez.webp"),
+  "CarlosFernandezMartinez.webp": require("../../images/FotosPerfil/CarlosFernandezMartinez.webp"),
+  "AnaSanchezRuiz.webp": require("../../images/FotosPerfil/AnaSanchezRuiz.webp"),
+  "default": require("../../images/FotosPerfil/img1.jpg") // Imagen por defecto
 };
 
-export default function Mensajes() {
+const getImageSource = (imageName) => {
+  return images[imageName] || images["default"];
+};
+
+export default function Mensajes({ route }) {
   const { darkMode } = useTheme();
   const navigation = useNavigation();
   const [selectedChatIds, setSelectedChatIds] = useState(new Set());
 
-  const [chats, setChats] = useState([
-    { id: '1', name: 'Juan', image: 'img1.jpg', messages: [
-        { id: 'm1', text: 'Hola, ¿cómo estás?', isOwn: false },
-        { id: 'm2', text: 'Con tu madre y tú?', isOwn: true }
-      ]
-    },
-    { id: '2', name: 'Maria', image: 'img2.jpg', messages: [
-        { id: 'm3', text: 'Nos vemos luego. Deberíamos de mirar cómo implementamos todo esto en la app', isOwn: false },
-        { id: 'm4', text: 'Sí, hasta pronto.', isOwn: true }
-      ]
+ 
+  const [chats, setChats] = useState(
+    profesores.map((profesor) => ({
+      id: profesor.id,
+      name: profesor.nombre,
+      image: profesor.imagen,
+      messages: [], //chats inician VACIOS
+    }))
+  );
+
+  // Verifica si se ha recibido un profesor desde `ExchangeTarget.js`
+  useEffect(() => {
+    if (route.params?.profesor) {
+      const profesorNombre = route.params.profesor;
+      const profesorData = profesores.find((p) => p.nombre === profesorNombre);
+
+      // Verificar si ya existe un chat con este profesor
+      const chatExistente = chats.find((chat) => chat.name === profesorNombre);
+
+      if (!chatExistente && profesorData) {
+        // 🔹 Crear un nuevo chat SIN mensajes y con la imagen correcta
+        const nuevoChat = {
+          id: `${Date.now()}`, // ID unico
+          name: profesorNombre,
+          image: profesorData.imagen, // Usar imagen del profesor
+          messages: [], // 🔹 Chat vacío
+        };
+
+        setChats([...chats, nuevoChat]);
+
+        // Navegar automáticamente al chat
+        setTimeout(() => {
+          navigation.navigate("ChatScreen", { chat: nuevoChat });
+        }, 100);
+      } else {
+        // Si ya existe, solo navegar al chat existente
+        navigation.navigate("ChatScreen", { chat: chatExistente });
+      }
     }
-  ]);
+  }, [route.params]);
 
-  // Actualizar el header dinámicamente
+  // Actualizar el header 
   useLayoutEffect(() => {
-    console.log("Updating header with selected chats:", selectedChatIds.size);
-
     if (selectedChatIds.size > 0) {
       navigation.setOptions({
         headerTitle: `${selectedChatIds.size} seleccionado(s)`,
@@ -54,18 +83,14 @@ export default function Mensajes() {
           </TouchableOpacity>
         ),
         headerRight: () => (
-          <View style={{ flexDirection: 'row', marginRight: 15 }}>
-          
-            {/* Botón para eliminar */}
-            <TouchableOpacity onPress={eliminarChats} style={styles.iconButton}>
-              <MaterialIcons name="delete" size={28} color="black" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={eliminarChats} style={styles.iconButton}>
+            <MaterialIcons name="delete" size={28} color="black" />
+          </TouchableOpacity>
         ),
       });
     } else {
       navigation.setOptions({
-        headerTitle: 'Mensajes',
+        headerTitle: "Mensajes",
         headerLeft: null,
         headerRight: null,
       });
@@ -76,7 +101,7 @@ export default function Mensajes() {
     if (selectedChatIds.size > 0) {
       toggleChatSelection(chat.id);
     } else {
-      navigation.navigate('ChatScreen', { chat });
+      navigation.navigate("ChatScreen", { chat });
     }
   };
 
@@ -85,7 +110,7 @@ export default function Mensajes() {
   };
 
   const toggleChatSelection = (id) => {
-    setSelectedChatIds(prevSelected => {
+    setSelectedChatIds((prevSelected) => {
       const newSelected = new Set(prevSelected);
       if (newSelected.has(id)) {
         newSelected.delete(id);
@@ -97,15 +122,13 @@ export default function Mensajes() {
   };
 
   const eliminarChats = () => {
-    setChats(chats.filter(chat => !selectedChatIds.has(chat.id)));
+    setChats(chats.filter((chat) => !selectedChatIds.has(chat.id)));
     setSelectedChatIds(new Set());
   };
 
- 
-
   return (
     <TouchableWithoutFeedback onPress={() => setSelectedChatIds(new Set())}>
-      <View style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}> 
+      <View style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}>
         <FlatList
           data={chats}
           keyExtractor={(item) => item.id}
@@ -114,8 +137,8 @@ export default function Mensajes() {
               onPress={() => handleChatPress(item)}
               onLongPress={() => handleChatLongPress(item.id)}
               style={[
-                styles.chatWrapper, 
-                darkMode ? styles.darkChatWrapper : styles.lightChatWrapper, 
+                styles.chatWrapper,
+                darkMode ? styles.darkChatWrapper : styles.lightChatWrapper,
                 selectedChatIds.has(item.id) && styles.selectedChat
               ]}
             >
@@ -132,7 +155,7 @@ export default function Mensajes() {
                   {item.name}
                 </Text>
                 <Text style={[styles.lastMessage, darkMode ? styles.darkSubText : styles.lightSubText]}>
-                  {item.messages[item.messages.length - 1]?.text}
+                  {item.messages.length > 0 ? item.messages[item.messages.length - 1]?.text : "Nuevo chat"}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -149,31 +172,31 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   darkContainer: {
-    backgroundColor: '#111',
+    backgroundColor: "#111",
   },
   lightContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   chatWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 15,
     borderBottomWidth: 1,
     borderRadius: 8,
   },
   darkChatWrapper: {
-    backgroundColor: '#222',
-    borderBottomColor: '#555',
+    backgroundColor: "#222",
+    borderBottomColor: "#555",
   },
   lightChatWrapper: {
-    backgroundColor: 'white',
-    borderBottomColor: '#ccc',
+    backgroundColor: "white",
+    borderBottomColor: "#ccc",
   },
   selectedChat: {
-    backgroundColor: 'tomato',
+    backgroundColor: "tomato",
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
   },
   profileImage: {
     width: 50,
@@ -181,10 +204,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   checkOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     right: 0,
-    backgroundColor: 'green',
+    backgroundColor: "green",
     borderRadius: 12,
     padding: 2,
   },
@@ -194,22 +217,22 @@ const styles = StyleSheet.create({
   },
   chatTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   lastMessage: {
     fontSize: 14,
   },
   darkText: {
-    color: 'white',
+    color: "white",
   },
   lightText: {
-    color: 'black',
+    color: "black",
   },
   darkSubText: {
-    color: 'lightgray',
+    color: "lightgray",
   },
   lightSubText: {
-    color: 'gray',
+    color: "gray",
   },
   iconButton: {
     marginHorizontal: 10,

@@ -6,6 +6,19 @@ import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import Mensaje from "../Components/Mensaje";
 
+
+const images = {
+  "JuanPerezGomez.webp": require("../../../images/FotosPerfil/JuanPerezGomez.webp"),
+  "MariaRodriguezLopez.webp": require("../../../images/FotosPerfil/MariaRodriguezLopez.webp"),
+  "CarlosFernandezMartinez.webp": require("../../../images/FotosPerfil/CarlosFernandezMartinez.webp"),
+  "AnaSanchezRuiz.webp": require("../../../images/FotosPerfil/AnaSanchezRuiz.webp"),
+  "default": require("../../../images/FotosPerfil/img1.jpg") // Imagen por defecto
+};
+
+const getImageSource = (imageName) => {
+  return images[imageName] || images["default"];
+};
+
 export default function ChatScreen({ route }) {
   const { chat } = route.params;
   const { darkMode } = useTheme();
@@ -52,14 +65,6 @@ export default function ChatScreen({ route }) {
     }
   };
 
-  const getImageSource = (imageName) => {
-    const images = {
-      'img1.jpg': require('../../../images/FotosPerfil/img2.jpg'),
-      'img2.jpg': require('../../../images/FotosPerfil/img1.jpg'),
-    };
-    return images[imageName] || require('../../../images/FotosPerfil/img1.jpg');
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: darkMode ? '#121212' : '#fff' }]}> 
       <View style={styles.headerContainer}>
@@ -69,12 +74,16 @@ export default function ChatScreen({ route }) {
         <Image source={getImageSource(chat.image)} style={styles.profileImage} />
         <Text style={[styles.tituloChat, { color: darkMode ? "white" : "black" }]}>{chat.name}</Text>
       </View>
+
+     
       <FlatList
         ref={flatListRef}
         data={mensajes}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <Mensaje mensaje={item} darkMode={darkMode} />}
       />
+
+     
       <View style={[styles.inputContainer, { backgroundColor: darkMode ? '#1E1E1E' : '#fff', borderColor: darkMode ? "#555" : "#ccc" }]}> 
         <TouchableOpacity onPress={enviarFoto} style={styles.botonAdjuntar}>
           <Ionicons name="image" size={24} color={darkMode ? "white" : "black"} />
@@ -110,9 +119,9 @@ const styles = StyleSheet.create({
     top: 10,
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     marginBottom: 5,
   },
   tituloChat: {
