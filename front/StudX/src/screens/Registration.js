@@ -5,10 +5,6 @@ import DropDownPicker from "react-native-dropdown-picker";
 export default function Registration({ navigation }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
-    { label: "Profesor", value: "profesor" },
-    { label: "Alumno", value: "alumno" },
-  ]);
 
   return (
     <View style={styles.container}>
@@ -19,18 +15,8 @@ export default function Registration({ navigation }) {
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />
         <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" />
-        <DropDownPicker
-          open={open}
-          value={value}
-          items={items}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          placeholder="Selecciona tu rol"
-          style={styles.dropdown}
-          dropDownContainerStyle={styles.dropdownContainer}
-        />
         <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" secureTextEntry />
+        <TextInput style={styles.input} placeholder="Universidad" placeholderTextColor="#888" secureTextEntry/>
       </View>
       <View style={styles.zonaBoton}>
         <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("Pantallas")}>
