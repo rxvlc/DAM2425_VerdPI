@@ -2,15 +2,23 @@ package backStudX.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.catalina.connector.Response;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 import backStudX.SendEmail;
 
 import backStudX.Util;
+import backStudX.model.Exchange;
 import backStudX.model.Token;
 import backStudX.model.User;
+import backStudX.repository.ExchangeRepository;
 import backStudX.repository.TokenRepository;
 import backStudX.repository.UserRepository;
 
@@ -33,8 +43,12 @@ public class Controller {
 
 	@Autowired
 	UserRepository userRepository;
+	
 	@Autowired
 	TokenRepository tokenRepository;
+	
+	@Autowired
+	ExchangeRepository exchangeRepository;
 
 	@PostMapping("/api/auth/register")
 	ResponseEntity<String> registerUser(@RequestBody String userData) {
@@ -114,41 +128,80 @@ public class Controller {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
-	
+
 	@PostMapping("/api/auth/forgotPassword")
-	ResponseEntity<String> forgotPassword(@RequestBody String userMail){
-		File credentials = new File("./pw.json");
-		String content = "";
-        try {
-			content = new String(Files.readAllBytes(credentials.toPath()));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        if(!content.equals("")) {
-    		JSONObject mailCredentials = new JSONObject(content);
-    		String email = mailCredentials.getString("mail");
-    		String password = mailCredentials.getString("psw");
-    		System.out.println(userMail);
-    		if(!userMail.equals("")) {
+	public ResponseEntity<String> forgotPassword(@RequestBody String userMail) {
+	    String content = "";
+	    try {
+	        // Accedemos al archivo pw.json desde el classpath
+	        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("pw.json");
 
-        		SendEmail.sendMail(email, password, userMail);
-        		return ResponseEntity.status(HttpStatus.OK).build();
-    		}
-        }
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	        if (inputStream == null) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se encontró el archivo de credenciales.");
+	        }
+
+	        // Leemos el contenido del archivo
+	        content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+
+	    if (!content.isEmpty()) {
+	        JSONObject mailCredentials = new JSONObject(content);
+	        String email = mailCredentials.getString("mail");
+	        String password = mailCredentials.getString("psw");
+	        
+	        if (!userMail.isEmpty()) {
+	            SendEmail.sendMail(email, password, userMail);
+	            return ResponseEntity.status(HttpStatus.OK).build();
+	        }
+	    }
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
-	
+
 	@PostMapping("/api/auth/reset-password")
-	ResponseEntity<String> resetPassword(){
-		
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-	}
-	
-	@PostMapping("/api/exchanges")
-	ResponseEntity<String> createExchange(){
+	ResponseEntity<String> resetPassword() {
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}
+
+	@PostMapping("/api/exchanges")
+	ResponseEntity<String> createExchange(@RequestBody String exchange) {
+	    try {
+	        JSONObject objectExchange = new JSONObject(exchange);
+
+	        String nativeLanguage = objectExchange.getString("nativeLanguage");
+	        String targetLanguage = objectExchange.getString("targetLanguage");
+	        String educationalLevel = objectExchange.getString("educationalLevel");
+	        int academicLevel = objectExchange.getInt("academicLevel");
+	        String idTeacherCreator = objectExchange.getString("idTeacherCreator");
+
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	        LocalDate beginDate = LocalDate.parse(objectExchange.getString("beginDate"), formatter);
+	        LocalDate endDate = LocalDate.parse(objectExchange.getString("endDate"), formatter);
+
+	        Date beginDateMongo = Date.from(beginDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	        Date endDateMongo = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+	        
+	        int quantityStudents = objectExchange.getInt("quantityStudents");
+	        String university = objectExchange.getString("university");
+
+	        // Crear el objeto Exchange
+	        Exchange newExchange = new Exchange(nativeLanguage, targetLanguage, educationalLevel, academicLevel,
+	                idTeacherCreator, beginDateMongo, endDateMongo, quantityStudents, university);
+
+	        exchangeRepository.save(newExchange);
+
+	        return ResponseEntity.status(HttpStatus.CREATED).build();
+	    } catch (Exception e) {
+	        // Manejo de excepciones
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al procesar la solicitud: " + e.getMessage());
+	    }
+	}
+	
+	
 
 }

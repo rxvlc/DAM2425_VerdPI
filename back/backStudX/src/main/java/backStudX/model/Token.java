@@ -10,8 +10,6 @@ public class Token {
 	@Id
 	private String id;
 	String userId;
-	
-
 	private String token;
 	private Instant expirationDate;
 
