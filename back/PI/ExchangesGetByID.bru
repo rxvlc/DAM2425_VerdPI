@@ -1,0 +1,15 @@
+meta {
+  name: ExchangesGetByID
+  type: http
+  seq: 15
+}
+
+get {
+  url: http://localhost:8080/api/exchanges/?exchangeId=67aa1d9e0efc842f927ada60
+  body: json
+  auth: none
+}
+
+params:query {
+  exchangeId: 67aa1d9e0efc842f927ada60
+}

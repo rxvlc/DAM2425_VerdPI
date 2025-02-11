@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.catalina.connector.Response;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import backStudX.SendEmail;
 
 import backStudX.Util;
+import backStudX.Services.ExchangeService;
 import backStudX.model.Exchange;
 import backStudX.model.Token;
 import backStudX.model.User;
@@ -43,12 +45,15 @@ public class Controller {
 
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	TokenRepository tokenRepository;
-	
+
 	@Autowired
 	ExchangeRepository exchangeRepository;
+
+	@Autowired
+	private ExchangeService exchangeService;
 
 	@PostMapping("/api/auth/register")
 	ResponseEntity<String> registerUser(@RequestBody String userData) {
@@ -131,35 +136,36 @@ public class Controller {
 
 	@PostMapping("/api/auth/forgotPassword")
 	public ResponseEntity<String> forgotPassword(@RequestBody String userMail) {
-	    String content = "";
-	    try {
-	        // Accedemos al archivo pw.json desde el classpath
-	        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("pw.json");
+		String content = "";
+		try {
+			// Accedemos al archivo pw.json desde el classpath
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream("pw.json");
 
-	        if (inputStream == null) {
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se encontró el archivo de credenciales.");
-	        }
+			if (inputStream == null) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("No se encontró el archivo de credenciales.");
+			}
 
-	        // Leemos el contenido del archivo
-	        content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+			// Leemos el contenido del archivo
+			content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	    }
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 
-	    if (!content.isEmpty()) {
-	        JSONObject mailCredentials = new JSONObject(content);
-	        String email = mailCredentials.getString("mail");
-	        String password = mailCredentials.getString("psw");
-	        
-	        if (!userMail.isEmpty()) {
-	            SendEmail.sendMail(email, password, userMail);
-	            return ResponseEntity.status(HttpStatus.OK).build();
-	        }
-	    }
-	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-	    
+		if (!content.isEmpty()) {
+			JSONObject mailCredentials = new JSONObject(content);
+			String email = mailCredentials.getString("mail");
+			String password = mailCredentials.getString("psw");
+
+			if (!userMail.isEmpty()) {
+				SendEmail.sendMail(email, password, userMail);
+				return ResponseEntity.status(HttpStatus.OK).build();
+			}
+		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
 	}
 
 	@PostMapping("/api/auth/reset-password")
@@ -170,41 +176,68 @@ public class Controller {
 
 	@PostMapping("/api/exchanges")
 	ResponseEntity<String> createExchange(@RequestBody String exchange) {
-	    try {
-	        JSONObject objectExchange = new JSONObject(exchange);
 
-	        String nativeLanguage = objectExchange.getString("nativeLanguage");
-	        String targetLanguage = objectExchange.getString("targetLanguage");
-	        String educationalLevel = objectExchange.getString("educationalLevel");
-	        int academicLevel = objectExchange.getInt("academicLevel");
-	        String idTeacherCreator = objectExchange.getString("idTeacherCreator");
+		try {
+			JSONObject objectExchange = new JSONObject(exchange);
 
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-	        LocalDate beginDate = LocalDate.parse(objectExchange.getString("beginDate"), formatter);
-	        LocalDate endDate = LocalDate.parse(objectExchange.getString("endDate"), formatter);
+			String token = objectExchange.getString("token");
+			Token t = tokenRepository.findToken(token);
+			if (t != null && !t.isExpired()) {
+				String nativeLanguage = objectExchange.getString("nativeLanguage");
+				String targetLanguage = objectExchange.getString("targetLanguage");
+				String educationalLevel = objectExchange.getString("educationalLevel");
+				int academicLevel = objectExchange.getInt("academicLevel");
+				String idTeacherCreator = objectExchange.getString("idTeacherCreator");
 
-	        Date beginDateMongo = Date.from(beginDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-	        Date endDateMongo = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+				LocalDate beginDate = LocalDate.parse(objectExchange.getString("beginDate"), formatter);
+				LocalDate endDate = LocalDate.parse(objectExchange.getString("endDate"), formatter);
 
-	        
-	        int quantityStudents = objectExchange.getInt("quantityStudents");
-	        String university = objectExchange.getString("university");
+				Date beginDateMongo = Date.from(beginDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				Date endDateMongo = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-	        // Crear el objeto Exchange
-	        Exchange newExchange = new Exchange(nativeLanguage, targetLanguage, educationalLevel, academicLevel,
-	                idTeacherCreator, beginDateMongo, endDateMongo, quantityStudents, university);
+				int quantityStudents = objectExchange.getInt("quantityStudents");
+				String university = objectExchange.getString("university");
 
-	        exchangeRepository.save(newExchange);
+				// Crear el objeto Exchange
+				Exchange newExchange = new Exchange(nativeLanguage, targetLanguage, educationalLevel, academicLevel,
+						idTeacherCreator, beginDateMongo, endDateMongo, quantityStudents, university);
 
-	        return ResponseEntity.status(HttpStatus.CREATED).build();
-	    } catch (Exception e) {
-	        // Manejo de excepciones
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al procesar la solicitud: " + e.getMessage());
-	    }
+				exchangeRepository.save(newExchange);
+
+				return ResponseEntity.status(HttpStatus.CREATED).build();
+			}else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+
+		} catch (Exception e) {
+			// Manejo de excepciones
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Error al procesar la solicitud: " + e.getMessage());
+		}
 	}
-	
-	
-	
-	
+
+	@RequestMapping("/api/exchanges")
+	public ResponseEntity<List<Exchange>> getExchanges(@RequestParam(required = false) String nativeLanguage,
+			@RequestParam(required = false) String targetLanguage,
+			@RequestParam(required = false) String educationalLevel,
+			@RequestParam(required = false) Integer academicLevel,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date beginDate,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+			@RequestParam(required = false) Integer quantityStudentsMin,
+			@RequestParam(required = false) Integer quantityStudentsMax,
+			@RequestParam(required = false) String university) {
+
+		List<Exchange> exchanges = exchangeService.searchExchanges(nativeLanguage, targetLanguage, educationalLevel,
+				academicLevel, beginDate, endDate, quantityStudentsMin, quantityStudentsMax, university);
+
+		return ResponseEntity.ok(exchanges);
+	}
+
+	@RequestMapping("/api/exchanges/")
+	public ResponseEntity<Optional<Exchange>> getExchangeById(@RequestParam(required = true) String exchangeId) {
+
+		return ResponseEntity.ok().body(exchangeRepository.findById(exchangeId));
+	}
 
 }
