@@ -39,11 +39,13 @@ import backStudX.SendEmail;
 import backStudX.Util;
 import backStudX.Services.ExchangeService;
 import backStudX.model.Exchange;
+import backStudX.model.Group;
 import backStudX.model.Token;
 import backStudX.model.User;
 import backStudX.model.Notifications;
 
 import backStudX.repository.ExchangeRepository;
+import backStudX.repository.GroupRepository;
 import backStudX.repository.NotificationsRepository;
 import backStudX.repository.TokenRepository;
 import backStudX.repository.UserRepository;
@@ -62,6 +64,9 @@ public class Controller {
 	
 	@Autowired
 	NotificationsRepository notificationRepository;
+	
+	@Autowired
+	GroupRepository groupRepository;
 
 	@Autowired
 	private ExchangeService exchangeService;
@@ -388,5 +393,67 @@ public class Controller {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
 		}
 	}
+	
+	
+	@PostMapping("/api/groups")
+	public ResponseEntity<String> createGroup(@RequestBody String group) {
+
+	    try {
+	        JSONObject objectGroup = new JSONObject(group);
+
+	        String token = objectGroup.getString("token");
+	        Token t = tokenRepository.findToken(token);
+	        if (t != null && !t.isExpired()) {
+	            // Obtener los datos de la solicitud
+	            String name = objectGroup.getString("name");
+	            int languajeLevel = objectGroup.getInt("languajeLevel");
+	            int quantity = objectGroup.getInt("quantity");
+	            String languaje = objectGroup.getString("languaje");
+
+	            // Crear el objeto Group
+	            Group newGroup = new Group(name, languajeLevel, quantity, languaje,t.getUserId());
+
+	            // Guardar el objeto en el repositorio
+	            groupRepository.save(newGroup);
+
+	            // Responder con estado creado
+	            return ResponseEntity.status(HttpStatus.CREATED).body("Group successfully created");
+	        } else {
+	            // Si el token es inválido o ha expirado
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+	        }
+
+	    } catch (Exception e) {
+	        // Manejo de excepciones
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("Error al procesar la solicitud: " + e.getMessage());
+	    }
+	}
+	
+	@RequestMapping("/api/groups")
+	public ResponseEntity<?> getGroupsWithIdOfTeacher(@RequestParam String token) {
+	    // Buscar el token en la base de datos
+	    Token t = tokenRepository.findToken(token);
+	    
+	    // Verificar si el token es válido y no ha expirado
+	    if (t != null && !t.isExpired()) {
+	        // Obtener los grupos asociados al ID del profesor
+	        Optional<Group> groupOptional = groupRepository.getGroupByTeacherId(t.getUserId());
+	        
+	        // Si el grupo existe, retornamos el grupo encontrado
+	        if (groupOptional.isPresent()) {
+	            return ResponseEntity.status(HttpStatus.OK).body(groupOptional.get());
+	        } else {
+	            // Si no se encuentra el grupo, retornamos un mensaje de error
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group not found for teacher.");
+	        }
+	    } else {
+	        // Si el token es inválido o ha expirado, retornamos un error
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+	    }
+	}
+
+	
+
 
 }

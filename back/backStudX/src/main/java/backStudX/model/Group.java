@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "groups")
-public class Groups {
+public class Group {
 	
 	@Id
 	String id;
@@ -12,13 +12,15 @@ public class Groups {
 	int languajeLevel;
 	int quantity;
 	String languaje;
-	
-	
-	public Groups(String name, int languajeLevel, int quantity, String languaje) {
+	String userId;
+
+
+	public Group(String name, int languajeLevel, int quantity, String languaje,String userId) {
 		this.name = name;
 		this.languajeLevel = languajeLevel;
 		this.quantity = quantity;
 		this.languaje = languaje;
+		this.userId = userId;
 	}
 
 
@@ -71,7 +73,14 @@ public class Groups {
 		this.languaje = languaje;
 	}
 	
-	
+	public String getUserId() {
+		return userId;
+	}
+
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 	
 	
 
