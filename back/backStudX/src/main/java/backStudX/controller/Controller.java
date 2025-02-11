@@ -102,7 +102,24 @@ public class Controller {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
 	}
+	
+	@PostMapping("/api/auth/loginWithToken")
+	ResponseEntity<String> loginWithToken(@RequestBody String userData) {
+		JSONObject newUserObject = new JSONObject(userData);
 
+		String emailUser = (String) newUserObject.get("email");
+		String token = (String) newUserObject.get("token");
+
+		Token t = tokenRepository.findToken(token);
+		if(t != null && t.getUserId().equals(emailUser)) {
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+	}
+	
 	@PostMapping("/api/auth/logout")
 	ResponseEntity<String> logoutUser(@RequestBody String userData) {
 
