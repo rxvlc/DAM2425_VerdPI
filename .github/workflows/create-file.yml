@@ -1,0 +1,21 @@
+name: Crear archivo en EC2
+
+on:
+  push:
+    branches:
+      - back
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Conectarse a EC2 y crear prueba.txt
+        env:
+          EC2_HOST: "44.220.1.21"
+          EC2_USER: "ubuntu"
+        run: |
+          echo "$EC2" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST "echo 'Este es un archivo de prueba' > ~/prueba.txt"
