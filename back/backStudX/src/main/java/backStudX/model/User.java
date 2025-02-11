@@ -1,6 +1,5 @@
 package backStudX.model;
 
-import org.springframework.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
