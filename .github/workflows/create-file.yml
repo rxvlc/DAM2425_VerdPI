@@ -11,16 +11,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Paso para configurar la clave privada
-      - name: Configurar la clave privada
-        run: |
-          echo "$EC2_PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
+      # Instalar sshpass
+      - name: Instalar sshpass
+        run: sudo apt-get install sshpass
 
-      # Paso para conectarse a EC2 y crear el archivo
+      # Paso para conectarse a EC2 y crear el archivo usando la contraseña
       - name: Conectarse a EC2 y crear prueba.txt
         env:
           EC2_HOST: "44.220.1.21"
           EC2_USER: "admin"
+          EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}  # Aquí guardas la contraseña como secreto
         run: |
-          ssh -i private_key.pem $EC2_USER@$EC2_HOST "echo 'Este es un archivo de prueba' > ~/prueba.txt"
+          sshpass -p $EC2_PASSWORD ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "echo 'Este es un archivo de prueba' > ~/prueba.txt"
