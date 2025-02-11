@@ -111,7 +111,7 @@ public class Controller {
 		String token = (String) newUserObject.get("token");
 
 		Token t = tokenRepository.findToken(token);
-		if(t != null && t.getUserId().equals(emailUser)) {
+		if(t != null && t.getUserId().equals(emailUser) && !t.isExpired()) {
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 
