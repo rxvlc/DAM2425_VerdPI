@@ -1,10 +1,59 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, StatusBar, Platform } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, StatusBar, Alert, ActivityIndicator } from "react-native";
+import { CommonActions } from "@react-navigation/native";
 
 export default function Registration({ navigation }) {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [university, setUniversity] = useState("");
+  const [loading, setLoading] = useState(false); // Estado para mostrar el indicador de carga
+
+  const handleRegister = async () => {
+    if (!username || !email || !password || !university) {
+      Alert.alert("Error", "Todos los campos son obligatorios");
+      return;
+    }
+
+    setLoading(true); // Mostrar indicador de carga
+
+    const userData = {
+      name: username,
+      email,
+      password,
+      university,
+    };
+
+    try {
+      const response = await fetch("http://44.220.1.21:8080/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        Alert.alert("Éxito", "Registro completado. Ahora puedes iniciar sesión.");
+
+        // 🔥 Redirigir a Login después del registro exitoso
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          })
+        );
+      } else {
+        const responseText = await response.text();
+        Alert.alert("Error", responseText || `Error ${response.status}: No se pudo registrar`);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error en la conexión con el servidor. Verifica tu conexión.");
+      console.error("Error en el registro:", error);
+    } finally {
+      setLoading(false); // Ocultar indicador de carga después de finalizar
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -13,15 +62,19 @@ export default function Registration({ navigation }) {
         <Image source={require("../images/logoIndividual.png")} style={styles.image} />
       </View>
       <View style={styles.zonaUsuariContrasenya}>
-        <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" />
-        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" />
-        <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" secureTextEntry />
-        <TextInput style={styles.input} placeholder="Universidad" placeholderTextColor="#888" secureTextEntry/>
+        <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" value={username} onChangeText={setUsername} />
+        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" value={email} onChangeText={setEmail} keyboardType="email-address" />
+        <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" value={password} onChangeText={setPassword} secureTextEntry />
+        <TextInput style={styles.input} placeholder="Universidad" placeholderTextColor="#888" value={university} onChangeText={setUniversity} />
       </View>
       <View style={styles.zonaBoton}>
-        <TouchableOpacity style={styles.boton} onPress={() => navigation.navigate("Pantallas")}>
-          <Text style={styles.botonTexto}>Registrar</Text>
-        </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
+          <TouchableOpacity style={styles.boton} onPress={handleRegister}>
+            <Text style={styles.botonTexto}>Registrar</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -61,24 +114,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 16,
   },
-  dropdown: {
-    width: "100%",
-    height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    backgroundColor: "#fff",
-    marginVertical: 10,
-  },
-  dropdownContainer: {
-    width: "100%",
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    zIndex: 1000, 
-  },
   boton: {
     backgroundColor: "#000",
     paddingVertical: 20,
@@ -100,4 +135,3 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 });
-
