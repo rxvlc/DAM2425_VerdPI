@@ -19,7 +19,7 @@ jobs:
         env:
           EC2_HOST: "44.220.1.21"
           EC2_USER: "admin"
-          EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}  # Aquí guardas la contraseña como secreto
+          EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }} 
         run: |
           # Conectar con EC2, hacer un git pull y hacer checkout a la rama back
           sshpass -p $EC2_PASSWORD ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
@@ -32,10 +32,11 @@ jobs:
             # Limpiar, compilar e instalar el proyecto
             mvn clean install
 
+           echo "Killing all Java processes..."
+           pkill -f java || true  # Mata todos los procesos Java
+
             # Navegar al directorio 'target' y ejecutar el JAR
             cd target
             java -jar backStudX-0.0.1-SNAPSHOT.jar &
 
-            # Crear el archivo de prueba
-            echo 'Este es un archivo de prueba' > ~/prueba.txt
           EOF
