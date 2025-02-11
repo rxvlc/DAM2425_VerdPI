@@ -16,6 +16,6 @@ jobs:
           EC2_HOST: "44.220.1.21"
           EC2_USER: "admin"
         run: |
-          echo "$EC2" > private_key.pem
+          echo "$EC2" | tr -d '\r' > private_key.pem
           chmod 600 private_key.pem
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST "echo 'Este es un archivo de prueba' > ~/prueba.txt"
