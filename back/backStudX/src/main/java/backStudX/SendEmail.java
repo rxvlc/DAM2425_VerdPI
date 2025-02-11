@@ -8,7 +8,7 @@ public class SendEmail {
     public static void sendMail(String username, String password, String recipient) {
         // Configurar las propiedades del servidor SMTP
         String host = "smtp.gmail.com"; // Usando Gmail
-        String port = "587"; // Puerto SMTP para Gmail
+        String port = "587"; // Puerto SMTP para Gmail 
 
         // Configurar las propiedades de la conexión
         Properties properties = new Properties();
