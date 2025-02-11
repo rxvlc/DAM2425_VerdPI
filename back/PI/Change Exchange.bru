@@ -1,0 +1,24 @@
+meta {
+  name: Change Exchange
+  type: http
+  seq: 16
+}
+
+put {
+  url: http://localhost:8080/api/exchanges/?id=67ab738a1135a61d8429dec4
+  body: json
+  auth: none
+}
+
+params:query {
+  id: 67ab738a1135a61d8429dec4
+}
+
+body:json {
+  {
+      "token": "436ef23e-ea24-43b3-a151-5e7c923d38bf",
+      "nativeLanguage": "fr",
+      "academicLevel": 4,
+    "quantityStudents" : 26
+  }
+}

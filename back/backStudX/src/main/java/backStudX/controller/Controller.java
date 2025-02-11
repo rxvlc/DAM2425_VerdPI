@@ -25,8 +25,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -107,7 +110,24 @@ public class Controller {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
 	}
+	
+	@PostMapping("/api/auth/loginWithToken")
+	ResponseEntity<String> loginWithToken(@RequestBody String userData) {
+		JSONObject newUserObject = new JSONObject(userData);
 
+		String emailUser = (String) newUserObject.get("email");
+		String token = (String) newUserObject.get("token");
+
+		Token t = tokenRepository.findToken(token);
+		if(t != null && t.getUserId().equals(emailUser) && !t.isExpired()) {
+			return ResponseEntity.status(HttpStatus.OK).build();
+		}
+
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+	}
+	
 	@PostMapping("/api/auth/logout")
 	ResponseEntity<String> logoutUser(@RequestBody String userData) {
 
@@ -195,7 +215,8 @@ public class Controller {
 				String targetLanguage = objectExchange.getString("targetLanguage");
 				String educationalLevel = objectExchange.getString("educationalLevel");
 				int academicLevel = objectExchange.getInt("academicLevel");
-				String idTeacherCreator = objectExchange.getString("idTeacherCreator");
+
+				String idTeacherCreator = t.getUserId();
 
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 				LocalDate beginDate = LocalDate.parse(objectExchange.getString("beginDate"), formatter);
@@ -214,7 +235,7 @@ public class Controller {
 				exchangeRepository.save(newExchange);
 
 				return ResponseEntity.status(HttpStatus.CREATED).build();
-			}else {
+			} else {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 			}
 
@@ -277,5 +298,95 @@ public class Controller {
 		}		
 	}
 	
+
+	@PutMapping("/api/exchanges/")
+	public ResponseEntity<?> updateExchange(@RequestParam String id, @RequestBody String exchangeJson) {
+
+		try {
+			JSONObject objectExchange = new JSONObject(exchangeJson);
+
+			String token = objectExchange.getString("token");
+			Token t = tokenRepository.findToken(token);
+
+			if (t == null || t.isExpired()) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado.");
+			}
+
+			Optional<Exchange> optionalExchange = exchangeRepository.findById(id);
+			if (optionalExchange.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Exchange no encontrado.");
+			}
+
+			Exchange existingExchange = optionalExchange.get();
+
+			// Actualizar solo los campos proporcionados en la petición
+			if (objectExchange.has("nativeLanguage")) {
+				existingExchange.setNativeLanguage(objectExchange.getString("nativeLanguage"));
+			}
+			if (objectExchange.has("targetLanguage")) {
+				existingExchange.setTargetLanguage(objectExchange.getString("targetLanguage"));
+			}
+			if (objectExchange.has("educationalLevel")) {
+				existingExchange.setEducationalLevel(objectExchange.getString("educationalLevel"));
+			}
+			if (objectExchange.has("academicLevel")) {
+				existingExchange.setAcademicLevel(objectExchange.getInt("academicLevel"));
+			}
+			if (objectExchange.has("beginDate")) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+				LocalDate beginDate = LocalDate.parse(objectExchange.getString("beginDate"), formatter);
+				existingExchange.setBeginDate(Date.from(beginDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+			}
+			if (objectExchange.has("endDate")) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+				LocalDate endDate = LocalDate.parse(objectExchange.getString("endDate"), formatter);
+				existingExchange.setEndDate(Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+			}
+			if (objectExchange.has("quantityStudents")) {
+				existingExchange.setQuantityStudents(objectExchange.getInt("quantityStudents"));
+			}
+			if (objectExchange.has("university")) {
+				existingExchange.setUniversity(objectExchange.getString("university"));
+			}
+
+			// Guardar cambios en MongoDB
+			exchangeRepository.save(existingExchange);
+
+			return ResponseEntity.ok(existingExchange);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Error al actualizar el intercambio: " + e.getMessage());
+		}
+	}
+
+	@DeleteMapping("/api/exchanges/")
+	public ResponseEntity<?> deleteExchange(@RequestParam String id, @RequestParam("token") String token) {
+		try {
+			// Verificar que el token es válido
+			Token t = tokenRepository.findToken(token);
+			if (t != null && !t.isExpired()) {
+				// Buscar el exchange por su id
+				Optional<Exchange> exchangeOptional = exchangeRepository.findById(id);
+				if (exchangeOptional.isPresent()) {
+					Exchange exchange = exchangeOptional.get();
+
+					// Eliminar el exchange
+					exchangeRepository.delete(exchange);
+
+					// Responder con confirmación de eliminación
+					return ResponseEntity.status(HttpStatus.OK).body("Exchange successfully deleted");
+				} else {
+					// Si no se encuentra el exchange con ese id
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Exchange not found");
+				}
+			} else {
+				// Si el token no es válido o ha expirado
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+			}
+		} catch (Exception e) {
+			// Manejo de errores
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+		}
+	}
 
 }
