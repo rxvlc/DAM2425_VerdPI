@@ -16,7 +16,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>BackStudX.Main</mainClass>
+					<mainClass>backStudX.Main</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
