@@ -63,7 +63,7 @@ export default function ExchangeTarget({
       style={[styles.card, { width: width * 0.9, maxWidth: 400 }]}
       resizeMode="cover"
     >
-      <View style={styles.overlay}>
+      <View style={[styles.overlay,{backgroundColor: darkMode?"#111":"white"},{borderColor:darkMode?"black":"cecfc7"}]}>
         <Text style={[styles.title, { color: darkMode ? "white" : "black" }]} numberOfLines={1} ellipsizeMode="tail">
           {centro}
         </Text>
@@ -81,12 +81,12 @@ export default function ExchangeTarget({
 
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ color: "black", fontSize: 16 }}>🌍 Idioma: </Text>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>{idioma} {banderaInfo.emoji}</Text>
+          <Text style={{ color:darkMode? "white":"black", fontSize: 16 }}>🌍 Idioma: </Text>
+          <Text style={{color:darkMode? "white":"black", fontSize: 16, fontWeight: "bold" }}>{idioma} {banderaInfo.emoji}</Text>
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ color: "black", fontSize: 16 }}>📚 Nivel: </Text>
+          <Text style={{ color:darkMode? "white":"black", fontSize: 16 }}>📚 Nivel: </Text>
           <View style={[styles.highlightContainer, { backgroundColor: nivelColors[nivel] || "#A5D6A7" }]}>
             <Text style={styles.highlightText}>{nivel.toUpperCase()}</Text>
           </View>
@@ -94,8 +94,8 @@ export default function ExchangeTarget({
 
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ color: "black", fontSize: 16 }}>🎓 Alumnos: </Text>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>{alumnos}</Text>
+          <Text style={{ color:darkMode? "white":"black", fontSize: 16 }}>🎓 Alumnos: </Text>
+          <Text style={{ color:darkMode? "white":"black",fontSize: 16, fontWeight: "bold" }}>{alumnos}</Text>
         </View>
 
         <View style={styles.buttonContainer}>
