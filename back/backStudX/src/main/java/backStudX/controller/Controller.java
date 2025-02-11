@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.management.Notification;
+
 import org.apache.catalina.connector.Response;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,10 @@ import backStudX.Services.ExchangeService;
 import backStudX.model.Exchange;
 import backStudX.model.Token;
 import backStudX.model.User;
+import backStudX.model.Notifications;
+
 import backStudX.repository.ExchangeRepository;
+import backStudX.repository.NotificationsRepository;
 import backStudX.repository.TokenRepository;
 import backStudX.repository.UserRepository;
 
@@ -51,6 +56,9 @@ public class Controller {
 
 	@Autowired
 	ExchangeRepository exchangeRepository;
+	
+	@Autowired
+	NotificationsRepository notificationRepository;
 
 	@Autowired
 	private ExchangeService exchangeService;
@@ -239,5 +247,35 @@ public class Controller {
 
 		return ResponseEntity.ok().body(exchangeRepository.findById(exchangeId));
 	}
+	
+	@PostMapping("/api/notifications")
+	ResponseEntity<String> createNotification(@RequestBody String notification){
+		JSONObject newNotification = new JSONObject(notification);
+		
+		String token = newNotification.getString("token");
+		Token t = tokenRepository.findToken(token);
+		
+		if (t != null && !t.isExpired()) {
+			String message = (String) newNotification.getString("message");
+			String recipient = (String) newNotification.getString("recipient");
+			String notificatonType = (String) newNotification.getString("notificationType");
+			
+			User searchUser = userRepository.findUserMail(recipient);
+			
+			if(searchUser == null)
+			{
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+			} else {
+				Notifications noti = new Notifications("hola", recipient, message, notificatonType, false);
+				notificationRepository.save(noti);
+				
+				return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+
+			}
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}		
+	}
+	
 
 }

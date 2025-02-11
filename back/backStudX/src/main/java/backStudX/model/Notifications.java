@@ -11,12 +11,14 @@ public class Notifications {
 	@Id
 	String id;
 	String idUserSender;
+	String idUserRecipient;
 	String message;
 	String typeMessage;
 	boolean messageReaded;
 	
-	public Notifications(String idUserSender, String message, String typeMessage, boolean messageReaded) {
+	public Notifications(String idUserSender, String idUserRecipient,  String message, String typeMessage, boolean messageReaded) {
 		this.idUserSender = idUserSender;
+		this.idUserRecipient = idUserRecipient;
 		this.message = message;
 		this.typeMessage = typeMessage;
 		this.messageReaded = messageReaded;
