@@ -14,7 +14,7 @@ jobs:
       - name: Conectarse a EC2 y crear prueba.txt
         env:
           EC2_HOST: "44.220.1.21"
-          EC2_USER: "ubuntu"
+          EC2_USER: "admin"
         run: |
           echo "$EC2" > private_key.pem
           chmod 600 private_key.pem
