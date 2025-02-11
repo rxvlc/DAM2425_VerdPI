@@ -10,6 +10,18 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.1.1</version>
 	</parent>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>BackStudX.Main</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 
 	<name>backStudX</name>
 	<description>Backend for studx</description>
@@ -44,12 +56,12 @@
 			<artifactId>jbcrypt</artifactId>
 			<version>0.4</version>
 		</dependency>
-		
+
 		<dependency>
-    <groupId>com.sun.mail</groupId>
-    <artifactId>javax.mail</artifactId>
-    <version>1.6.2</version>
-</dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.2</version>
+		</dependency>
 
 
 	</dependencies>
