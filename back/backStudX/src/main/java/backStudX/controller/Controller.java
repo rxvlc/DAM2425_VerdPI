@@ -159,6 +159,7 @@ public class Controller {
 	        }
 	    }
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	    
 	}
 
 	@PostMapping("/api/auth/reset-password")
