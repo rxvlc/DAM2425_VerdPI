@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Instalar sshpass
+      - name: Instalar sshpass
+        run: sudo apt-get install sshpass
+        
       - name: Conectarse a EC2 y ejecutar comandos
         env:
           EC2_HOST: "44.220.1.21"
