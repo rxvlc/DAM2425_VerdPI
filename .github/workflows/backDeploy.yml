@@ -37,6 +37,7 @@ jobs:
 
             # Navegar al directorio 'target' y ejecutar el JAR
             cd target
-            java -jar backStudX-0.0.1-SNAPSHOT.jar &
-
+            nohup java -jar backStudX-0.0.1-SNAPSHOT.jar &
+            
+            exit
           EOF
