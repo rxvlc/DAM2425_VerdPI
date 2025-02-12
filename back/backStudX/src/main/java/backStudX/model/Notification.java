@@ -1,14 +1,15 @@
 package backStudX.model;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
 @Document(collection = "notifications")
-public class Notifications {
-	
-	
+public class Notification {
+
 	@Id
 	String id;
 	String idUserSender;
@@ -16,82 +17,67 @@ public class Notifications {
 	String message;
 	String typeMessage;
 	boolean messageReaded;
-	
-	public Notifications(String idUserSender, String idUserRecipient,  String message, String typeMessage, boolean messageReaded) {
+	private LocalDateTime createdAt;
+
+	public Notification(String idUserSender, String idUserRecipient, String message, String typeMessage,
+			boolean messageReaded) {
 		this.idUserSender = idUserSender;
 		this.idUserRecipient = idUserRecipient;
 		this.message = message;
 		this.typeMessage = typeMessage;
 		this.messageReaded = messageReaded;
+		this.createdAt = LocalDateTime.now(); // Se asigna la fecha actual al momento de la creación
 	}
-	
-	
-	
-	
+
 	// Change property to readed message or not readed.
-	public void ChangeToReadedMessage(){
+	public void ChangeToReadedMessage() {
 		messageReaded = true;
 	}
-	
+
 	public void ChangeToNotReadedMessage() {
 		messageReaded = false;
 	}
 
-
-	//  Getters & Setters
+	// Getters & Setters
 
 	public String getId() {
 		return id;
 	}
 
-
 	public void setId(String id) {
 		this.id = id;
 	}
-
 
 	public String getIdUserSender() {
 		return idUserSender;
 	}
 
-
 	public void setIdUserSender(String idUserSender) {
 		this.idUserSender = idUserSender;
 	}
-
 
 	public String getMessage() {
 		return message;
 	}
 
-
 	public void setMessage(String message) {
 		this.message = message;
 	}
-
 
 	public String getTypeMessage() {
 		return typeMessage;
 	}
 
-
 	public void setTypeMessage(String typeMessage) {
 		this.typeMessage = typeMessage;
 	}
-
 
 	public boolean isMessageReaded() {
 		return messageReaded;
 	}
 
-
 	public void setMessageReaded(boolean messageReaded) {
 		this.messageReaded = messageReaded;
 	}
-	
-	
-	
-	
-	
-	
+
 }

@@ -1,0 +1,22 @@
+meta {
+  name: Create Notification
+  type: http
+  seq: 17
+}
+
+post {
+  url: http://localhost:8080/api/notifications
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "token": "b09cd4cb-5409-4ebc-a6f3-d7c058dce4f7",
+      "idUserSender": "manugamu@gmail.com",
+      "message": "Hola, tienes una nueva notificación.",
+      "recipient": "victorbermelldelfresno@gmail.com",
+      "notificationType": "MESSAGE"
+  }
+  
+}

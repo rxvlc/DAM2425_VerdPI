@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.management.Notification;
-
 import org.apache.catalina.connector.Response;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +43,7 @@ import backStudX.model.Exchange;
 import backStudX.model.Group;
 import backStudX.model.Token;
 import backStudX.model.User;
-import backStudX.model.Notifications;
+import backStudX.model.Notification;
 import backStudX.model.Preferences;
 import backStudX.repository.ExchangeRepository;
 import backStudX.repository.GroupRepository;
@@ -170,11 +168,13 @@ public class Controller {
 			userInJson.put("name", u.getName());
 			userInJson.put("password", u.getHashPasswd());
 			userInJson.put("university", u.getUniversity());
+			userInJson.put("urlProfilePicture", u.getUrlProfilePicture());
 			return ResponseEntity.status(HttpStatus.OK).body(userInJson.toString());
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
+	
 
 	@PostMapping("/api/auth/forgotPassword")
 	public ResponseEntity<String> forgotPassword(@RequestBody String userMail) {
@@ -283,73 +283,89 @@ public class Controller {
 		return ResponseEntity.ok().body(exchangeRepository.findById(exchangeId));
 	}
 
-	@PostMapping("/api/notifications")
-	ResponseEntity<String> createNotification(@RequestBody String notification) {
-		JSONObject newNotification = new JSONObject(notification);
-
-		String token = newNotification.getString("token");
+	@GetMapping("/api/notifications")
+	public ResponseEntity<List<Notification>> getUserNotifications(
+			@RequestParam(value = "idUserRec") String idUserRecipient, @RequestParam(value = "token") String token) {
+		// Validar el token
 		Token t = tokenRepository.findToken(token);
 
-		if (t != null && !t.isExpired()) {
-			String seder = (String) newNotification.getString("idUserSender");
-			String message = (String) newNotification.getString("message");
-			String recipient = (String) newNotification.getString("recipient");
-			String notificatonType = (String) newNotification.getString("notificationType");
-
-			User searchUser = userRepository.findUserMail(recipient);
-
-			if (searchUser == null) {
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-			} else {
-				Notifications noti = new Notifications("hola", recipient, message, notificatonType, false);
-				notificationsRepository.save(noti);
-				
-				return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-
-			}
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		if (t == null || t.isExpired()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // El token es inválido o expirado
 		}
+
+		// Obtener las notificaciones del destinatario
+		List<Notification> notifications = notificationsRepository.findUserRecipient(idUserRecipient);
+
+		if (notifications.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // No hay notificaciones
+		}
+
+		// Devolver las notificaciones encontradas
+		return ResponseEntity.ok(notifications);
 	}
-	
-	@GetMapping("api/notifications")
-    public void getUserNotifications(@RequestParam String notificationBody) {
-		
-        JSONObject notification = new JSONObject(notificationBody);
-        String userMail = notification.getString("idUserSender"); 
-	}
-	
+
 	@PutMapping("/api/notifications/read")
 	public ResponseEntity<?> updateReadedNotification(@RequestParam String updatedInfo) {
 		try {
 			JSONObject readedMessage = new JSONObject(updatedInfo);
-			
+
 			String id = readedMessage.getString("id");
 			String token = readedMessage.getString("token");
 			Token t = tokenRepository.findToken(token);
-			
+
 			if (t == null || t.isExpired()) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado.");
 			}
-			
-			Optional<Notifications> notificationSearched = notificationsRepository.findById(id);
-			Notifications notificationSelected = notificationSearched.get();
-			
-			if(readedMessage.has("messageReaded")) {
+
+			Optional<Notification> notificationSearched = notificationsRepository.findById(id);
+			Notification notificationSelected = notificationSearched.get();
+
+			if (readedMessage.has("messageReaded")) {
 				notificationSelected.setMessageReaded(true);
 			}
-			
+
 			notificationsRepository.save(notificationSelected);
 			return ResponseEntity.ok(notificationSelected);
 
-			
 		} catch (Exception e) {
 			// TODO: handle exception
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body("Error al actualizar el intercambio: " + e.getMessage());
-		}		
+		}
 	}
 	
+	@PutMapping("/api/notifications/{id}/read")
+	public ResponseEntity<String> markNotificationAsRead(
+	        @PathVariable("id") String notificationId, 
+	        @RequestParam("token") String token) {
+
+	    // Validar el token
+	    Token t = tokenRepository.findToken(token);
+	    if (t == null || t.isExpired()) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("Invalid or expired token.");
+	    }
+
+	    // Buscar la notificación por ID
+	    Optional<Notification> notificationOpt = notificationsRepository.findById(notificationId);
+	    if (!notificationOpt.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body("Notification not found.");
+	    }
+
+	    // Obtener la notificación
+	    Notification notification = notificationOpt.get();
+
+	    // Marcar la notificación como leída
+	    notification.setMessageReaded(true);
+
+	    // Guardar la notificación actualizada
+	    notificationsRepository.save(notification);
+
+	    // Devolver respuesta exitosa
+	    return ResponseEntity.ok("Notification marked as read.");
+	}
+
 
 	@PutMapping("/api/exchanges/")
 	public ResponseEntity<?> updateExchange(@RequestParam String id, @RequestBody String exchangeJson) {
@@ -678,4 +694,28 @@ public class Controller {
 		}
 	}
 
+	@PutMapping("/api/auth/update")
+	ResponseEntity<String> updateUser(@RequestBody String userData) {
+	    JSONObject updatedUserObject = new JSONObject(userData);
+
+	    String email = updatedUserObject.getString("email");
+	    User existingUser = userRepository.findUserMail(email);
+
+	    if (existingUser == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+	    }
+
+	    String name = updatedUserObject.optString("name", existingUser.getName());
+	    String university = updatedUserObject.optString("university", existingUser.getUniversity());
+	    String urlProfilePicture = updatedUserObject.optString("urlProfilePicture", existingUser.getUrlProfilePicture());
+
+	    existingUser.setName(name);
+	    existingUser.setUniversity(university);
+	    existingUser.setUrlProfilePicture(urlProfilePicture);
+
+	    userRepository.save(existingUser);
+	    return ResponseEntity.ok("User updated successfully");
+	}
+
+	
 }
