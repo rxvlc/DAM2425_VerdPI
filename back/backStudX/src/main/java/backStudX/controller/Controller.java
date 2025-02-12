@@ -228,7 +228,7 @@ public class Controller {
 				String nativeLanguage = objectExchange.getString("nativeLanguage");
 				String targetLanguage = objectExchange.getString("targetLanguage");
 				String educationalLevel = objectExchange.getString("educationalLevel");
-				int academicLevel = objectExchange.getInt("academicLevel");
+				String academicLevel = objectExchange.getString("academicLevel");
 
 				String idTeacherCreator = t.getUserId();
 
@@ -342,7 +342,7 @@ public class Controller {
 				existingExchange.setEducationalLevel(objectExchange.getString("educationalLevel"));
 			}
 			if (objectExchange.has("academicLevel")) {
-				existingExchange.setAcademicLevel(objectExchange.getInt("academicLevel"));
+				existingExchange.setAcademicLevel(objectExchange.getString("academicLevel"));
 			}
 			if (objectExchange.has("beginDate")) {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
