@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext"; 
@@ -14,7 +14,8 @@ export default function Perfil() {
       try {
         const token = await SecureStore.getItemAsync("userToken");
         if (!token) {
-          Alert.alert("Error", "No hay sesión activa.");
+          console.log("No hay sesión activa.");
+          setUserData(null); // No hay sesión, se muestra "No disponible"
           return;
         }
 
@@ -26,12 +27,12 @@ export default function Perfil() {
           const data = await response.json();
           setUserData(data);
         } else {
-          const errorText = await response.text();
-          Alert.alert("Error", errorText || "No se pudo obtener la información del usuario.");
+          console.log("Error: No se pudo obtener la información del usuario.");
+          setUserData(null); // Se mantiene la interfaz sin popups
         }
       } catch (error) {
-        console.error("Error al obtener datos del usuario:", error);
-        Alert.alert("Error", "No se pudo conectar con el servidor.");
+        console.log("Error al obtener datos del usuario:", error);
+        setUserData(null); // Si hay error, se pone en null para mostrar "No disponible"
       } finally {
         setLoading(false);
       }
@@ -59,7 +60,6 @@ export default function Perfil() {
           />
         </View>
 
-       
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
             <Ionicons name="person-circle-outline" size={24} color={darkMode ? "#FFA500" : "#555"} />
@@ -136,4 +136,3 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 });
-

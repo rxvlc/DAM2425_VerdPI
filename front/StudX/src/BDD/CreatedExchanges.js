@@ -5,7 +5,8 @@ const createdExchanges = [
       centro: "Florida Universitaria",
       dificultad: "A1",
       alumnos: 12,
-      idioma: "English",
+      idiomaDeseado: "English",
+      idioma: "Spanish",
       imagen: "JuanPerezGomez.webp",
     },
     {
@@ -14,7 +15,8 @@ const createdExchanges = [
       centro: "Berenguer Dalmau",
       dificultad: "A2",
       alumnos: 22,
-      idioma: "Spanish",
+      idiomaDeseado: "Spanish",
+      idioma: "French",
       imagen: "MariaRodriguezLopez.webp",
     },
     {
@@ -23,7 +25,8 @@ const createdExchanges = [
       centro: "Esteve Paluzie",
       dificultad: "C2",
       alumnos: 7,
-      idioma: "French",
+      idiomaDeseado: "French",
+      idioma: "Russian",
       imagen: "CarlosFernandezMartinez.webp",
     },
     {
@@ -32,7 +35,8 @@ const createdExchanges = [
       centro: "Penya Rotja",
       dificultad: "B2",
       alumnos: 16,
-      idioma: "German",
+      idiomaDeseado: "German",
+      idioma: "Greek",
       imagen: "AnaSanchezRuiz.webp",
     },
     {
@@ -41,7 +45,8 @@ const createdExchanges = [
       centro: "Esteve Paluzie",
       dificultad: "C1",
       alumnos: 5,
-      idioma: "French",
+      idiomaDeseado: "French",
+      idioma: "Italian",
       imagen: "img2.jpg",
     },
     {
@@ -50,7 +55,8 @@ const createdExchanges = [
       centro: "Esteve Paluzie",
       dificultad: "B1",
       alumnos: 28,
-      idioma: "Russian",
+      idiomaDeseado: "Russian",
+      idioma: "Turkish",
       imagen: "AnaSanchezRuiz.webp",
     },
   ];
