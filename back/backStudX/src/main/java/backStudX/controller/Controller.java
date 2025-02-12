@@ -302,13 +302,8 @@ public class Controller {
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 			} else {
 				Notifications noti = new Notifications("hola", recipient, message, notificatonType, false);
-<<<<<<< HEAD
 				notificationsRepository.save(noti);
 				
-=======
-				notificationRepository.save(noti);
-
->>>>>>> c9805ff12e6c21f3b3a95f1131492236d017765b
 				return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 
 			}
@@ -318,10 +313,10 @@ public class Controller {
 	}
 	
 	@GetMapping("api/notifications")
-    public List<Notification> getUserNotifications(@RequestParam String userDetails) {
+    public void getUserNotifications(@RequestParam String notificationBody) {
 		
-        String userId = notificationsRepository.findUserRecipient(userDetails);    
-        return notifications.getUserNotifications(userId);
+        JSONObject notification = new JSONObject(notificationBody);
+        String userMail = notification.getString("idUserSender"); 
 	}
 	
 	@PutMapping("/api/notifications/read")
