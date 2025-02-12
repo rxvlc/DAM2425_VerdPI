@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+
 import {
   View,
   Image,
@@ -54,12 +56,19 @@ const ProfileEdit = (props) => {
   
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-      setFotoPerfil({ uri });
+
+      const compressedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 800 } }],  // Redimensionar a 800px (ajustable)
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // Comprimir al 70%
+      );
+
+    setFotoPerfil({ uri: compressedImage.uri });
   
       // Crear el objeto FormData para enviar el archivo
       const formData = new FormData();
       formData.append("file", {
-        uri,
+        uri : compressedImage.uri,
         name: "photo.jpg", // Nombre del archivo
         type: "image/jpeg", // Tipo de archivo
       });
@@ -86,10 +95,12 @@ const ProfileEdit = (props) => {
   
         // Crear el objeto con la nueva URL
         const updateData = {
-          token,
+          token : token,
           urlProfilePicture: imageUrl,
         };
   
+        console.log(token);
+        console.log(imageUrl);
         // Hacer la petición PUT para actualizar el perfil
         const updateResponse = await fetch("http://44.220.1.21:8080/api/auth/update", {
           method: "PUT",
@@ -98,11 +109,9 @@ const ProfileEdit = (props) => {
           },
           body: JSON.stringify(updateData),
         });
-        console.log(token);
-        console.log(imageUrl);
         
-        
-        const updateResult = await updateResponse.json();
+       
+        const updateResult = await updateResponse.text();
         console.log("Respuesta de actualización:", updateResult);
       } catch (error) {
         console.error("Error en el proceso:", error);
