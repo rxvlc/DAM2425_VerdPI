@@ -316,7 +316,6 @@ public class Controller {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
-<<<<<<< HEAD
 	
 	@GetMapping("api/notifications")
     public List<Notification> getUserNotifications(@RequestParam String userDetails) {
@@ -356,8 +355,6 @@ public class Controller {
 		}		
 	}
 	
-=======
->>>>>>> c9805ff12e6c21f3b3a95f1131492236d017765b
 
 	@PutMapping("/api/exchanges/")
 	public ResponseEntity<?> updateExchange(@RequestParam String id, @RequestBody String exchangeJson) {

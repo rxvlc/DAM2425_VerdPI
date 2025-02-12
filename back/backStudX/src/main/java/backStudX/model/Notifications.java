@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 @Document(collection = "notifications")
 public class Notifications {
 	
+	
 	@Id
 	String id;
 	String idUserSender;
@@ -23,6 +24,8 @@ public class Notifications {
 		this.typeMessage = typeMessage;
 		this.messageReaded = messageReaded;
 	}
+	
+	
 	
 	
 	// Change property to readed message or not readed.
