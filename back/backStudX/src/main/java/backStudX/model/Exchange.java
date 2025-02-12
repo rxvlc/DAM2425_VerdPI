@@ -14,14 +14,14 @@ public class Exchange {
 	String nativeLanguage;
 	String targetLanguage;
 	String educationalLevel;
-	int academicLevel;
+	String academicLevel;
 	String idTeacherCreator;
 	private Date beginDate;
 	private Date endDate;
 	int quantityStudents;
 	String university;
 
-	public Exchange(String nativeLanguage, String targetLanguage, String educationalLevel, int academicLevel,
+	public Exchange(String nativeLanguage, String targetLanguage, String educationalLevel, String academicLevel,
 			String idTeacherCreator, Date beginDate, Date endDate, int quantityStudents, String university) {
 		this.nativeLanguage = nativeLanguage;
 		this.targetLanguage = targetLanguage;
@@ -66,11 +66,11 @@ public class Exchange {
 		this.educationalLevel = educationalLevel;
 	}
 
-	public int getAcademicLevel() {
+	public String getAcademicLevel() {
 		return academicLevel;
 	}
 
-	public void setAcademicLevel(int academicLevel) {
+	public void setAcademicLevel(String academicLevel) {
 		this.academicLevel = academicLevel;
 	}
 
