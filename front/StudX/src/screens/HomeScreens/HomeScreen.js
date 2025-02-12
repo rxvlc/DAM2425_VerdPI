@@ -148,18 +148,7 @@ export default function HomeScreen() {
         <Tab.Screen name="Mensajes" component={Mensajes} />
         <Tab.Screen name="Perfil" component={Perfil2} options={{ headerShown: false }} />
       </Tab.Navigator>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <CreateGroup onClose={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+   
     </KeyboardAvoidingView>
   );
 }
