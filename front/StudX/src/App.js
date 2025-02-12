@@ -7,6 +7,8 @@ import Registration from "./screens/Registration";
 import HomeScreen from "./screens/HomeScreens/HomeScreen";
 import ChatScreen from "./screens/MensajesScreens/Components/ChatScreen";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import CreateGroup from "./screens/HomeScreens/CreateExchange";
+import CreatedExchange from "./screens/HomeScreens/CreateExchange";
 
 const Stack = createStackNavigator();
 
@@ -33,6 +35,7 @@ function AppWrapper() {
           <Stack.Screen name="Registration" component={Registration} />
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
+          <Stack.Screen name="Crear Intercambios" component={CreatedExchange}/>
         </Stack.Navigator>
       </View>
     </ImageBackground>
