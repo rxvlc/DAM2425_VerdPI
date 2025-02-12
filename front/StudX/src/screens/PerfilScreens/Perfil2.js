@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, Image, ScrollView, Dimensions } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext"; 
+
+const { width, height } = Dimensions.get("window");
 
 export default function Perfil() {
   const [userData, setUserData] = useState(null);
@@ -15,7 +17,7 @@ export default function Perfil() {
         const token = await SecureStore.getItemAsync("userToken");
         if (!token) {
           console.log("No hay sesión activa.");
-          setUserData(null); // No hay sesión, se muestra "No disponible"
+          setUserData(null);
           return;
         }
 
@@ -28,11 +30,11 @@ export default function Perfil() {
           setUserData(data);
         } else {
           console.log("Error: No se pudo obtener la información del usuario.");
-          setUserData(null); // Se mantiene la interfaz sin popups
+          setUserData(null);
         }
       } catch (error) {
         console.log("Error al obtener datos del usuario:", error);
-        setUserData(null); // Si hay error, se pone en null para mostrar "No disponible"
+        setUserData(null);
       } finally {
         setLoading(false);
       }
@@ -50,46 +52,55 @@ export default function Perfil() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: darkMode ? "#121212" : "#F5F5F5" }]}>
-      <View style={[styles.profileCard, { backgroundColor: darkMode ? "#1E1E1E" : "#FFF" }]}>
-      
-        <View style={styles.avatarContainer}>
-          <Image
-            source={require("../../images/fotoPerfil.jpg")}
-            style={styles.avatar}
-          />
-        </View>
-
-        <View style={styles.infoContainer}>
-          <View style={styles.infoRow}>
-            <Ionicons name="person-circle-outline" size={24} color={darkMode ? "#FFA500" : "#555"} />
-            <Text style={[styles.label, { color: darkMode ? "#FFF" : "#333" }]}>Nombre:</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={[styles.container, { backgroundColor: darkMode ? "#121212" : "#F5F5F5" }]}>
+        <View style={[styles.profileCard, { backgroundColor: darkMode ? "#1E1E1E" : "#FFF" }]}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={require("../../images/fotoPerfil.jpg")}
+              style={styles.avatar}
+            />
           </View>
-          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.name || "No disponible"}</Text>
 
-          <View style={styles.infoRow}>
-            <Ionicons name="mail-outline" size={24} color={darkMode ? "#FFA500" : "#555"} />
-            <Text style={[styles.label, { color: darkMode ? "#FFF" : "#333" }]}>Correo:</Text>
-          </View>
-          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.email || "No disponible"}</Text>
+          <View style={styles.infoContainer}>
+            <View style={styles.infoRow}>
+              <Ionicons name="person-circle-outline" size={24} color={darkMode ? "#FFA500" : "#555"} />
+              <Text style={[styles.label, { color: darkMode ? "#FFF" : "#333" }]}>Name:</Text>
+            </View>
+            <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.name || "No disponible"}</Text>
 
-          <View style={styles.infoRow}>
-            <Ionicons name="school-outline" size={24} color={darkMode ? "#FFA500" : "#555"} />
-            <Text style={[styles.label, { color: darkMode ? "#FFF" : "#333" }]}>Universidad:</Text>
+            <View style={styles.infoRow}>
+              <Ionicons name="mail-outline" size={24} color={darkMode ? "#FFA500" : "#555"} />
+              <Text style={[styles.label, { color: darkMode ? "#FFF" : "#333" }]}>Email:</Text>
+            </View>
+            <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.email || "No disponible"}</Text>
+
+            <View style={styles.infoRow}>
+              <Ionicons name="school-outline" size={24} color={darkMode ? "#FFA500" : "#555"} />
+              <Text style={[styles.label, { color: darkMode ? "#FFF" : "#333" }]}>University:</Text>
+            </View>
+            <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.university || "No disponible"}</Text>
           </View>
-          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.university || "No disponible"}</Text>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    width: '100%',
+    justifyContent: "center",
+    alignItems: "center", justifyContent: "center",
+  },
   container: {
     flex: 1,
-    justifyContent: "center",
+    width: '100%',
+    justifyContent: "flex-start", 
     alignItems: "center",
-    paddingHorizontal: 20,
+    
+    paddingTop: height * 0.05, 
   },
   center: {
     flex: 1,
@@ -97,7 +108,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileCard: {
-    width: "90%",
+    width: '70%',
     borderRadius: 15,
     padding: 20,
     alignItems: "center",
@@ -106,14 +117,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+    marginTop: 10, 
   },
   avatarContainer: {
     marginBottom: 15,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: width * 0.3,
+    height: width * 0.3,
+    borderRadius: width * 0.15,
     borderWidth: 3,
     borderColor: "#FFA500",
   },

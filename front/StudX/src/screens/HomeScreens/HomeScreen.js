@@ -144,7 +144,7 @@ export default function HomeScreen() {
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen name="Busqueda" component={Busqueda} />
         <Tab.Screen name="Mensajes" component={Mensajes} />
-        <Tab.Screen name="Perfil" component={Perfil2} options={{ headerShown: false }} />
+        <Tab.Screen name="Perfil" component={Perfil2} />
       </Tab.Navigator>
     </KeyboardAvoidingView>
   );

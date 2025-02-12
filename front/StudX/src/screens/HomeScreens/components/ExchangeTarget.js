@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "rgba(255, 255, 255, 0.92)", // Ligera transparencia para resaltar el efecto
     borderColor: "#d6d4d4",
-    borderWidth: 0.5
+    borderWidth: 0.5,
   },
   title: {
     fontSize: 14,
