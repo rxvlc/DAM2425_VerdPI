@@ -8,6 +8,8 @@ import Registration from "./screens/Registration";
 import HomeScreen from "./screens/HomeScreens/HomeScreen";
 import ChatScreen from "./screens/MensajesScreens/Components/ChatScreen";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import CreateGroup from "./screens/HomeScreens/CreateExchange";
+import CreatedExchange from "./screens/HomeScreens/CreateExchange";
 import SearchFilterScreen from "./screens/BusquedaScreens/SearchFilterScreen";
 import { FiltersProvider } from "./context/FiltersContext";
 import Busquedas from "./screens/BusquedaScreens/Busqueda";
@@ -52,6 +54,7 @@ function AppWrapper() {
           />
           <Stack.Screen name="SeachScreen" component={Busquedas} />
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
+          <Stack.Screen name="Crear Intercambios" component={CreatedExchange}/>
         </Stack.Navigator>
       </View>
     </ImageBackground>

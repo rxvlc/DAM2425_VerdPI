@@ -20,6 +20,7 @@ import Home from "../HomeScreens/Home";
 import Perfil2 from "../PerfilScreens/Perfil2";
 import Busqueda from "../BusquedaScreens/Busqueda";
 import Mensajes from "../MensajesScreens/Mensajes";
+import CreateGroup from "./CreateExchange";
 
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get("window");
@@ -28,6 +29,7 @@ export default function HomeScreen() {
   const { darkMode, setDarkMode } = useTheme();
   const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const modo = darkMode ? "Modo Claro" : "Modo Oscuro";
 
   // Función para cerrar sesión
@@ -98,7 +100,7 @@ export default function HomeScreen() {
           headerRight: () => (
             <View style={styles.headerRightContainer}>
               {/* Botón "+" más grande */}
-              <TouchableOpacity onPress={() => navigation.navigate("CrearIntercambio")} style={styles.addButton}>
+              <TouchableOpacity onPress={() => navigation.navigate("Crear Intercambios")} style={styles.addButton}>
                 <Ionicons name="add-circle-outline" size={PixelRatio.getPixelSizeForLayoutSize(12)} color={darkMode ? "white" : "black"} />
               </TouchableOpacity>
 
@@ -146,6 +148,7 @@ export default function HomeScreen() {
         <Tab.Screen name="Mensajes" component={Mensajes} />
         <Tab.Screen name="Perfil" component={Perfil2} />
       </Tab.Navigator>
+   
     </KeyboardAvoidingView>
   );
 }
@@ -157,10 +160,14 @@ const styles = StyleSheet.create({
     marginRight: width * 0.03,
   },
   addButton: {
-    marginRight: width * 0.05,
+    marginRight: width * 0.05, // Espacio entre "+" y el menú
   },
   menuButton: {
-    padding: width * 0.015,
+    padding: width * 0.015, // Aumenta el área táctil sin afectar diseño
+  },
+  menuContainer: {
+    position: "relative",
+    alignItems: "flex-end",
   },
   menuDropdown: {
     position: "absolute",
@@ -186,5 +193,17 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     paddingVertical: height * 0.015,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
   },
 });
