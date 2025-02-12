@@ -708,7 +708,7 @@ public class Controller {
 	        }
 
 	        // Obtener el usuario a partir del email asociado al token
-	        String email = t.getEmail();
+	        String email = t.getUserId();
 	        User existingUser = userRepository.findUserMail(email);
 
 	        if (existingUser == null) {
