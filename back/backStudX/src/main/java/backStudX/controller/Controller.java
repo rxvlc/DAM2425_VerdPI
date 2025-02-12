@@ -61,7 +61,7 @@ public class Controller {
 	ExchangeRepository exchangeRepository;
 	
 	@Autowired
-	NotificationsRepository notificationRepository;
+	NotificationsRepository notificationsRepository;
 
 	@Autowired
 	private ExchangeService exchangeService;
@@ -277,6 +277,7 @@ public class Controller {
 		Token t = tokenRepository.findToken(token);
 		
 		if (t != null && !t.isExpired()) {
+			String seder = (String) newNotification.getString("idUserSender");
 			String message = (String) newNotification.getString("message");
 			String recipient = (String) newNotification.getString("recipient");
 			String notificatonType = (String) newNotification.getString("notificationType");
@@ -288,13 +289,51 @@ public class Controller {
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 			} else {
 				Notifications noti = new Notifications("hola", recipient, message, notificatonType, false);
-				notificationRepository.save(noti);
+				notificationsRepository.save(noti);
 				
 				return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 
 			}
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}		
+	}
+	
+	@GetMapping("api/notifications")
+    public List<Notification> getUserNotifications(@RequestParam String userDetails) {
+		
+        String userId = notificationsRepository.findUserRecipient(userDetails);    
+        return notifications.getUserNotifications(userId);
+	}
+	
+	@PutMapping("/api/notifications/read")
+	public ResponseEntity<?> updateReadedNotification(@RequestParam String updatedInfo) {
+		try {
+			JSONObject readedMessage = new JSONObject(updatedInfo);
+			
+			String id = readedMessage.getString("id");
+			String token = readedMessage.getString("token");
+			Token t = tokenRepository.findToken(token);
+			
+			if (t == null || t.isExpired()) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado.");
+			}
+			
+			Optional<Notifications> notificationSearched = notificationsRepository.findById(id);
+			Notifications notificationSelected = notificationSearched.get();
+			
+			if(readedMessage.has("messageReaded")) {
+				notificationSelected.setMessageReaded(true);
+			}
+			
+			notificationsRepository.save(notificationSelected);
+			return ResponseEntity.ok(notificationSelected);
+
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Error al actualizar el intercambio: " + e.getMessage());
 		}		
 	}
 	
