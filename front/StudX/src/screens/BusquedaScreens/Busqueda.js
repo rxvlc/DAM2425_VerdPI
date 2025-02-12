@@ -1,10 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TextInput } from "react-native";
+import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 
-export default function Busquedas() {
+export default function Busquedas(props) {
   const { darkMode } = useTheme();
   const [query, setQuery] = useState("");
   const [resultados, setResultados] = useState([]);
@@ -13,7 +13,11 @@ export default function Busquedas() {
     <View style={[styles.container, darkMode && styles.containerDark]}>
       <View style={styles.zonaBusqueda}>
         <View style={[styles.searchBar, darkMode && styles.searchBarDark]}>
-          <Ionicons name="search" size={20} color={darkMode ? "#ccc" : "#A0A0A0"} />
+          <Ionicons
+            name="search"
+            size={20}
+            color={darkMode ? "#ccc" : "#A0A0A0"}
+          />
           <TextInput
             placeholder="Search..."
             placeholderTextColor={darkMode ? "#bbb" : "#A0A0A0"}
@@ -22,12 +26,23 @@ export default function Busquedas() {
             onChangeText={setQuery}
           />
         </View>
+        <Pressable onPress={() => props.navigation.navigate("SearchFilterScreen")}>
+        <Ionicons
+          name="filter"
+          size={24} // Un poco más grande para hacerlo más visible
+          color={darkMode ? "#ccc" : "#A0A0A0"}
+          style={[styles.filterIcon,{padding: 5}]} // Agregamos estilo para posicionarlo mejor
+        />
+        </Pressable>
       </View>
 
       <View style={styles.zonaResultados}>
         {resultados.length > 0 ? (
           resultados.map((item, index) => (
-            <Text key={index} style={[styles.resultadoItem, darkMode && styles.textDark]}>
+            <Text
+              key={index}
+              style={[styles.resultadoItem, darkMode && styles.textDark]}
+            >
               {item}
             </Text>
           ))
@@ -50,7 +65,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#121212",
   },
   zonaBusqueda: {
-    flex: 1,
+    flex : 1,
+    flexDirection : 'row',
     alignItems: "center",
     justifyContent: "center",
   },

@@ -1,13 +1,23 @@
 import React, { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { 
-  View, StyleSheet, TouchableOpacity, Text, Dimensions, Image, PixelRatio, KeyboardAvoidingView, Platform, Modal,modalVisible,
+import { useNavigation, CommonActions } from "@react-navigation/native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+  Image,
+  PixelRatio,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
 } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../../context/ThemeContext";
 import Home from "../HomeScreens/Home";
-import Perfil from "../PerfilScreens/Perfil";
+import Perfil2 from "../PerfilScreens/Perfil2";
 import Busqueda from "../BusquedaScreens/Busqueda";
 import Mensajes from "../MensajesScreens/Mensajes";
 import CreateGroup from "./CreateExchange";
@@ -22,8 +32,54 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const modo = darkMode ? "Modo Claro" : "Modo Oscuro";
 
+  // Función para cerrar sesión
+  const handleLogout = async () => {
+    try {
+      // Obtener el token almacenado
+      const token = await SecureStore.getItemAsync("userToken");
+      const email = await SecureStore.getItemAsync("email");
+
+      if (!token) {
+        Alert.alert("Error", "No hay sesión activa.");
+        return;
+      }
+
+      // Enviar petición de logout a la API
+      const response = await fetch("http://44.220.1.21:8080/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Enviar el token en el header
+        },
+        body: JSON.stringify({ email, token }), // Enviar datos en el body
+      });
+
+      if (response.ok) {
+        // Eliminar el token y email de SecureStore
+        await SecureStore.deleteItemAsync("userToken");
+        await SecureStore.deleteItemAsync("email");
+
+        Alert.alert("Éxito", "Cierre de sesión exitoso");
+
+        // Redirigir al usuario a la pantalla de Login limpiando la pila
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }], // Asegúrate de que "Login" es el nombre correcto de la pantalla
+          })
+        );
+      } else {
+        const responseText = await response.text();
+        Alert.alert("Error", responseText || `Error ${response.status}: No se pudo cerrar sesión`);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error en la conexión con el servidor");
+      console.error("Error en el logout:", error);
+    }
+  };
+
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
@@ -34,9 +90,9 @@ export default function HomeScreen() {
           headerTitleAlign: "left",
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
-              <Image 
-                source={darkMode ? require("../../images/Logos/StudXBlanco.png") : require("../../images/Logos/StudX.png")} 
-                style={[styles.headerLogo, { width: width * 0.1, height: height * 0.05 }]} 
+              <Image
+                source={darkMode ? require("../../images/Logos/StudXBlanco.png") : require("../../images/Logos/StudX.png")}
+                style={[styles.headerLogo, { width: width * 0.1, height: height * 0.05 }]}
               />
               <Text style={[styles.headerTitleText, { color: darkMode ? "white" : "black" }]}>{route.name}</Text>
             </View>
@@ -54,12 +110,12 @@ export default function HomeScreen() {
               </TouchableOpacity>
 
               {menuVisible && (
-                <View style={[styles.menuDropdown, { backgroundColor: darkMode ? "#333" : "white", right: 0 }]}> 
+                <View style={[styles.menuDropdown, { backgroundColor: darkMode ? "#333" : "white", right: 0 }]}>
                   <TouchableOpacity style={styles.menuItem} onPress={() => { setDarkMode(!darkMode); setMenuVisible(false); }}>
                     <Text style={{ color: darkMode ? "white" : "black", fontSize: width * 0.04 }}>{modo}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.menuItem} onPress={() => setMenuVisible(false)}>
-                    <Text style={{ color: darkMode ? "white" : "black", fontSize: width * 0.04 }}>Ajustes de Perfil</Text>
+                  <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+                    <Text style={{ color: darkMode ? "white" : "black", fontSize: width * 0.04 }}>Logout</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -72,7 +128,7 @@ export default function HomeScreen() {
           tabBarPressColor: "transparent",
           tabBarButton: (props) => (
             <TouchableOpacity {...props} activeOpacity={1} onPress={() => { setMenuVisible(false); props.onPress(); }} />
-          ), 
+          ),
           tabBarIcon: ({ color, size, focused }) => {
             let iconName;
             if (route.name === "Home") iconName = "home-outline";
@@ -90,7 +146,7 @@ export default function HomeScreen() {
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen name="Busqueda" component={Busqueda} />
         <Tab.Screen name="Mensajes" component={Mensajes} />
-        <Tab.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
+        <Tab.Screen name="Perfil" component={Perfil2} options={{ headerShown: false }} />
       </Tab.Navigator>
       <Modal
         animationType="slide"
@@ -115,10 +171,10 @@ const styles = StyleSheet.create({
     marginRight: width * 0.03,
   },
   addButton: {
-    marginRight: width * 0.05, 
+    marginRight: width * 0.05, // Espacio entre "+" y el menú
   },
   menuButton: {
-    padding: width * 0.015, 
+    padding: width * 0.015, // Aumenta el área táctil sin afectar diseño
   },
   menuContainer: {
     position: "relative",
@@ -127,7 +183,6 @@ const styles = StyleSheet.create({
   menuDropdown: {
     position: "absolute",
     top: height * 0.05,
-    backgroundColor: "#333",
     padding: width * 0.02,
     borderRadius: 8,
     minWidth: width * 0.4,
@@ -148,9 +203,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   menuItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     paddingVertical: height * 0.015,
   },
   modalContainer: {
@@ -166,4 +218,3 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 });
-
