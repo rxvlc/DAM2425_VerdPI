@@ -1,34 +1,130 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import RNPickerSelect from "react-native-picker-select"; // Usamos react-native-picker-select
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import LanguageSelector from "../../components/LanguageSelector";
 
-const CreatedExchange = ({ onClose }) => {
+export default function CreatedExchange({ onClose }) {
   const [nombreGrupo, setNombreGrupo] = useState("");
-  const [nivel, setNivel] = useState("medio"); // Estado para el nivel
-
-  const [language, setLanguage] = useState(null);
-  const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
+  const [nivel, setNivel] = useState(null);
+  const [nativeLanguage, setNativeLanguage] = useState(null);
+  const [targetLanguage, setTargetLanguage] = useState(null);
   const [numAlumnos, setNumAlumnos] = useState(1);
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFin, setFechaFin] = useState("");
+  const [academicLevel, setAcademicLevel] = useState("");
+  const [university, setUniversity] = useState(""); // Estado para la universidad
+  const [token, setToken] = useState(null); // Estado para el token
 
-  const [languages] = useState([
-    { label: "Español", value: "es" },
-    { label: "Inglés", value: "en" },
-    { label: "Francés", value: "fr" },
-  ]);
-  
-  const [cursos] = useState([
-    { label: "Matemáticas", value: "matematicas" },
-    { label: "Historia", value: "historia" },
-    { label: "Ciencias", value: "ciencias" },
-  ]);
+  // Efecto para obtener el token y los datos del usuario
+  useEffect(() => {
+    const fetchTokenAndUserData = async () => {
+      try {
+        // Obtener el token desde SecureStore
+        const tokenFromSecureStore = await SecureStore.getItemAsync("userToken");
+        if (!tokenFromSecureStore) {
+          console.log("No hay token guardado.");
+          Alert.alert("Error", "No se ha encontrado una sesión activa.");
+          return;
+        }
+        setToken(tokenFromSecureStore); // Guardar el token en el estado
+
+        // Realizar la solicitud GET con el token
+        const response = await fetch(`http://44.220.1.21:8080/api/users/me?token=${tokenFromSecureStore}`);
+        if (response.ok) {
+          const data = await response.json();
+          setUniversity(data.university || "No disponible"); // Guardar la universidad
+        } else {
+          console.log("Error al obtener los datos del usuario");
+        }
+      } catch (error) {
+        console.log("Error al obtener el token o datos del usuario:", error);
+      }
+    };
+
+    fetchTokenAndUserData();
+  }, []);
+
+  const handleNivelPress = (selectedNivel) => {
+    if (nivel === selectedNivel) {
+      switch (selectedNivel) {
+        case "A1":
+          setNivel("A2");
+          break;
+        case "A2":
+          setNivel(null);
+          break;
+        case "B1":
+          setNivel("B2");
+          break;
+        case "B2":
+          setNivel(null);
+          break;
+        case "C1":
+          setNivel("C2");
+          break;
+        case "C2":
+          setNivel(null);
+          break;
+        default:
+          setNivel(null);
+      }
+    } else {
+      setNivel(selectedNivel);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!token) {
+      Alert.alert("Error", "No se pudo encontrar el token.");
+      return;
+    }
+
+    const apiUrl = "http://44.220.1.21:8080/api/exchanges"; // URL de la API
+
+    const data = {
+      nativeLanguage,
+      targetLanguage,
+      educationalLevel: academicLevel,
+      academicLevel: nivel ? nivel.toUpperCase() : "",
+      beginDate: formatFecha(fechaInicio),
+      endDate: formatFecha(fechaFin),
+      quantityStudents: numAlumnos,
+      university, // Usamos el valor de universidad obtenido
+      token,
+    };
+
+    try {
+      console.log("Enviando datos:", data); // Debug
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        Alert.alert("Éxito", "Grupo creado exitosamente");
+        onClose();
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Error", `No se pudo guardar: ${errorData.message || "Inténtalo de nuevo"}`);
+      }
+    } catch (error) {
+      Alert.alert("Error de conexión", error.message);
+    }
+  };
+
+  // Función para formatear fecha a DD-MM-YYYY
+  const formatFecha = (fecha) => {
+    if (!fecha) return "";
+    const partes = fecha.split("-");
+    return partes.length === 3 ? `${partes[2]}-${partes[1]}-${partes[0]}` : fecha;
+  };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={onClose}>
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
-
       <ScrollView>
         <Text style={styles.label}>Nombre del Grupo</Text>
         <TextInput
@@ -38,46 +134,27 @@ const CreatedExchange = ({ onClose }) => {
           placeholder="Ingrese el nombre del grupo"
         />
 
-        <Text style={styles.label}>Nivel</Text>
+        <Text style={styles.label}>Nivel {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
         <View style={styles.trafficLight}>
-          {/* Bolas representando el semáforo */}
           <TouchableOpacity
-            style={[styles.light, nivel === "bajo" && styles.lightActiveGreen]}
-            onPress={() => setNivel("bajo")}
+            style={[styles.light, nivel === "A1" && styles.lightGreenA1, nivel === "A2" && styles.lightGreenA2]}
+            onPress={() => handleNivelPress("A1")}
           />
           <TouchableOpacity
-            style={[styles.light, nivel === "medio" && styles.lightActiveYellow]}
-            onPress={() => setNivel("medio")}
+            style={[styles.light, nivel === "B1" && styles.lightYellowB1, nivel === "B2" && styles.lightYellowB2]}
+            onPress={() => handleNivelPress("B1")}
           />
           <TouchableOpacity
-            style={[styles.light, nivel === "alto" && styles.lightActiveRed]}
-            onPress={() => setNivel("alto")}
+            style={[styles.light, nivel === "C1" && styles.lightRedC1, nivel === "C2" && styles.lightRedC2]}
+            onPress={() => handleNivelPress("C1")}
           />
         </View>
 
-        <Text style={styles.label}>Idioma</Text>
-        <RNPickerSelect
-          value={language}
-          onValueChange={setLanguage}
-          items={languages}
-          placeholder={{ label: "Selecciona un idioma", value: null }}
-          style={{
-            inputIOS: styles.pickerInput,
-            inputAndroid: styles.pickerInput,
-          }}
-        />
+        <Text style={styles.label}>Idioma Nativo</Text>
+        <LanguageSelector name="nativo" onLanguageChange={setNativeLanguage} />
 
-        <Text style={styles.label}>Curso</Text>
-        <RNPickerSelect
-          value={cursoSeleccionado}
-          onValueChange={setCursoSeleccionado}
-          items={cursos}
-          placeholder={{ label: "Selecciona un curso", value: null }}
-          style={{
-            inputIOS: styles.pickerInput,
-            inputAndroid: styles.pickerInput,
-          }}
-        />
+        <Text style={styles.label}>Idioma De Intercambios</Text>
+        <LanguageSelector name="intercambio" onLanguageChange={setTargetLanguage} />
 
         <Text style={styles.label}>Número de alumnos</Text>
         <TextInput
@@ -87,25 +164,43 @@ const CreatedExchange = ({ onClose }) => {
           keyboardType="numeric"
         />
 
-        <TouchableOpacity style={styles.saveButton} onPress={onClose}>
+        <Text style={styles.label}>Nivel Educacional</Text>
+        <TextInput
+          style={styles.input}
+          value={academicLevel}
+          onChangeText={setAcademicLevel}
+          placeholder="Ej: Bachiller"
+        />
+
+        <Text style={styles.label}>Fecha de inicio</Text>
+        <TextInput
+          style={styles.input}
+          value={fechaInicio}
+          onChangeText={setFechaInicio}
+          placeholder="YYYY-MM-DD"
+        />
+
+        <Text style={styles.label}>Fecha de fin</Text>
+        <TextInput
+          style={styles.input}
+          value={fechaFin}
+          onChangeText={setFechaFin}
+          placeholder="YYYY-MM-DD"
+        />
+
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Guardar</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F3F4F6",
     padding: 20,
-  },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 10,
   },
   label: {
     fontSize: 16,
@@ -129,16 +224,25 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#ccc", // Bola vacía sin color
+    backgroundColor: "#ccc",
   },
-  lightActiveRed: {
-    backgroundColor: "#FF3B30", // Rojo
+  lightGreenA1: {
+    backgroundColor: "#A8E6A2",
   },
-  lightActiveYellow: {
-    backgroundColor: "#FFCC00", // Amarillo
+  lightGreenA2: {
+    backgroundColor: "#4CAF50",
   },
-  lightActiveGreen: {
-    backgroundColor: "#4CAF50", // Verde
+  lightYellowB1: {
+    backgroundColor: "#FFEE99",
+  },
+  lightYellowB2: {
+    backgroundColor: "#FFCC00",
+  },
+  lightRedC1: {
+    backgroundColor: "#FFB3B3",
+  },
+  lightRedC2: {
+    backgroundColor: "#FF3B30",
   },
   saveButton: {
     backgroundColor: "#000",
@@ -152,15 +256,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  pickerInput: {
-    fontSize: 16,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    color: "#000",
-    marginTop: 20,
-  },
 });
-
-export default CreatedExchange;

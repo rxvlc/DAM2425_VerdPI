@@ -7,16 +7,16 @@ export default function LanguageSelector({ onLanguageChange, name }) {
   const [open, setOpen] = useState(false);
 
   const languages = [
-    { label: "English", value: "en" },
-    { label: "Spanish", value: "es" },
-    { label: "French", value: "fr" },
-    { label: "German", value: "de" },
-    { label: "Italian", value: "it" },
-    { label: "Portuguese", value: "pt" },
-    { label: "Japanese", value: "ja" },
-    { label: "Chinese", value: "zh" },
-    { label: "Russian", value: "ru" },
-    { label: "Arabic", value: "ar" },
+    { label: "English", value: "English" },
+    { label: "Spanish", value: "Spanish" },
+    { label: "French", value: "French" },
+    { label: "German", value: "German" },
+    { label: "Italian", value: "Italian" },
+    { label: "Portuguese", value: "Portuguese" },
+    { label: "Japanese", value: "Japanese" },
+    { label: "Chinese", value: "Chinese" },
+    { label: "Russian", value: "Russian" },
+    { label: "Arabic", value: "Arabic" },
   ];
 
   const handleLanguageSelect = (language) => {
