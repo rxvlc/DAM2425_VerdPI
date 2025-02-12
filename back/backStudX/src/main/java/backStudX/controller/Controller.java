@@ -695,27 +695,45 @@ public class Controller {
 	}
 
 	@PutMapping("/api/auth/update")
-	ResponseEntity<String> updateUser(@RequestBody String userData) {
-	    JSONObject updatedUserObject = new JSONObject(userData);
+	public ResponseEntity<String> updateUser(@RequestBody String userData) {
+	    try {
+	        JSONObject updatedUserObject = new JSONObject(userData);
 
-	    String email = updatedUserObject.getString("email");
-	    User existingUser = userRepository.findUserMail(email);
+	        // Extraer y validar el token
+	        String token = updatedUserObject.getString("token");
+	        Token t = tokenRepository.findToken(token);
 
-	    if (existingUser == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+	        if (t == null || t.isExpired()) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado.");
+	        }
+
+	        // Obtener el usuario a partir del email asociado al token
+	        String email = t.getEmail();
+	        User existingUser = userRepository.findUserMail(email);
+
+	        if (existingUser == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
+	        }
+
+	        // Actualizar solo los campos proporcionados
+	        String name = updatedUserObject.optString("name", existingUser.getName());
+	        String university = updatedUserObject.optString("university", existingUser.getUniversity());
+	        String urlProfilePicture = updatedUserObject.optString("urlProfilePicture", existingUser.getUrlProfilePicture());
+
+	        existingUser.setName(name);
+	        existingUser.setUniversity(university);
+	        existingUser.setUrlProfilePicture(urlProfilePicture);
+
+	        // Guardar cambios en la base de datos
+	        userRepository.save(existingUser);
+
+	        return ResponseEntity.ok("Usuario actualizado correctamente");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("Error al actualizar el usuario: " + e.getMessage());
 	    }
-
-	    String name = updatedUserObject.optString("name", existingUser.getName());
-	    String university = updatedUserObject.optString("university", existingUser.getUniversity());
-	    String urlProfilePicture = updatedUserObject.optString("urlProfilePicture", existingUser.getUrlProfilePicture());
-
-	    existingUser.setName(name);
-	    existingUser.setUniversity(university);
-	    existingUser.setUrlProfilePicture(urlProfilePicture);
-
-	    userRepository.save(existingUser);
-	    return ResponseEntity.ok("User updated successfully");
 	}
+
 
 	
 }
