@@ -76,10 +76,10 @@ export default function ExchangeTarget({
   return (
     <ImageBackground
       source={banderaInfo.img}
-      style={[styles.card, { width: width * 0.5, maxWidth: 250 }]}
+      style={[styles.card, { width: width * 0.56, maxWidth: 250 }]}
       resizeMode="cover"
     >
-      <View style={[styles.overlay, { backgroundColor: darkMode ? "#111" : "white" }]}>
+      <View style={[styles.overlay, { backgroundColor: darkMode ? "#242323" : "white" },{ borderColor: darkMode ? null : "#d6d4d4" }]}>
         <Text style={[styles.title, { color: darkMode ? "white" : "black" }]} numberOfLines={1} ellipsizeMode="tail">
           {centro}
         </Text>
@@ -123,7 +123,10 @@ export default function ExchangeTarget({
             onPress={onChatPress}
             activeOpacity={0.7}
           >
-            <Ionicons name="chatbubble-outline" size={16} color="white" />
+            <View style={styles.buttonContent}>
+              <Ionicons name="chatbubble-outline" size={16} color="white" />
+              <Text style={styles.buttonText}>Chat</Text>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -131,9 +134,13 @@ export default function ExchangeTarget({
             onPress={onSolicitudPress}
             activeOpacity={0.7}
           >
-            <Ionicons name="document-text-outline" size={16} color="white" />
+            <View style={styles.buttonContent}>
+              <Ionicons name="document-text-outline" size={16} color="white" />
+              <Text style={styles.buttonText}>request</Text>
+            </View>
           </TouchableOpacity>
         </View>
+
       </View>
     </ImageBackground>
   );
@@ -152,11 +159,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     overflow: "hidden",
   },
-  
+
   overlay: {
     padding: 12,
     borderRadius: 12,
     backgroundColor: "rgba(255, 255, 255, 0.92)", // Ligera transparencia para resaltar el efecto
+    borderColor: "#d6d4d4",
+    borderWidth: 0.5
   },
   title: {
     fontSize: 14,
@@ -200,11 +209,11 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center", // Centrar el contenido
-    paddingVertical: 7, // Más alto
-    paddingHorizontal: 20, // Más ancho
-    borderRadius: 25, // Bordes más redondeados
-    width: "48%", // Ocupar casi la mitad del contenedor
+    justifyContent: "center",
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    width: "48%",
     elevation: 2,
   },
   chatButton: {
@@ -212,5 +221,14 @@ const styles = StyleSheet.create({
   },
   solicitudButton: {
     backgroundColor: "#FF5722",
+  },
+  buttonContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 12,
+    marginTop: 2, // Espaciado entre el icono y el texto
   },
 });

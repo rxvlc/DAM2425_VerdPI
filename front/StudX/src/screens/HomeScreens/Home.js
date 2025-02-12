@@ -87,12 +87,13 @@ export default function Home() {
       </Animated.View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#ffffff" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>No hay conexión con el servidor.</Text>
-        </View>
-      ) : (
+  <ActivityIndicator size="large" color="#ffffff" style={styles.loader} />
+) : error ? (
+  <View style={styles.errorContainer}>
+    <Text style={styles.errorText}>No hay conexión con el servidor.</Text>
+  </View>
+) : (
+
         <View style={styles.listContainer}>
           <Text style={styles.exchangesAvailable}>Exchanges Available</Text>
           <FlatList
@@ -164,5 +165,19 @@ const styles = StyleSheet.create({
   listContent: {
     alignItems: "center", 
     paddingBottom: 20,
-  }
+  },
+  errorContainer: {
+    flex: 1, 
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  
+  errorText: {
+    fontSize: scaleFont(18),
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
+  },
+  
 });
