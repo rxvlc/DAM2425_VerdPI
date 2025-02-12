@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Platform, ScrollView } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Platform, ScrollView, Pressable } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useFilters } from "../../context/FiltersContext"; // Importamos el context
 import Toast from 'react-native-toast-message';
@@ -43,16 +43,19 @@ export default function SearchFilterScreen(props) {
     setTargetLanguage(language);
   };
 
+  const [open,setOpen] = useState(false);
+
   return (
-    <ScrollView 
+    <View 
       contentContainerStyle={styles.container}
       scrollEnabled={!open} // Deshabilitar el scroll cuando el dropdown está abierto
     >
       <Text style={styles.title}>Filtros</Text>
 
       {/* LanguageSelector para nativeLanguage */}
+      <Pressable onPress={() => setOpen(!open)}>
       <LanguageSelector onLanguageChange={handleLanguageNative} name="native" style={styles.languageSelector} />
-
+      </Pressable>
       {/* LanguageSelector para targetLanguage */}
       <LanguageSelector onLanguageChange={handleLanguageTarget} name="target" style={styles.languageSelector} />
 
@@ -114,7 +117,7 @@ export default function SearchFilterScreen(props) {
       />
 
       <Button title="Guardar Filtros" onPress={handleSaveFilters} />
-    </ScrollView>
+    </View>
   );
 }
 
