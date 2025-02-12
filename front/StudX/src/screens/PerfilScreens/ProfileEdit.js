@@ -98,8 +98,11 @@ const ProfileEdit = (props) => {
           },
           body: JSON.stringify(updateData),
         });
-  
-        const updateResult = await updateResponse;
+        console.log(token);
+        console.log(imageUrl);
+        
+        
+        const updateResult = await updateResponse.json();
         console.log("Respuesta de actualización:", updateResult);
       } catch (error) {
         console.error("Error en el proceso:", error);

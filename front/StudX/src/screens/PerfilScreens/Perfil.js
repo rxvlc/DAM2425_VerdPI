@@ -27,11 +27,8 @@ export default function Perfil(props) {
   );
 
   useEffect(() => {
-    if (editProfileOpened) {
       fetchUserData();
-      setEditProfileOpened(false);
-    }
-  }, [editProfileOpened])
+  }, [])
   const fetchUserData = async () => {
     try {
       const token = await SecureStore.getItemAsync("userToken");
