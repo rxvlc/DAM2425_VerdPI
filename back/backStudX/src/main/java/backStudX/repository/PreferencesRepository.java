@@ -13,4 +13,6 @@ public interface PreferencesRepository extends MongoRepository<Preferences, Stri
 	@Query(value = "{ 'preferences' : ?0 }")
 	List<User> findUserPreferences(boolean darkMode);
 	
+    Preferences findByUserId(String userId);
+
 }

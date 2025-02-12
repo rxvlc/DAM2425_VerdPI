@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import backStudX.SendEmail;
 
 import backStudX.Util;
@@ -47,16 +46,17 @@ import backStudX.model.Group;
 import backStudX.model.Token;
 import backStudX.model.User;
 import backStudX.model.Notifications;
-
+import backStudX.model.Preferences;
 import backStudX.repository.ExchangeRepository;
 import backStudX.repository.GroupRepository;
 import backStudX.repository.NotificationsRepository;
+import backStudX.repository.PreferencesRepository;
 import backStudX.repository.TokenRepository;
 import backStudX.repository.UserRepository;
 
 @RestController
 public class Controller {
-	
+
 	@Autowired
 	UserRepository userRepository;
 
@@ -65,18 +65,21 @@ public class Controller {
 
 	@Autowired
 	ExchangeRepository exchangeRepository;
-	
+
 	@Autowired
 	NotificationsRepository notificationRepository;
-	
+
 	@Autowired
 	GroupRepository groupRepository;
 
 	@Autowired
+	PreferencesRepository preferencesRepository;
+
+	@Autowired
 	private ExchangeService exchangeService;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
+	@Autowired
+	private CloudinaryService cloudinaryService;
 
 	@PostMapping("/api/auth/register")
 	ResponseEntity<String> registerUser(@RequestBody String userData) {
@@ -122,7 +125,7 @@ public class Controller {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
 	}
-	
+
 	@PostMapping("/api/auth/loginWithToken")
 	ResponseEntity<String> loginWithToken(@RequestBody String userData) {
 		JSONObject newUserObject = new JSONObject(userData);
@@ -131,15 +134,14 @@ public class Controller {
 		String token = (String) newUserObject.get("token");
 
 		Token t = tokenRepository.findToken(token);
-		if(t != null && t.getUserId().equals(emailUser) && !t.isExpired()) {
+		if (t != null && t.getUserId().equals(emailUser) && !t.isExpired()) {
 			return ResponseEntity.status(HttpStatus.OK).build();
 		}
 
-		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
 	}
-	
+
 	@PostMapping("/api/auth/logout")
 	ResponseEntity<String> logoutUser(@RequestBody String userData) {
 
@@ -280,36 +282,34 @@ public class Controller {
 
 		return ResponseEntity.ok().body(exchangeRepository.findById(exchangeId));
 	}
-	
+
 	@PostMapping("/api/notifications")
-	ResponseEntity<String> createNotification(@RequestBody String notification){
+	ResponseEntity<String> createNotification(@RequestBody String notification) {
 		JSONObject newNotification = new JSONObject(notification);
-		
+
 		String token = newNotification.getString("token");
 		Token t = tokenRepository.findToken(token);
-		
+
 		if (t != null && !t.isExpired()) {
 			String message = (String) newNotification.getString("message");
 			String recipient = (String) newNotification.getString("recipient");
 			String notificatonType = (String) newNotification.getString("notificationType");
-			
+
 			User searchUser = userRepository.findUserMail(recipient);
-			
-			if(searchUser == null)
-			{
+
+			if (searchUser == null) {
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 			} else {
 				Notifications noti = new Notifications("hola", recipient, message, notificatonType, false);
 				notificationRepository.save(noti);
-				
+
 				return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 
 			}
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}		
+		}
 	}
-	
 
 	@PutMapping("/api/exchanges/")
 	public ResponseEntity<?> updateExchange(@RequestParam String id, @RequestBody String exchangeJson) {
@@ -400,76 +400,242 @@ public class Controller {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
 		}
 	}
-	
-	
+
 	@PostMapping("/api/groups")
 	public ResponseEntity<String> createGroup(@RequestBody String group) {
 
-	    try {
-	        JSONObject objectGroup = new JSONObject(group);
+		try {
+			JSONObject objectGroup = new JSONObject(group);
 
-	        String token = objectGroup.getString("token");
-	        Token t = tokenRepository.findToken(token);
-	        if (t != null && !t.isExpired()) {
-	            // Obtener los datos de la solicitud
-	            String name = objectGroup.getString("name");
-	            int languajeLevel = objectGroup.getInt("languajeLevel");
-	            int quantity = objectGroup.getInt("quantity");
-	            String languaje = objectGroup.getString("languaje");
+			String token = objectGroup.getString("token");
+			Token t = tokenRepository.findToken(token);
+			if (t != null && !t.isExpired()) {
+				// Obtener los datos de la solicitud
+				String name = objectGroup.getString("name");
+				int languajeLevel = objectGroup.getInt("languajeLevel");
+				int quantity = objectGroup.getInt("quantity");
+				String languaje = objectGroup.getString("languaje");
 
-	            // Crear el objeto Group
-	            Group newGroup = new Group(name, languajeLevel, quantity, languaje,t.getUserId());
+				// Crear el objeto Group
+				Group newGroup = new Group(name, languajeLevel, quantity, languaje, t.getUserId());
 
-	            // Guardar el objeto en el repositorio
-	            groupRepository.save(newGroup);
+				// Guardar el objeto en el repositorio
+				groupRepository.save(newGroup);
 
-	            // Responder con estado creado
-	            return ResponseEntity.status(HttpStatus.CREATED).body("Group successfully created");
-	        } else {
-	            // Si el token es inválido o ha expirado
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
-	        }
+				// Responder con estado creado
+				return ResponseEntity.status(HttpStatus.CREATED).body("Group successfully created");
+			} else {
+				// Si el token es inválido o ha expirado
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+			}
 
-	    } catch (Exception e) {
-	        // Manejo de excepciones
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                .body("Error al procesar la solicitud: " + e.getMessage());
-	    }
+		} catch (Exception e) {
+			// Manejo de excepciones
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Error al procesar la solicitud: " + e.getMessage());
+		}
 	}
-	
+
 	@RequestMapping("/api/groups")
 	public ResponseEntity<?> getGroupsWithIdOfTeacher(@RequestParam String token) {
-	    // Buscar el token en la base de datos
-	    Token t = tokenRepository.findToken(token);
-	    
-	    // Verificar si el token es válido y no ha expirado
-	    if (t != null && !t.isExpired()) {
-	        // Obtener los grupos asociados al ID del profesor
-	        Optional<Group> groupOptional = groupRepository.getGroupByTeacherId(t.getUserId());
-	        
-	        // Si el grupo existe, retornamos el grupo encontrado
-	        if (groupOptional.isPresent()) {
-	            return ResponseEntity.status(HttpStatus.OK).body(groupOptional.get());
-	        } else {
-	            // Si no se encuentra el grupo, retornamos un mensaje de error
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group not found for teacher.");
-	        }
-	    } else {
-	        // Si el token es inválido o ha expirado, retornamos un error
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
-	    }
+		// Buscar el token en la base de datos
+		Token t = tokenRepository.findToken(token);
+
+		// Verificar si el token es válido y no ha expirado
+		if (t != null && !t.isExpired()) {
+			// Obtener los grupos asociados al ID del profesor
+			Optional<Group> groupOptional = groupRepository.getGroupByTeacherId(t.getUserId());
+
+			// Si el grupo existe, retornamos el grupo encontrado
+			if (groupOptional.isPresent()) {
+				return ResponseEntity.status(HttpStatus.OK).body(groupOptional.get());
+			} else {
+				// Si no se encuentra el grupo, retornamos un mensaje de error
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group not found for teacher.");
+			}
+		} else {
+			// Si el token es inválido o ha expirado, retornamos un error
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+		}
 	}
-	
+
+	@RequestMapping("/api/groups/")
+	public ResponseEntity<?> getOneGroup(@RequestParam(required = true) String groupId, @RequestParam String token) {
+
+		Token t = tokenRepository.findToken(token);
+		if (t != null && !t.isExpired()) {
+			return ResponseEntity.ok().body(groupRepository.findById(groupId));
+		} else {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+
+	@PutMapping("/api/groups/")
+	public ResponseEntity<?> updateGroup(@RequestParam String id, @RequestBody String groupJson) {
+		try {
+			JSONObject objectGroup = new JSONObject(groupJson);
+
+			Optional<Group> optionalGroup = groupRepository.findById(id);
+			if (optionalGroup.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Grupo no encontrado.");
+			}
+
+			Group existingGroup = optionalGroup.get();
+
+			// Actualizar solo los campos proporcionados en la petición
+			if (objectGroup.has("name")) {
+				existingGroup.setName(objectGroup.getString("name"));
+			}
+			if (objectGroup.has("languajeLevel")) {
+				existingGroup.setLanguajeLevel(objectGroup.getInt("languajeLevel"));
+			}
+			if (objectGroup.has("quantity")) {
+				existingGroup.setQuantity(objectGroup.getInt("quantity"));
+			}
+			if (objectGroup.has("languaje")) {
+				existingGroup.setLanguaje(objectGroup.getString("languaje"));
+			}
+			if (objectGroup.has("userId")) {
+				existingGroup.setUserId(objectGroup.getString("userId"));
+			}
+
+			// Guardar cambios en MongoDB
+			groupRepository.save(existingGroup);
+
+			return ResponseEntity.ok(existingGroup);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Error al actualizar el grupo: " + e.getMessage());
+		}
+	}
+
+	@DeleteMapping("/api/groups/")
+	public ResponseEntity<?> deleteGroup(@RequestParam String id, @RequestParam("token") String token) {
+		try {
+			// Verificar que el token es válido
+			Token t = tokenRepository.findToken(token);
+			if (t == null || t.isExpired()) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+			}
+
+			// Buscar el grupo por su id
+			Optional<Group> groupOptional = groupRepository.findById(id);
+			if (groupOptional.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group not found");
+			}
+
+			if (groupOptional.get().getUserId().equals(t.getUserId())) {
+				// Eliminar el grupo
+				groupRepository.delete(groupOptional.get());
+				// Responder con confirmación de eliminación
+				return ResponseEntity.status(HttpStatus.OK).body("Group successfully deleted");
+			} else {
+
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Probably problem with token");
+			}
+
+		} catch (Exception e) {
+			// Manejo de errores
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+		}
+	}
+
 	@PostMapping("/api/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-		  try {
-	            // Llamar al servicio de Cloudinary para cargar el archivo
-	            String fileUrl = cloudinaryService.uploadFile(file);
-	            return ResponseEntity.ok(fileUrl); // Retornar la URL del archivo cargado
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            return ResponseEntity.status(500).body("Error uploading file");
-	        }
-    }
+	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+		try {
+			// Llamar al servicio de Cloudinary para cargar el archivo
+			String fileUrl = cloudinaryService.uploadFile(file);
+			return ResponseEntity.ok(fileUrl); // Retornar la URL del archivo cargado
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("Error uploading file");
+		}
+	}
+
+	@PostMapping("/api/preferences")
+	public ResponseEntity<String> createPreference(@RequestBody String preferenceJson) {
+		try {
+			JSONObject objectPref = new JSONObject(preferenceJson);
+
+			String token = objectPref.getString("token");
+			Token t = tokenRepository.findToken(token);
+
+			if (t != null && !t.isExpired()) {
+				// Obtener los datos de la solicitud
+				String userId = t.getUserId();
+				boolean darkMode = objectPref.getBoolean("darkMode");
+				boolean notifications = objectPref.getBoolean("notifications");
+				String language = objectPref.getString("language");
+
+				// Crear el objeto Preferences
+				Preferences newPreference = new Preferences(userId, darkMode, notifications, language);
+
+				// Guardar en el repositorio
+				preferencesRepository.save(newPreference);
+
+				// Responder con estado 201 Created
+				return ResponseEntity.status(HttpStatus.CREATED).body("Preference successfully created");
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+			}
+
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Error al procesar la solicitud: " + e.getMessage());
+		}
+	}
+
+	// GET - Obtener preferencias del usuario
+	@GetMapping("/api/users/me/preferences")
+	public ResponseEntity<?> getUserPreferences(@RequestParam String token) {
+		try {
+			Token t = tokenRepository.findToken(token);
+
+			if (t != null && !t.isExpired()) {
+				Preferences preferences = preferencesRepository.findByUserId(t.getUserId());
+
+				if (preferences != null) {
+					return ResponseEntity.ok(preferences);
+				} else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Preferences not found for user.");
+				}
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error retrieving preferences: " + e.getMessage());
+		}
+	}
+
+	// PUT - Actualizar preferencias del usuario
+	@PutMapping("/api/users/me/preferences")
+	public ResponseEntity<String> updateUserPreferences(@RequestBody String preferencesJson) {
+		try {
+			JSONObject json = new JSONObject(preferencesJson);
+			String token = json.getString("token");
+
+			Token t = tokenRepository.findToken(token);
+			if (t != null && !t.isExpired()) {
+				Preferences preferences = preferencesRepository.findByUserId(t.getUserId());
+
+				if (preferences != null) {
+					// Actualizar preferencias con los nuevos valores
+					preferences.setDarkMode(json.getBoolean("darkMode"));
+					preferences.setNotifications(json.getBoolean("notifications"));
+					preferences.setLanguage(json.getString("language"));
+
+					preferencesRepository.save(preferences);
+					return ResponseEntity.ok("Preferences updated successfully");
+				} else {
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Preferences not found for user.");
+				}
+			} else {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating preferences: " + e.getMessage());
+		}
+	}
 
 }

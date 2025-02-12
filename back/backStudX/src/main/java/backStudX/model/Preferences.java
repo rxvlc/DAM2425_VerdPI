@@ -8,11 +8,13 @@ public class Preferences {
 
 	@Id
 	String id;
+	String userId;
 	boolean darkMode;
 	boolean notifications;
 	String language;
-	
-	public Preferences(String id, boolean darkmode, boolean notifications, String languaje) {
+
+	public Preferences(String userId, boolean darkmode, boolean notifications, String languaje) {
+		this.userId = userId;
 		this.darkMode = darkmode;
 		this.notifications = notifications;
 		this.language = languaje;
@@ -49,7 +51,13 @@ public class Preferences {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
-	
-	
-	
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 }
