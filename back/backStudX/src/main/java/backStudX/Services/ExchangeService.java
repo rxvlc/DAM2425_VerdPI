@@ -20,7 +20,7 @@ public class ExchangeService {
 
     public List<Exchange> searchExchanges(String nativeLanguage, String targetLanguage, String educationalLevel,
                                           Integer academicLevel, Date beginDate, Date endDate,
-                                          Integer quantityStudentsMin, Integer quantityStudentsMax, String university) {
+                                          Integer quantityStudentsMin, Integer quantityStudentsMax, String university, String userId) {
         Query query = new Query();
 
         if (nativeLanguage != null) {
@@ -51,6 +51,9 @@ public class ExchangeService {
             query.addCriteria(Criteria.where("university").is(university));
         }
 
+        if (userId != null) {
+            query.addCriteria(Criteria.where("idTeacherCreator").is(userId));
+        }
         return mongoTemplate.find(query, Exchange.class);
     }
 }
