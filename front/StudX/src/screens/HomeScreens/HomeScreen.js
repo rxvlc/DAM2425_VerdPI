@@ -17,7 +17,7 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../../context/ThemeContext";
 import Home from "../HomeScreens/Home";
-import Perfil2 from "../PerfilScreens/Perfil2";
+import Perfil2 from "../PerfilScreens/Perfil";
 import Busqueda from "../BusquedaScreens/Busqueda";
 import Mensajes from "../MensajesScreens/Mensajes";
 import CreateGroup from "./CreateExchange";

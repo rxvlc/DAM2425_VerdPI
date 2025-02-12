@@ -1,85 +1,71 @@
-import React, { useState, useEffect } from 'react';
-import { Picker } from '@react-native-picker/picker';
-import {
-  View,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Pressable,
-  Text,
-  TextInput,
-  ImageBackground,
-} from 'react-native';
-import { Avatar, IconButton } from 'react-native-paper';
-import * as ImagePicker from 'expo-image-picker';
-import { Dimensions } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, ActivityIndicator, Image, ScrollView, Dimensions, ImageBackground, TouchableOpacity } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
+import { Avatar, IconButton } from 'react-native-paper';
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
-const { width } = Dimensions.get('window'); 
 
-const Perfil = () => {
+const { width, height } = Dimensions.get("window");
+
+export default function Perfil(props) {
   const [fotoPerfil, setFotoPerfil] = useState(
     require('../../images/fotoPerfil.jpg')
   );
+  const [fotoFondo, setFotoFondo] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { darkMode } = useTheme();
-  const [fotoFondo, setFotoFondo] = useState(require('../../images/fotoFondo.jpg'));
-  const [hasPermission, setHasPermission] = useState(null);
-  const [isFocused, setIsFocused] = useState(false);
-  const [name, setName] = useState('Sergio Samper Calvo');
-  const [email, setEmail] = useState('sesaca@alumnatflorida.es');
-  const [rol, setRol] = useState('Alumno');
-  const [password, setPassword] = useState('hola123');
-  const [isSecure, setIsSecure] = useState(true);
+  const [editProfileOpened, setEditProfileOpened] = useState(false);
 
-  const toggleSecureEntry = () => {
-    setIsSecure(!isSecure);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserData(); // Refresca los datos cada vez que vuelves a esta pantalla
+    }, [])
+  );
 
   useEffect(() => {
-    (async () => {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    if (editProfileOpened) {
+      fetchUserData();
+      setEditProfileOpened(false);
+    }
+  }, [editProfileOpened])
+  const fetchUserData = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("userToken");
+      if (!token) {
+        console.log("No hay sesión activa.");
+        setUserData(null);
+        return;
+      }
 
-  const openCamera = async () => {
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+      const response = await fetch(
+        `http://44.220.1.21:8080/api/users/me?token=${token}`
+      );
 
-    if (!result.canceled) {
-      setFotoPerfil({ uri: result.assets[0].uri });
+      if (response.ok) {
+        const data = await response.json();
+
+        setUserData(data);
+      } else {
+        console.log("Error: No se pudo obtener la información del usuario.");
+        setUserData(null);
+      }
+    } catch (error) {
+      console.log("Error al obtener datos del usuario:", error);
+      setUserData(null);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const openGallery = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setFotoFondo({ uri: result.assets[0].uri });
-    }
-  };
-
-  if (hasPermission === null) {
-    return <View />;
-  }
-
-  if (!hasPermission) {
+  
+  if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: 'center'}}>
-          We need your permission to show the camera
-        </Text>
-        <Pressable onPress={openCamera} style={styles.buttonText}>
-          <Text style={{ fontSize: 25, color: 'Black' }}>Grant permission</Text>
-        </Pressable>
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#FFA500" />
       </View>
     );
   }
@@ -101,73 +87,45 @@ const Perfil = () => {
         </View>
       </View> */}
 
-<View style={styles.fotosContainer}>
-  <ImageBackground source={fotoFondo} style={styles.coverImage}>
-  <TouchableOpacity style={styles.cameraIconFondo} onPress={openGallery}>
-          <IconButton icon="upload" size={25} />
-        </TouchableOpacity>
-    <View style={styles.avatarWrapper}>
-      <Avatar.Image size={width * 0.3} source={fotoPerfil} />
-      <TouchableOpacity style={styles.cameraIconPerfil} onPress={openCamera}>
-        <IconButton icon="camera" size={25} />
-      </TouchableOpacity>
-    </View>
-  </ImageBackground>
-</View>
-
-
-
-      <View style={[styles.infoContainer, {backgroundColor: darkMode? "#111":"#fff"}]}>
-        <ScrollView>
-          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Nombre</Text>
-          <TextInput
-            style={[styles.input, isFocused && styles.inputFocused]}
-            value={name}
-            onChangeText={setName}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          />
-          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Correo</Text>
-          <TextInput
-            style={[styles.input, isFocused && styles.inputFocused]}
-            value={email}
-            onChangeText={setEmail}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          />
-          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Rol</Text>
-          <Picker
-            selectedValue={rol}
-            onValueChange={(itemValue) => setRol(itemValue)}
-            style={styles.picker}>
-            <Picker.Item label="Alumno" value="Alumno" />
-            <Picker.Item label="Profesor" value="Profesor" />
-          </Picker>
-
-          <Text style={[styles.label, { color : darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Password</Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={[styles.textInput, isFocused && styles.inputFocused]}
-              value={password}
-              onChangeText={setPassword}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              secureTextEntry={isSecure}
+      <View style={styles.fotosContainer}>
+        <ImageBackground source={fotoFondo} style={styles.coverImage}>
+          <View style={styles.avatarWrapper}>
+            <Avatar.Image
+              size={width * 0.3}
+              source={{
+                uri: userData?.urlProfilePicture || "https://picsum.photos/200/200"
+              }}
             />
-            <TouchableOpacity onPress={toggleSecureEntry}>
-              <IconButton icon="eye" size={25} color="grey" />
-            </TouchableOpacity>
           </View>
-          <TouchableOpacity>
+        </ImageBackground>
+      </View>
+
+
+
+      <View style={[styles.infoContainer, { backgroundColor: darkMode ? "#111" : "#fff" }]}>
+        <ScrollView>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Nombre</Text>
+          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.name || "No disponible"}</Text>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Correo</Text>
+          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.email || "No disponible"}</Text>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>University</Text>
+          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.university || "No disponible"}</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setEditProfileOpened(true);
+              props.navigation.navigate("Editar Perfil");
+            }}
+          >
             <View style={styles.save}>
-              <Text style={styles.saveButt}>Save</Text>
+              <Text style={styles.saveButt}>Edit</Text>
             </View>
           </TouchableOpacity>
+
         </ScrollView>
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -194,12 +152,12 @@ const styles = StyleSheet.create({
     borderColor: '#4CAF50',
   },
   avatarWrapper: {
-    position: 'absolute', 
-    left: 0, 
+    position: 'absolute',
+    left: 0,
     bottom: 0,
-    alignItems: 'flex-start', 
-    padding: 10, 
-},
+    alignItems: 'flex-start',
+    padding: 10,
+  },
 
   cameraIconPerfil: {
     position: 'absolute',
@@ -209,27 +167,27 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'grey',
-    elevation: 3, 
-    shadowColor: '#000', 
+    elevation: 3,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
   cameraIconFondo: {
     position: 'absolute',
-    top: 10, 
-    right: 10, 
+    top: 10,
+    right: 10,
     backgroundColor: 'white',
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'grey',
-    padding: 5, 
-    elevation: 5, 
-    shadowColor: '#000', 
+    padding: 5,
+    elevation: 5,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-},
+  },
 
   label: {
     fontSize: 16,
@@ -286,7 +244,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
 });
-
-export default Perfil;

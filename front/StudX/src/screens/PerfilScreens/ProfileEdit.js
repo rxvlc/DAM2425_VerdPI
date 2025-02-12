@@ -15,10 +15,12 @@ import { Avatar, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Dimensions } from 'react-native';
 import { useTheme } from "../../context/ThemeContext";
+import * as SecureStore from "expo-secure-store";
+
 
 const { width } = Dimensions.get('window'); 
 
-const Perfil = () => {
+const ProfileEdit = (props) => {
   const [fotoPerfil, setFotoPerfil] = useState(
     require('../../images/fotoPerfil.jpg')
   );
@@ -49,11 +51,63 @@ const Perfil = () => {
       aspect: [1, 1],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setFotoPerfil({ uri: result.assets[0].uri });
+      const uri = result.assets[0].uri;
+      setFotoPerfil({ uri });
+  
+      // Crear el objeto FormData para enviar el archivo
+      const formData = new FormData();
+      formData.append("file", {
+        uri,
+        name: "photo.jpg", // Nombre del archivo
+        type: "image/jpeg", // Tipo de archivo
+      });
+  
+      try {
+        // Subir la imagen
+        const uploadResponse = await fetch("http://44.220.1.21:8080/api/upload", {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+  
+        if (!uploadResponse.ok) {
+          throw new Error("Error al subir la imagen");
+        }
+  
+        const imageUrl = await uploadResponse.text();
+        console.log("URL de la imagen subida:", imageUrl);
+  
+        // Obtener el token (ajusta esto según cómo almacenes el token)
+        const token = await SecureStore.getItemAsync("userToken"); 
+  
+        // Crear el objeto con la nueva URL
+        const updateData = {
+          token,
+          urlProfilePicture: imageUrl,
+        };
+  
+        // Hacer la petición PUT para actualizar el perfil
+        const updateResponse = await fetch("http://44.220.1.21:8080/api/auth/update", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updateData),
+        });
+  
+        const updateResult = await updateResponse;
+        console.log("Respuesta de actualización:", updateResult);
+      } catch (error) {
+        console.error("Error en el proceso:", error);
+      }
     }
   };
+  
+  
 
   const openGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -158,7 +212,7 @@ const Perfil = () => {
               <IconButton icon="eye" size={25} color="grey" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress = {() => props.navigation.goBack()}>
             <View style={styles.save}>
               <Text style={styles.saveButt}>Save</Text>
             </View>
@@ -289,4 +343,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default Perfil;
+export default ProfileEdit;

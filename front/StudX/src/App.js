@@ -14,7 +14,8 @@ import SearchFilterScreen from "./screens/BusquedaScreens/SearchFilterScreen";
 import { FiltersProvider } from "./context/FiltersContext";
 import Busquedas from "./screens/BusquedaScreens/Busqueda";
 import Toast from "react-native-toast-message";
-
+import ProfileEdit from "./screens/PerfilScreens/ProfileEdit";
+import Perfil from "./screens/PerfilScreens/Perfil";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -55,6 +56,9 @@ function AppWrapper() {
           <Stack.Screen name="SeachScreen" component={Busquedas} />
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
           <Stack.Screen name="Crear Intercambios" component={CreatedExchange}/>
+          <Stack.Screen name="Ver Perfil" component={Perfil}/>
+          <Stack.Screen name="Editar Perfil" component={ProfileEdit}/>
+
         </Stack.Navigator>
       </View>
     </ImageBackground>
