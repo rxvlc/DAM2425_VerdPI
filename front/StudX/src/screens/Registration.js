@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, StatusBar, Alert, ActivityIndicator } from "react-native";
 import { CommonActions } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 export default function Registration({ navigation }) {
   const [username, setUsername] = useState("");
@@ -34,7 +35,12 @@ export default function Registration({ navigation }) {
       });
 
       if (response.ok) {
-        Alert.alert("Éxito", "Registro completado. Ahora puedes iniciar sesión.");
+        Toast.show({
+          type: 'success',
+          position: 'bottom',
+          text1: 'Éxito',
+          text2: 'Registro completado. Ahora puedes iniciar sesión.',
+        });
 
         // 🔥 Redirigir a Login después del registro exitoso
         navigation.dispatch(
