@@ -269,10 +269,10 @@ public class Controller {
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
 			@RequestParam(required = false) Integer quantityStudentsMin,
 			@RequestParam(required = false) Integer quantityStudentsMax,
-			@RequestParam(required = false) String university) {
+			@RequestParam(required = false) String university,@RequestParam(required = false) String userId) {
 
 		List<Exchange> exchanges = exchangeService.searchExchanges(nativeLanguage, targetLanguage, educationalLevel,
-				academicLevel, beginDate, endDate, quantityStudentsMin, quantityStudentsMax, university);
+				academicLevel, beginDate, endDate, quantityStudentsMin, quantityStudentsMax, university,userId);
 
 		return ResponseEntity.ok(exchanges);
 	}
