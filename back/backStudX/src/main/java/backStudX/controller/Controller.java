@@ -34,9 +34,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+
 import backStudX.SendEmail;
 
 import backStudX.Util;
+import backStudX.Services.CloudinaryService;
 import backStudX.Services.ExchangeService;
 import backStudX.model.Exchange;
 import backStudX.model.Group;
@@ -52,7 +56,7 @@ import backStudX.repository.UserRepository;
 
 @RestController
 public class Controller {
-
+	
 	@Autowired
 	UserRepository userRepository;
 
@@ -70,6 +74,9 @@ public class Controller {
 
 	@Autowired
 	private ExchangeService exchangeService;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
 	@PostMapping("/api/auth/register")
 	ResponseEntity<String> registerUser(@RequestBody String userData) {
@@ -452,8 +459,17 @@ public class Controller {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
 	    }
 	}
-
 	
-
+	@PostMapping("/api/upload")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+		  try {
+	            // Llamar al servicio de Cloudinary para cargar el archivo
+	            String fileUrl = cloudinaryService.uploadFile(file);
+	            return ResponseEntity.ok(fileUrl); // Retornar la URL del archivo cargado
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(500).body("Error uploading file");
+	        }
+    }
 
 }
