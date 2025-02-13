@@ -44,7 +44,7 @@ export default function Login({ navigation }) {
       const token = await SecureStore.getItemAsync("userToken");
       console.log(loginWithToken());
       
-      if (token && !loginWithToken) {
+      if (token && loginWithToken) {
         // Si hay un token, redirigir automáticamente a HomeScreen
         navigation.dispatch(
           CommonActions.reset({
