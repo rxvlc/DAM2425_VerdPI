@@ -36,6 +36,10 @@ export default function Home() {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    // navigation.navigate("Login");
+  },[])
+
   const fetchUserData = async () => {
     try {
       const token = await SecureStore.getItemAsync("userToken");

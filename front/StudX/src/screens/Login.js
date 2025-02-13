@@ -8,11 +8,43 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(true); // Estado para controlar la carga
 
+  const loginWithToken = async () => {
+    try {
+      
+      const token = await SecureStore.getItemAsync("userToken");
+      const email = await SecureStore.getItemAsync("email");
+      const response = await fetch('http://44.220.1.21:8080/api/auth/loginWithToken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          token,
+        }),
+      });
+  
+      if (response.ok) {
+        console.log('Inicio de sesión exitoso');
+        return true;
+      } else {
+        console.log('Inicio de sesión fallido');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error en la petición:', error);
+    }
+    return false;
+  };
+
+  
   // 🔥 Verificar si hay una sesión activa al cargar la pantalla
   useEffect(() => {
     const checkUserSession = async () => {
       const token = await SecureStore.getItemAsync("userToken");
-      if (token) {
+      console.log(loginWithToken());
+      
+      if (token && !loginWithToken) {
         // Si hay un token, redirigir automáticamente a HomeScreen
         navigation.dispatch(
           CommonActions.reset({

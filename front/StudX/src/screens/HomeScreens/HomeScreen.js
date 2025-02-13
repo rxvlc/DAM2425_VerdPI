@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, CommonActions } from "@react-navigation/native";
@@ -70,13 +70,21 @@ export default function HomeScreen() {
         );
       } else {
         const responseText = await response.text();
-        Alert.alert("Error", responseText || `Error ${response.status}: No se pudo cerrar sesión`);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }], // Asegúrate de que "Login" es el nombre correcto de la pantalla
+          })
+        );
+        Alert.alert("Error", responseText || `Error ${response.status}: No se pudo cerrar sesión correctamente`);
       }
     } catch (error) {
       Alert.alert("Error", "Error en la conexión con el servidor");
       console.error("Error en el logout:", error);
     }
   };
+
+  
 
   return (
     <KeyboardAvoidingView
