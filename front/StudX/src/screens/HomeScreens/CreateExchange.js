@@ -73,7 +73,10 @@ export default function CreatedExchange({ onClose }) {
           `http://44.220.1.21:8080/api/groups?token=${tokenFromSecureStore}`
         );
 
-        if (response.ok) {
+        const responseText = await response.text(); // Espera a que se resuelva el texto de la respuesta
+
+        
+        if (response.ok || responseText === "Group not found for teacher.") {
           const data = await response.json();
           // Aquí, puedes manejar los grupos obtenidos como desees
           console.log("Grupos:", data);
