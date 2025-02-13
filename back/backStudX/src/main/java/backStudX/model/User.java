@@ -13,7 +13,7 @@ public class User {
 	private String hashPasswd;
 	private String university;
 	String urlProfilePicture = "https://fastly.picsum.photos/id/466/200/200.jpg?hmac=VydiBydfVntkv5HY6NXsWaNXDedBW2VWNmm8MqF5Cew";
-	
+	String urlHeaderPicture = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuN1JkUbRlc-IiikIatjEF2cD2hnN72yMxiw&s";
 	
 	
 
@@ -95,6 +95,18 @@ public class User {
 
 	public void setUrlProfilePicture(String urlProfilePicture) {
 		this.urlProfilePicture = urlProfilePicture;
+	}
+
+
+
+	public String getUrlHeaderPicture() {
+		return urlHeaderPicture;
+	}
+
+
+
+	public void setUrlHeaderPicture(String urlHeaderPicture) {
+		this.urlHeaderPicture = urlHeaderPicture;
 	}
 
 

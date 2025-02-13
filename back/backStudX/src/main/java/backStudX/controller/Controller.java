@@ -723,10 +723,11 @@ public class Controller {
 	        String name = updatedUserObject.optString("name", existingUser.getName());
 	        String university = updatedUserObject.optString("university", existingUser.getUniversity());
 	        String urlProfilePicture = updatedUserObject.optString("urlProfilePicture", existingUser.getUrlProfilePicture());
-
+	        String urlHeaderPicture = updatedUserObject.optString("urlHeaderPicture",existingUser.getUrlHeaderPicture());
 	        existingUser.setName(name);
 	        existingUser.setUniversity(university);
 	        existingUser.setUrlProfilePicture(urlProfilePicture);
+	        existingUser.setUrlHeaderPicture(urlHeaderPicture);
 
 	        // Guardar cambios en la base de datos
 	        userRepository.save(existingUser);
