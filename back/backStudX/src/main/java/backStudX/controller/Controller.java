@@ -169,6 +169,7 @@ public class Controller {
 			userInJson.put("password", u.getHashPasswd());
 			userInJson.put("university", u.getUniversity());
 			userInJson.put("urlProfilePicture", u.getUrlProfilePicture());
+			userInJson.put("urlHeaderPicture", u.getUrlHeaderPicture());
 			return ResponseEntity.status(HttpStatus.OK).body(userInJson.toString());
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
