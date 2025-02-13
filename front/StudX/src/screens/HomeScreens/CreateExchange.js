@@ -43,7 +43,7 @@ export default function CreatedExchange({ onClose }) {
 
     fetchTokenAndUserData();
   }, []);
-
+   
   const handleNivelPress = (selectedNivel) => {
     if (nivel === selectedNivel) {
       switch (selectedNivel) {
@@ -166,6 +166,7 @@ export default function CreatedExchange({ onClose }) {
     }
 
     setFechaFin(currentDate);
+
   };
 
   return (
@@ -243,7 +244,7 @@ export default function CreatedExchange({ onClose }) {
           />
         )}
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+        <TouchableOpacity style={styles.saveButton} onPress={{handleSave}}>
           <Text style={styles.saveButtonText}>Guardar</Text>
         </TouchableOpacity>
       </ScrollView>

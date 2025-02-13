@@ -99,6 +99,10 @@ export default function HomeScreen() {
           ),
           headerRight: () => (
             <View style={styles.headerRightContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate("Crear Grupos")} style={styles.groupButton}>
+                <Ionicons name="people-outline" size={PixelRatio.getPixelSizeForLayoutSize(12)} color={darkMode ? "white" : "black"} />
+              </TouchableOpacity>
+
               {/* Botón "+" más grande */}
               <TouchableOpacity onPress={() => navigation.navigate("Crear Intercambios")} style={styles.addButton}>
                 <Ionicons name="add-circle-outline" size={PixelRatio.getPixelSizeForLayoutSize(12)} color={darkMode ? "white" : "black"} />
@@ -148,7 +152,7 @@ export default function HomeScreen() {
         <Tab.Screen name="Mensajes" component={Mensajes} />
         <Tab.Screen name="Perfil" component={Perfil2} />
       </Tab.Navigator>
-   
+
     </KeyboardAvoidingView>
   );
 }
@@ -161,6 +165,9 @@ const styles = StyleSheet.create({
   },
   addButton: {
     marginRight: width * 0.05, // Espacio entre "+" y el menú
+  },
+  groupButton:{
+    marginRight: width * 0.05,
   },
   menuButton: {
     padding: width * 0.015, // Aumenta el área táctil sin afectar diseño

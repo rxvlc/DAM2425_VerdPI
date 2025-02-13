@@ -136,7 +136,7 @@ export default function ExchangeTarget({
           >
             <View style={styles.buttonContent}>
               <Ionicons name="document-text-outline" size={16} color="white" />
-              <Text style={styles.buttonText}>request</Text>
+              <Text style={styles.buttonText}>Join</Text>
             </View>
           </TouchableOpacity>
         </View>
