@@ -44,7 +44,8 @@ export default function Perfil(props) {
 
       if (response.ok) {
         const data = await response.json();
-
+        console.log(data);
+        
         setUserData(data);
       } else {
         console.log("Error: No se pudo obtener la información del usuario.");
@@ -85,7 +86,9 @@ export default function Perfil(props) {
       </View> */}
 
       <View style={styles.fotosContainer}>
-        <ImageBackground source={fotoFondo} style={styles.coverImage}>
+        <ImageBackground source={{
+                uri: userData?.urlHeaderPicture || "https://picsum.photos/200/200"
+              }} style={styles.coverImage}>
           <View style={styles.avatarWrapper}>
             <Avatar.Image
               size={width * 0.3}
