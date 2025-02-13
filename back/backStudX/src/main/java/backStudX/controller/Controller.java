@@ -244,7 +244,7 @@ public class Controller {
 
 				// Crear el objeto Exchange
 				Exchange newExchange = new Exchange(nativeLanguage, targetLanguage, educationalLevel, academicLevel,
-						idTeacherCreator, beginDateMongo, endDateMongo, quantityStudents, university);
+						idTeacherCreator, beginDateMongo, endDateMongo, quantityStudents, university, "pending");
 
 				exchangeRepository.save(newExchange);
 
@@ -269,7 +269,8 @@ public class Controller {
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
 			@RequestParam(required = false) Integer quantityStudentsMin,
 			@RequestParam(required = false) Integer quantityStudentsMax,
-			@RequestParam(required = false) String university,@RequestParam(required = false) String userId) {
+			@RequestParam(required = false) String university,@RequestParam(required = false) String userId,
+			@RequestParam(required = false) String status) {
 
 		List<Exchange> exchanges = exchangeService.searchExchanges(nativeLanguage, targetLanguage, educationalLevel,
 				academicLevel, beginDate, endDate, quantityStudentsMin, quantityStudentsMax, university,userId);
@@ -415,6 +416,9 @@ public class Controller {
 			}
 			if (objectExchange.has("university")) {
 				existingExchange.setUniversity(objectExchange.getString("university"));
+			}
+			if(objectExchange.has("status")) {
+				existingExchange.setUniversity(objectExchange.getString("status"));
 			}
 
 			// Guardar cambios en MongoDB

@@ -20,9 +20,10 @@ public class Exchange {
 	private Date endDate;
 	int quantityStudents;
 	String university;
+	String status;
 
 	public Exchange(String nativeLanguage, String targetLanguage, String educationalLevel, String academicLevel,
-			String idTeacherCreator, Date beginDate, Date endDate, int quantityStudents, String university) {
+			String idTeacherCreator, Date beginDate, Date endDate, int quantityStudents, String university, String status) {
 		this.nativeLanguage = nativeLanguage;
 		this.targetLanguage = targetLanguage;
 		this.educationalLevel = educationalLevel;
@@ -32,6 +33,7 @@ public class Exchange {
 		this.endDate = endDate;
 		this.quantityStudents = quantityStudents;
 		this.university = university;
+		this.status = status;
 	}
 
 	public String getId() {
@@ -112,6 +114,14 @@ public class Exchange {
 
 	public void setUniversity(String university) {
 		this.university = university;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }
