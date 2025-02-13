@@ -7,7 +7,8 @@ import {
   Text,
   Animated,
   Dimensions,
-  ScrollView
+  ScrollView,
+  RefreshControl
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../../context/ThemeContext";
@@ -28,83 +29,93 @@ export default function Home() {
   const [exchanges, setExchanges] = useState([]);
   const [myExchanges, setMyExchanges] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
   const [userName, setUserName] = useState("Usuario");
   const [userEmail, setUserEmail] = useState("");
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = await SecureStore.getItemAsync("userToken");
-        const email = await SecureStore.getItemAsync("email");
-        if (!token || !email) {
-          console.log("⚠ No hay token o email guardado.");
-          return;
-        }
-        setUserEmail(email);
-        const response = await fetch(`${USER_API_URL}?token=${token}`);
-        if (response.ok) {
-          const data = await response.json();
-          setUserName(data.name || "Usuario");
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }).start();
-        } else {
-          console.log("⚠ Error al obtener el usuario:", response.status);
-        }
-      } catch (error) {
-        console.log("⚠ No se pudo conectar al servidor para obtener el usuario.");
+  const fetchUserData = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("userToken");
+      const email = await SecureStore.getItemAsync("email");
+      if (!token || !email) {
+        console.log("⚠ No hay token o email guardado.");
+        return;
       }
-    };
-    fetchUserData();
-  }, []);
+      setUserEmail(email);
+      const response = await fetch(`${USER_API_URL}?token=${token}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUserName(data.name || "Usuario");
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        console.log("⚠ Error al obtener el usuario:", response.status);
+      }
+    } catch (error) {
+      console.log("⚠ No se pudo conectar al servidor para obtener el usuario.");
+    }
+  };
+
+  const fetchExchanges = async () => {
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) {
+        console.log("⚠ Error en la respuesta del servidor:", response.status);
+        throw new Error("Error en la respuesta del servidor");
+      }
+      const data = await response.json();
+      setExchanges(data);
+      setError(false);
+    } catch (error) {
+      console.log("⚠ No se pudo conectar al servidor para obtener intercambios.");
+      setError(true);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const fetchMyExchanges = async () => {
+    if (!userEmail) return;
+    try {
+      const response = await fetch(`${API_URL}?userId=${userEmail}`);
+      if (!response.ok) {
+        console.log("⚠ Error al obtener los intercambios del usuario:", response.status);
+        throw new Error("Error en la respuesta del servidor");
+      }
+      const data = await response.json();
+      setMyExchanges(data);
+    } catch (error) {
+      console.log("⚠ No se pudo obtener los intercambios del usuario.");
+    }
+  };
 
   useEffect(() => {
-    const fetchExchanges = async () => {
-      try {
-        const response = await fetch(API_URL);
-        if (!response.ok) {
-          console.log("⚠ Error en la respuesta del servidor:", response.status);
-          throw new Error("Error en la respuesta del servidor");
-        }
-        const data = await response.json();
-        setExchanges(data);
-        setError(false);
-      } catch (error) {
-        console.log("⚠ No se pudo conectar al servidor para obtener intercambios.");
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetchUserData();
     fetchExchanges();
   }, []);
 
   useEffect(() => {
-    if (!userEmail) return;
-    const fetchMyExchanges = async () => {
-      try {
-        const response = await fetch(`${API_URL}?userId=${userEmail}`);
-        if (!response.ok) {
-          console.log("⚠ Error al obtener los intercambios del usuario:", response.status);
-          throw new Error("Error en la respuesta del servidor");
-        }
-        const data = await response.json();
-        setMyExchanges(data);
-      } catch (error) {
-        console.log("⚠ No se pudo obtener los intercambios del usuario.");
-      }
-    };
     fetchMyExchanges();
   }, [userEmail]);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchExchanges();
+    fetchMyExchanges();
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: darkMode ? "#111" : "#ff5733", width }]}>
-      <ScrollView>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <Animated.View style={[styles.welcomeContainer, { opacity: fadeAnim }]}>
           <Text style={[styles.welcomeText, { color: "white" }]}>¡Welcome <Text style={styles.userName}>{userName}</Text>!</Text>
         </Animated.View>
@@ -119,29 +130,30 @@ export default function Home() {
           <View style={styles.listContainer}>
             <Text style={styles.exchangesAvailable}>Exchanges Available</Text>
             <FlatList
-              data={exchanges}
-              keyExtractor={(item) => item.id}
-              horizontal
-              renderItem={({ item }) => (
-                <ExchangeTarget
-                  centro={item.university}
-                  profesor={item.idTeacherCreator}
-                  alumnos={item.quantityStudents}
-                  nivel={item.academicLevel.toString()}
-                  idiomaDeseado={item.targetLanguage}
-                  idioma={item.nativeLanguage}
-                  onChatPress={() => navigation.navigate("Mensajes", { profesor: item.idTeacherCreator })}
-                  onSolicitudPress={() => console.log(`Solicitud a ${item.idTeacherCreator}`)}
-                />
-              )}
-              contentContainerStyle={styles.listContent}
-              showsHorizontalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            />
+  data={[...exchanges].reverse()} 
+  keyExtractor={(item) => item.id}
+  horizontal
+  renderItem={({ item }) => (
+    <ExchangeTarget
+      centro={item.university}
+      profesor={item.idTeacherCreator}
+      alumnos={item.quantityStudents}
+      nivel={item.academicLevel.toString()}
+      idiomaDeseado={item.targetLanguage}
+      idioma={item.nativeLanguage}
+      onChatPress={() => navigation.navigate("Mensajes", { profesor: item.idTeacherCreator })}
+      onSolicitudPress={() => console.log(`Solicitud a ${item.idTeacherCreator}`)}
+    />
+  )}
+  contentContainerStyle={styles.listContent}
+  showsHorizontalScrollIndicator={false}
+  refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+/>
+
 
             <Text style={styles.exchangesAvailable}>My Exchanges</Text>
             <FlatList
-              data={myExchanges}
+              data={[...myExchanges].reverse()} 
               keyExtractor={(item) => item.id}
               horizontal
               renderItem={({ item }) => (
@@ -154,6 +166,7 @@ export default function Home() {
               )}
               contentContainerStyle={styles.listContent}
               showsHorizontalScrollIndicator={false}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             />
           </View>
         )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from "react-native";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as SecureStore from "expo-secure-store";
 import LanguageSelector from "../../components/LanguageSelector";
 
@@ -9,30 +10,29 @@ export default function CreatedExchange({ onClose }) {
   const [nativeLanguage, setNativeLanguage] = useState(null);
   const [targetLanguage, setTargetLanguage] = useState(null);
   const [numAlumnos, setNumAlumnos] = useState(1);
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
+  const [fechaInicio, setFechaInicio] = useState(new Date());
+  const [fechaFin, setFechaFin] = useState(new Date());
   const [academicLevel, setAcademicLevel] = useState("");
-  const [university, setUniversity] = useState(""); // Estado para la universidad
-  const [token, setToken] = useState(null); // Estado para el token
+  const [university, setUniversity] = useState("");
+  const [token, setToken] = useState(null);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
-  // Efecto para obtener el token y los datos del usuario
   useEffect(() => {
     const fetchTokenAndUserData = async () => {
       try {
-        // Obtener el token desde SecureStore
         const tokenFromSecureStore = await SecureStore.getItemAsync("userToken");
         if (!tokenFromSecureStore) {
           console.log("No hay token guardado.");
           Alert.alert("Error", "No se ha encontrado una sesión activa.");
           return;
         }
-        setToken(tokenFromSecureStore); // Guardar el token en el estado
+        setToken(tokenFromSecureStore);
 
-        // Realizar la solicitud GET con el token
         const response = await fetch(`http://44.220.1.21:8080/api/users/me?token=${tokenFromSecureStore}`);
         if (response.ok) {
           const data = await response.json();
-          setUniversity(data.university || "No disponible"); // Guardar la universidad
+          setUniversity(data.university || "No disponible");
         } else {
           console.log("Error al obtener los datos del usuario");
         }
@@ -79,7 +79,21 @@ export default function CreatedExchange({ onClose }) {
       return;
     }
 
-    const apiUrl = "http://44.220.1.21:8080/api/exchanges"; // URL de la API
+    // Validar fechas
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Ignorar la hora, comparar solo la fecha
+
+    if (fechaInicio < today) {
+      Alert.alert("Error", "La fecha de inicio no puede ser anterior a hoy.");
+      return;
+    }
+
+    if (fechaFin < fechaInicio) {
+      Alert.alert("Error", "La fecha de fin no puede ser anterior a la fecha de inicio.");
+      return;
+    }
+
+    const apiUrl = "http://44.220.1.21:8080/api/exchanges";
 
     const data = {
       nativeLanguage,
@@ -89,12 +103,12 @@ export default function CreatedExchange({ onClose }) {
       beginDate: formatFecha(fechaInicio),
       endDate: formatFecha(fechaFin),
       quantityStudents: numAlumnos,
-      university, // Usamos el valor de universidad obtenido
+      university,
       token,
     };
 
     try {
-      console.log("Enviando datos:", data); // Debug
+      console.log("Enviando datos:", data);
 
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -116,11 +130,42 @@ export default function CreatedExchange({ onClose }) {
     }
   };
 
-  // Función para formatear fecha a DD-MM-YYYY
   const formatFecha = (fecha) => {
     if (!fecha) return "";
-    const partes = fecha.split("-");
-    return partes.length === 3 ? `${partes[2]}-${partes[1]}-${partes[0]}` : fecha;
+    const date = new Date(fecha);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const onStartDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || fechaInicio;
+    setShowStartDatePicker(Platform.OS === 'ios');
+
+    // Validar que la fecha de inicio no sea anterior a hoy
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Ignorar la hora, comparar solo la fecha
+
+    if (currentDate < today) {
+      Alert.alert("Error", "La fecha de inicio no puede ser anterior a hoy.");
+      return;
+    }
+
+    setFechaInicio(currentDate);
+  };
+
+  const onEndDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || fechaFin;
+    setShowEndDatePicker(Platform.OS === 'ios');
+
+    // Validar que la fecha de fin no sea anterior a la fecha de inicio
+    if (currentDate < fechaInicio) {
+      Alert.alert("Error", "La fecha de fin no puede ser anterior a la fecha de inicio.");
+      return;
+    }
+
+    setFechaFin(currentDate);
   };
 
   return (
@@ -173,20 +218,30 @@ export default function CreatedExchange({ onClose }) {
         />
 
         <Text style={styles.label}>Fecha de inicio</Text>
-        <TextInput
-          style={styles.input}
-          value={fechaInicio}
-          onChangeText={setFechaInicio}
-          placeholder="YYYY-MM-DD"
-        />
+        <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
+          <Text style={styles.input}>{fechaInicio.toLocaleDateString()}</Text>
+        </TouchableOpacity>
+        {showStartDatePicker && (
+          <DateTimePicker
+            value={fechaInicio}
+            mode="date"
+            display="default"
+            onChange={onStartDateChange}
+          />
+        )}
 
         <Text style={styles.label}>Fecha de fin</Text>
-        <TextInput
-          style={styles.input}
-          value={fechaFin}
-          onChangeText={setFechaFin}
-          placeholder="YYYY-MM-DD"
-        />
+        <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
+          <Text style={styles.input}>{fechaFin.toLocaleDateString()}</Text>
+        </TouchableOpacity>
+        {showEndDatePicker && (
+          <DateTimePicker
+            value={fechaFin}
+            mode="date"
+            display="default"
+            onChange={onEndDateChange}
+          />
+        )}
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Guardar</Text>
