@@ -1,80 +1,48 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import { SelectList } from "react-native-dropdown-select-list";
 
-export default function LanguageSelector({ onLanguageChange, name }) {
+const LanguageSelector = ({ name, onLanguageChange }) => {
   const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [open, setOpen] = useState(false);
 
   const languages = [
-    { label: "English", value: "English" },
-    { label: "Spanish", value: "Spanish" },
-    { label: "French", value: "French" },
-    { label: "German", value: "German" },
-    { label: "Italian", value: "Italian" },
-    { label: "Portuguese", value: "Portuguese" },
-    { label: "Japanese", value: "Japanese" },
-    { label: "Chinese", value: "Chinese" },
-    { label: "Russian", value: "Russian" },
-    { label: "Arabic", value: "Arabic" },
+    { key: "es", value: "Español" },
+    { key: "en", value: "Inglés" },
+    { key: "fr", value: "Francés" },
+    { key: "de", value: "Alemán" },
+    { key: "it", value: "Italiano" },
+    { key: "it", value: "Italiano" },
+    // Puedes agregar más idiomas según lo necesites
   ];
-
-  const handleLanguageSelect = (language) => {
-    setSelectedLanguage(language);
-    onLanguageChange(language); // Llamamos a la función pasada como prop
-  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select Language</Text>
-
-      {/* Dropdown con búsqueda integrada */}
-      <DropDownPicker
-        open={open}
-        value={selectedLanguage}
-        items={languages}
-        setValue={handleLanguageSelect} // Pasamos la función para actualizar el idioma
-        placeholder={`Select a ${name} language`}
-        searchable={true} // Activa la búsqueda dentro del dropdown
-        setOpen={setOpen}
-        containerStyle={[styles.pickerContainer, { zIndex: open ? 1000 : 0 }]}  // Ajusta el zIndex dinámicamente
-        searchablePlaceholder={`Search for ${name} language...`}
-        searchableError="No languages found"
-        style={styles.dropdown}
-        dropDownStyle={styles.dropdownList}
+      <SelectList
+        data={languages}
+        setSelected={setSelectedLanguage}
+        onSelect={(value) => onLanguageChange(value)} // Esta función se pasa como prop para actualizar el idioma seleccionado
+        boxStyles={styles.dropdownBox}
+        placeholder="Buscar"
+        search={true} // Habilita la búsqueda
+        searchPlaceholder="Escribe"
       />
-
-      <Text>Selected Language: {selectedLanguage}</Text>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 16,
+    marginBottom: 20,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  pickerContainer: {
+  dropdownBox: {
     height: 50,
-  },
-  dropdown: {
+    width: "100%",
+    backgroundColor: "#fff",
     borderWidth: 1,
-    padding: 10,
-    marginVertical: 10,
+    borderColor: "#ccc",
     borderRadius: 5,
-    fontSize: 16,
-    backgroundColor: '#fff', // Fondo blanco para evitar superposiciones
-  },
-  dropdownList: {
-    borderRadius: 5,
-    borderWidth: 1,
-    marginTop: 10,
-    backgroundColor: '#fff', // Fondo blanco para evitar superposiciones
+    paddingHorizontal: 10,
   },
 });
+
+export default LanguageSelector;

@@ -8,7 +8,6 @@ import Registration from "./screens/Registration";
 import HomeScreen from "./screens/HomeScreens/HomeScreen";
 import ChatScreen from "./screens/MensajesScreens/Components/ChatScreen";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
-import CreateGroup from "./screens/HomeScreens/CreateExchange";
 import CreatedExchange from "./screens/HomeScreens/CreateExchange";
 import SearchFilterScreen from "./screens/BusquedaScreens/SearchFilterScreen";
 import { FiltersProvider } from "./context/FiltersContext";
@@ -16,6 +15,7 @@ import Busquedas from "./screens/BusquedaScreens/Busqueda";
 import Toast from "react-native-toast-message";
 import ProfileEdit from "./screens/PerfilScreens/ProfileEdit";
 import Perfil from "./screens/PerfilScreens/Perfil";
+import CreateGroup from "./screens/HomeScreens/CreateGroup";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -56,6 +56,7 @@ function AppWrapper() {
           <Stack.Screen name="SeachScreen" component={Busquedas} />
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
           <Stack.Screen name="Crear Intercambios" component={CreatedExchange}/>
+          <Stack.Screen name="Crear Grupos"  component={CreateGroup}/>
           <Stack.Screen name="Ver Perfil" component={Perfil}/>
           <Stack.Screen name="Editar Perfil" component={ProfileEdit}/>
 
