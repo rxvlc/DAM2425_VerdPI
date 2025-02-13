@@ -21,13 +21,11 @@ export default function LanguageSelector({ onLanguageChange, name }) {
 
   const handleLanguageSelect = (language) => {
     setSelectedLanguage(language);
-    onLanguageChange(language); // Llamamos a la función pasada como prop
+    onLanguageChange(language); 
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select Language</Text>
-
       {/* Dropdown con búsqueda integrada */}
       <DropDownPicker
         open={open}
@@ -43,8 +41,6 @@ export default function LanguageSelector({ onLanguageChange, name }) {
         style={styles.dropdown}
         dropDownStyle={styles.dropdownList}
       />
-
-      <Text>Selected Language: {selectedLanguage}</Text>
     </View>
   );
 }

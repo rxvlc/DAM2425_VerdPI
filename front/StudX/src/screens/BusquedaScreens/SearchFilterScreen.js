@@ -43,19 +43,17 @@ export default function SearchFilterScreen(props) {
     setTargetLanguage(language);
   };
 
-  const [open,setOpen] = useState(false);
 
   return (
     <View 
-      contentContainerStyle={styles.container}
-      scrollEnabled={!open} // Deshabilitar el scroll cuando el dropdown está abierto
+      style={styles.container}
     >
       <Text style={styles.title}>Filtros</Text>
 
       {/* LanguageSelector para nativeLanguage */}
-      <Pressable onPress={() => setOpen(!open)}>
       <LanguageSelector onLanguageChange={handleLanguageNative} name="native" style={styles.languageSelector} />
-      </Pressable>
+
+
       {/* LanguageSelector para targetLanguage */}
       <LanguageSelector onLanguageChange={handleLanguageTarget} name="target" style={styles.languageSelector} />
 
