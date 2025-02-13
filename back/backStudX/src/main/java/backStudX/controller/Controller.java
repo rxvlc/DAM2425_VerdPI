@@ -264,7 +264,7 @@ public class Controller {
 	public ResponseEntity<List<Exchange>> getExchanges(@RequestParam(required = false) String nativeLanguage,
 			@RequestParam(required = false) String targetLanguage,
 			@RequestParam(required = false) String educationalLevel,
-			@RequestParam(required = false) Integer academicLevel,
+			@RequestParam(required = false) String academicLevel,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date beginDate,
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
 			@RequestParam(required = false) Integer quantityStudentsMin,

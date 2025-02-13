@@ -19,7 +19,7 @@ public class ExchangeService {
     private MongoTemplate mongoTemplate;
 
     public List<Exchange> searchExchanges(String nativeLanguage, String targetLanguage, String educationalLevel,
-                                          Integer academicLevel, Date beginDate, Date endDate,
+                                          String academicLevel, Date beginDate, Date endDate,
                                           Integer quantityStudentsMin, Integer quantityStudentsMax, String university, String userId) {
         Query query = new Query();
 
