@@ -1,11 +1,37 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 export default function CreateGroup({ onClose }) {
   const [name, setName] = useState("");
   const [nivel, setNivel] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [languaje, setLanguaje] = useState("");
+  const [language, setLanguage] = useState("");
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const storedToken = await SecureStore.getItemAsync("userToken");
+        if (!storedToken) {
+          Alert.alert("Error", "No se ha encontrado una sesión activa.");
+          return;
+        }
+        setToken(storedToken);
+      } catch (error) {
+        console.log("Error obteniendo el token:", error);
+      }
+    };
+    fetchToken();
+  }, []);
 
   const handleNivelPress = (selectedNivel) => {
     if (nivel === selectedNivel) {
@@ -37,23 +63,43 @@ export default function CreateGroup({ onClose }) {
   };
 
   const handleSave = async () => {
-    if (!name || !languaje) {
+    if (!name || !language || !nivel) {
       Alert.alert("Error", "Todos los campos son obligatorios.");
       return;
     }
 
+    if (!token) {
+      Alert.alert("Error", "No se pudo obtener el token de autenticación.");
+      return;
+    }
+
+    const apiUrl = "http://44.220.1.21:8080/api/groups";
     const data = {
       name,
-      nivel,
+      level: nivel,
       quantity,
-      languaje,
+      language,
+      token,
     };
 
     try {
       console.log("Enviando datos:", data);
-      // Simulación de envío a API (reemplazar con fetch si es necesario)
-      Alert.alert("Éxito", "Grupo creado exitosamente");
-      onClose();
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        Alert.alert("Éxito", "Grupo creado exitosamente");
+        onClose();
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Error", errorData.message || "No se pudo crear el grupo");
+      }
     } catch (error) {
       Alert.alert("Error de conexión", error.message);
     }
@@ -72,18 +118,9 @@ export default function CreateGroup({ onClose }) {
 
         <Text style={styles.label}>Nivel {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
         <View style={styles.trafficLight}>
-          <TouchableOpacity
-            style={[styles.light, nivel === "A1" && styles.lightGreenA1, nivel === "A2" && styles.lightGreenA2]}
-            onPress={() => handleNivelPress("A1")}
-          />
-          <TouchableOpacity
-            style={[styles.light, nivel === "B1" && styles.lightYellowB1, nivel === "B2" && styles.lightYellowB2]}
-            onPress={() => handleNivelPress("B1")}
-          />
-          <TouchableOpacity
-            style={[styles.light, nivel === "C1" && styles.lightRedC1, nivel === "C2" && styles.lightRedC2]}
-            onPress={() => handleNivelPress("C1")}
-          />
+          <TouchableOpacity style={[styles.light, nivel === "A1" && styles.lightGreen]} onPress={() => handleNivelPress("A1")} />
+          <TouchableOpacity style={[styles.light, nivel === "B1" && styles.lightYellow]} onPress={() => handleNivelPress("B1")} />
+          <TouchableOpacity style={[styles.light, nivel === "C1" && styles.lightRed]} onPress={() => handleNivelPress("C1")} />
         </View>
 
         <Text style={styles.label}>Cantidad de Alumnos</Text>
@@ -97,8 +134,8 @@ export default function CreateGroup({ onClose }) {
         <Text style={styles.label}>Idioma</Text>
         <TextInput
           style={styles.input}
-          value={languaje}
-          onChangeText={setLanguaje}
+          value={language}
+          onChangeText={setLanguage}
           placeholder="Ingrese el idioma"
         />
 
@@ -140,22 +177,13 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: "#ccc",
   },
-  lightGreenA1: {
-    backgroundColor: "#A8E6A2",
-  },
-  lightGreenA2: {
+  lightGreen: {
     backgroundColor: "#4CAF50",
   },
-  lightYellowB1: {
-    backgroundColor: "#FFEE99",
-  },
-  lightYellowB2: {
+  lightYellow: {
     backgroundColor: "#FFCC00",
   },
-  lightRedC1: {
-    backgroundColor: "#FFB3B3",
-  },
-  lightRedC2: {
+  lightRed: {
     backgroundColor: "#FF3B30",
   },
   saveButton: {

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { SelectList } from "react-native-dropdown-select-list";
 
 const LanguageSelector = ({ name, onLanguageChange }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
 
   const languages = [
     { key: "es", value: "Español" },
@@ -11,20 +11,22 @@ const LanguageSelector = ({ name, onLanguageChange }) => {
     { key: "fr", value: "Francés" },
     { key: "de", value: "Alemán" },
     { key: "it", value: "Italiano" },
-    { key: "it", value: "Italiano" },
-    // Puedes agregar más idiomas según lo necesites
+    { key: "pt", value: "Portugués" },
   ];
 
   return (
     <View style={styles.container}>
       <SelectList
         data={languages}
-        setSelected={setSelectedLanguage}
-        onSelect={(value) => onLanguageChange(value)} // Esta función se pasa como prop para actualizar el idioma seleccionado
+        setSelected={(val) => {
+          setSelectedLanguage(val);
+          const selectedObj = languages.find((lang) => lang.value === val);
+          onLanguageChange(selectedObj ? selectedObj.key : "");
+        }}
         boxStyles={styles.dropdownBox}
-        placeholder="Buscar"
-        search={true} // Habilita la búsqueda
-        searchPlaceholder="Escribe"
+        placeholder="Selecciona un idioma"
+        search={true}
+        searchPlaceholder="Escribe un idioma"
       />
     </View>
   );
