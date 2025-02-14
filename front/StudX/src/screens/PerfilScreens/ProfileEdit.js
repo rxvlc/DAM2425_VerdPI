@@ -32,8 +32,9 @@ const ProfileEdit = (props) => {
   const [isFocused, setIsFocused] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [rol, setRol] = useState('Alumno');
   const [password, setPassword] = useState('');
+  const [university, setUniversity] = useState('');
+
   const [isSecure, setIsSecure] = useState(true);
   const [userData, setUserData] = useState(null);
   
@@ -81,6 +82,14 @@ const ProfileEdit = (props) => {
         setLoading(false);
       }
     };
+
+    useEffect(() => {
+      if (userData) {
+        setName(userData.name || '');
+        setEmail(userData.email || '');
+        setUniversity(userData.university || '');
+      }
+    }, [userData]);
 
   const openCamera = async () => {
     const result = await ImagePicker.launchCameraAsync({
@@ -247,6 +256,41 @@ const ProfileEdit = (props) => {
     );
   }
 
+  const handleSave = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("userToken");
+  
+      if (!token) {
+        console.log("No hay sesión activa.");
+        return;
+      }
+  
+      const updateData = {
+        token: token,
+        name: name,
+        email: email,
+        university: university,
+      };
+  
+      const response = await fetch("http://44.220.1.21:8080/api/auth/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateData),
+      });
+  
+      if (response.ok) {
+        console.log("Perfil actualizado con éxito.");
+        fetchUserData(); // Vuelve a cargar los datos actualizados
+      } else {
+        console.log("Error al actualizar el perfil.");
+      }
+    } catch (error) {
+      console.error("Error en la actualización:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* <View style={styles.fotosContainer}>
@@ -289,7 +333,7 @@ const ProfileEdit = (props) => {
           <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Nombre</Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
-            value={userData?.name || "No disponible"}
+            value={name}
             onChangeText={setName}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
@@ -297,7 +341,7 @@ const ProfileEdit = (props) => {
           <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Correo</Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
-            value={userData?.email || "No disponible"}
+            value={email}
             onChangeText={setEmail}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
@@ -305,8 +349,8 @@ const ProfileEdit = (props) => {
           <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>University</Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
-            value={userData?.university || "No disponible"}
-            onChangeText={setName}
+            value={university}
+            onChangeText={setUniversity}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
@@ -324,7 +368,7 @@ const ProfileEdit = (props) => {
               <IconButton icon="eye" size={25} color="grey" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => props.navigation.goBack()}>
+          <TouchableOpacity onPress={() => {handleSave(); navigation.goBack()}}>
             <View style={styles.save}>
               <Text style={styles.saveButt}>Save</Text>
             </View>
