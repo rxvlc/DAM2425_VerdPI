@@ -48,6 +48,14 @@ const banderas = {
   Vietnamese: { img: require("../../../images/Banderas/VN.png"), emoji: "🇻🇳" }, // Vietnamita
 };
 
+
+
+const estudiandoImg = require("../../../images/LogosExchanges/Studying.png");
+const speak = require("../../../images/LogosExchanges/Speak.png")
+const level = require("../../../images/LogosExchanges/Nivel.png")
+const students = require("../../../images/LogosExchanges/Estudiante.png")
+
+
 const nivelColors = {
   A1: "#A5D6A7",
   A2: "#4CAF50",
@@ -96,24 +104,30 @@ export default function ExchangeTarget({
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}>🌍 Learning: </Text>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idiomaDeseado} {banderaInfo.emoji}</Text>
+        <Image source={estudiandoImg} style={styles.studyIcon} />
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Learning: </Text>
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idiomaDeseado} </Text>
+          <Image source={banderaInfo.img} style={styles.flag} />
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}>🌍 Speak: </Text>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idioma} {banderaInfo2.emoji}</Text>
+        <Image source={speak} style={styles.studyIcon} />
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Speak: </Text>
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idioma} </Text>
+               <Image source={banderaInfo2.img} style={styles.flag} />
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}>📚 Level: </Text>
+        <Image source={level} style={styles.studyIcon} />
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Level: </Text>
           <View style={[styles.highlightContainer, { backgroundColor: nivelColors[nivel] || "#A5D6A7" }]}>
             <Text style={styles.highlightText}>{nivel.toUpperCase()}</Text>
           </View>
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}>🎓 Students: </Text>
+        <Image source={students} style={styles.studyIcon} />
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Students: </Text>
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{alumnos}</Text>
         </View>
 
@@ -126,17 +140,6 @@ export default function ExchangeTarget({
             <View style={styles.buttonContent}>
               <Ionicons name="chatbubble-outline" size={16} color="white" />
               <Text style={styles.buttonText}>Chat</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.solicitudButton]}
-            onPress={onSolicitudPress}
-            activeOpacity={0.7}
-          >
-            <View style={styles.buttonContent}>
-              <Ionicons name="document-text-outline" size={16} color="white" />
-              <Text style={styles.buttonText}>Join</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -201,9 +204,21 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
+   flag: {
+    width: 20,
+    height: 15,
+    marginRight: 5,
+    resizeMode: "contain",
+  },
+  studyIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 5,
+    resizeMode: "contain",
+  },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between", // Espaciado uniforme
+    justifyContent:"center",
     marginTop: 10,
   },
   button: {
