@@ -45,7 +45,7 @@ export default function Home() {
       const token = await SecureStore.getItemAsync("userToken");
       const email = await SecureStore.getItemAsync("email");
       if (!token || !email) {
-        console.log("⚠ No hay token o email guardado.");
+        console.log("⚠ No token or email saved.");
         return;
       }
       setUserEmail(email);
@@ -59,10 +59,10 @@ export default function Home() {
           useNativeDriver: true,
         }).start();
       } else {
-        console.log("⚠ Error al obtener el usuario:", response.status);
+        console.log("⚠ Error getting user:", response.status);
       }
     } catch (error) {
-      console.log("⚠ No se pudo conectar al servidor para obtener el usuario.");
+      console.log("⚠ Could not connect to the server to get the user.");
     }
   };
 
@@ -70,15 +70,15 @@ export default function Home() {
     try {
       const response = await fetch(API_URL);
       if (!response.ok) {
-        console.log("⚠ Error en la respuesta del servidor:", response.status);
-        throw new Error("Error en la respuesta del servidor");
+        console.log("⚠ Error in server response:", response.status);
+        throw new Error("Error in server response");
       }
       const data = await response.json();
       setExchanges(data);
       setError(false);
     } catch (error) {
       console.log(
-        "⚠ No se pudo conectar al servidor para obtener intercambios."
+        "⚠ Could not connect to server to get exchanges."
       );
       setError(true);
     } finally {
@@ -93,15 +93,15 @@ export default function Home() {
       const response = await fetch(`${API_URL}?userId=${userEmail}`);
       if (!response.ok) {
         console.log(
-          "⚠ Error al obtener los intercambios del usuario:",
+          "⚠ Error getting user exchanges:",
           response.status
         );
-        throw new Error("Error en la respuesta del servidor");
+        throw new Error("Error in server response");
       }
       const data = await response.json();
       setMyExchanges(data);
     } catch (error) {
-      console.log("⚠ No se pudo obtener los intercambios del usuario.");
+      console.log("⚠ Failed to get user exchanges.");
     }
   };
 
@@ -169,9 +169,6 @@ export default function Home() {
                     navigation.navigate("Mensajes", {
                       profesor: item.idTeacherCreator,
                     })
-                  }
-                  onSolicitudPress={() =>
-                    console.log(`Solicitud a ${item.idTeacherCreator}`)
                   }
                 />
               )}

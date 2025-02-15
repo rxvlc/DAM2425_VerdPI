@@ -13,7 +13,7 @@ import { useTheme } from "../../../context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
-const banderas = {
+const flags = {
   Spanish: { img: require("../../../images/Banderas/ES.png"), emoji: "🇪🇸" }, // Español
   English: { img: require("../../../images/Banderas/GB.png"), emoji: "🇬🇧" }, // Inglés
   French: { img: require("../../../images/Banderas/FR.png"), emoji: "🇫🇷" }, // Francés
@@ -50,13 +50,13 @@ const banderas = {
 
 
 
-const estudiandoImg = require("../../../images/LogosExchanges/Studying.png");
+const learningImg = require("../../../images/LogosExchanges/Studying.png");
 const speak = require("../../../images/LogosExchanges/Speak.png")
 const level = require("../../../images/LogosExchanges/Nivel.png")
 const students = require("../../../images/LogosExchanges/Estudiante.png")
 
 
-const nivelColors = {
+const levelColors = {
   A1: "#A5D6A7",
   A2: "#4CAF50",
   B1: "#FFB74D",
@@ -73,17 +73,16 @@ export default function ExchangeTarget({
   profesorImagen,
   idiomaDeseado,
   idioma,
-  onSolicitudPress,
   onChatPress
 }) {
   const { darkMode } = useTheme();
 
-  const banderaInfo = banderas[idiomaDeseado] || { img: require("../../../images/Banderas/ES.png"), emoji: "🌍" };
-  const banderaInfo2 = banderas[idioma] || { img: require("../../../images/Banderas/ES.png"), emoji: "🌍" };
+  const flagInfo = flags[idiomaDeseado] || { img: require("../../../images/Banderas/Grey.jpg")};
+  const flagInfo2 = flags[idioma] || { img: require("../../../images/Banderas/Grey.jpg")};
 
   return (
     <ImageBackground
-      source={banderaInfo.img}
+      source={flagInfo.img}
       style={[styles.card, { width: width * 0.56, maxWidth: 250 }]}
       resizeMode="cover"
     >
@@ -104,23 +103,23 @@ export default function ExchangeTarget({
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Image source={estudiandoImg} style={styles.studyIcon} />
+        <Image source={learningImg} style={styles.studyIcon} />
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Learning: </Text>
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idiomaDeseado} </Text>
-          <Image source={banderaInfo.img} style={styles.flag} />
+          <Image source={flagInfo.img} style={styles.flag} />
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image source={speak} style={styles.studyIcon} />
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Speak: </Text>
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idioma} </Text>
-               <Image source={banderaInfo2.img} style={styles.flag} />
+               <Image source={flagInfo2.img} style={styles.flag} />
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image source={level} style={styles.studyIcon} />
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Level: </Text>
-          <View style={[styles.highlightContainer, { backgroundColor: nivelColors[nivel] || "#A5D6A7" }]}>
+          <View style={[styles.highlightContainer, { backgroundColor: levelColors[nivel] || "#A5D6A7" }]}>
             <Text style={styles.highlightText}>{nivel.toUpperCase()}</Text>
           </View>
         </View>
@@ -154,11 +153,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
     marginHorizontal: 10,
-    elevation: 8, // Aumenta la sombra en Android sin exagerarla
+    elevation: 8, 
     shadowColor: "black",
-    shadowOffset: { width: 0, height: 4 }, // Menor desplazamiento para mantenerlo contenido
-    shadowOpacity: 4, // Aumenta la opacidad para mayor notoriedad
-    shadowRadius: 6, // Un difuminado moderado para que no se expanda demasiado
+    shadowOffset: { width: 0, height: 4 }, 
+    shadowOpacity: 4, 
+    shadowRadius: 6, 
     alignSelf: "center",
     overflow: "hidden",
   },
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
   overlay: {
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.92)", // Ligera transparencia para resaltar el efecto
+    backgroundColor: "rgba(255, 255, 255, 0.92)", 
     borderColor: "#d6d4d4",
     borderWidth: 0.5,
   },
@@ -244,6 +243,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 12,
-    marginTop: 2, // Espaciado entre el icono y el texto
+    marginTop: 2, 
   },
 });

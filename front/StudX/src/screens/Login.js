@@ -6,7 +6,7 @@ import { CommonActions } from "@react-navigation/native";
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(true); // Estado para controlar la carga
+  const [loading, setLoading] = useState(true); 
 
   const loginWithToken = async () => {
     try {
@@ -25,27 +25,26 @@ export default function Login({ navigation }) {
       });
   
       if (response.ok) {
-        console.log('Inicio de sesión exitoso');
+        console.log('Login succesfull');
         return true;
       } else {
-        console.log('Inicio de sesión fallido');
+        console.log('Failed login');
         return false;
       }
     } catch (error) {
-      console.error('Error en la petición:', error);
+      console.error('Error in request:', error);
     }
     return false;
   };
 
   
-  // 🔥 Verificar si hay una sesión activa al cargar la pantalla
+
   useEffect(() => {
     const checkUserSession = async () => {
       const token = await SecureStore.getItemAsync("userToken");
       console.log(loginWithToken());
       
       if (token && !loginWithToken) {
-        // Si hay un token, redirigir automáticamente a HomeScreen
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -53,7 +52,7 @@ export default function Login({ navigation }) {
           })
         );
       } else {
-        setLoading(false); // Si no hay token, mostrar el formulario de login
+        setLoading(false);
       }
     };
 
@@ -62,7 +61,7 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Todos los campos son obligatorios");
+      Alert.alert("Error", "All fields are required");
       return;
     }
 
@@ -88,11 +87,11 @@ export default function Login({ navigation }) {
         );
       } else {
         const responseText = await response.text();
-        Alert.alert("Error", responseText || `Error ${response.status}: No se pudo iniciar sesión`);
+        Alert.alert("Error", responseText || `Error ${response.status}: Failed to log in`);
       }
     } catch (error) {
-      Alert.alert("Error", "Error en la conexión con el servidor");
-      console.error("Error en el login:", error);
+      Alert.alert("Error", "Error connecting to server");
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }

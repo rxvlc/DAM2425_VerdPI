@@ -11,15 +11,15 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
-import profesores from "../../BDD/Profesores"; // Importamos la lista de profesores
+import profesores from "../../BDD/Profesores"; 
 
-// Función para obtener la imagen correcta del profesor
+
 const images = {
   "JuanPerezGomez.webp": require("../../images/FotosPerfil/JuanPerezGomez.webp"),
   "MariaRodriguezLopez.webp": require("../../images/FotosPerfil/MariaRodriguezLopez.webp"),
   "CarlosFernandezMartinez.webp": require("../../images/FotosPerfil/CarlosFernandezMartinez.webp"),
   "AnaSanchezRuiz.webp": require("../../images/FotosPerfil/AnaSanchezRuiz.webp"),
-  "default": require("../../images/FotosPerfil/img1.jpg") // Imagen por defecto
+  "default": require("../../images/FotosPerfil/img1.jpg") 
 };
 
 const getImageSource = (imageName) => {
@@ -37,42 +37,38 @@ export default function Mensajes({ route }) {
       id: profesor.id,
       name: profesor.nombre,
       image: profesor.imagen,
-      messages: [], //chats inician VACIOS
+      messages: [], 
     }))
   );
 
-  // Verifica si se ha recibido un profesor desde `ExchangeTarget.js`
+ 
   useEffect(() => {
     if (route.params?.profesor) {
       const profesorNombre = route.params.profesor;
       const profesorData = profesores.find((p) => p.nombre === profesorNombre);
 
-      // Verificar si ya existe un chat con este profesor
       const chatExistente = chats.find((chat) => chat.name === profesorNombre);
 
       if (!chatExistente && profesorData) {
-        // 🔹 Crear un nuevo chat SIN mensajes y con la imagen correcta
         const nuevoChat = {
-          id: `${Date.now()}`, // ID unico
+          id: `${Date.now()}`, 
           name: profesorNombre,
-          image: profesorData.imagen, // Usar imagen del profesor
-          messages: [], // 🔹 Chat vacío
+          image: profesorData.imagen, 
+          messages: [], 
         };
 
         setChats([...chats, nuevoChat]);
 
-        // Navegar automáticamente al chat
         setTimeout(() => {
           navigation.navigate("ChatScreen", { chat: nuevoChat });
         }, 100);
       } else {
-        // Si ya existe, solo navegar al chat existente
         navigation.navigate("ChatScreen", { chat: chatExistente });
       }
     }
   }, [route.params]);
 
-  // Actualizar el header 
+
   useLayoutEffect(() => {
     if (selectedChatIds.size > 0) {
       navigation.setOptions({

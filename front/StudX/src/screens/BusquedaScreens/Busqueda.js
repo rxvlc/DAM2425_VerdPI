@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
@@ -29,9 +28,9 @@ export default function Busquedas(props) {
         <Pressable onPress={() => props.navigation.navigate("SearchFilterScreen")}>
         <Ionicons
           name="filter"
-          size={24} // Un poco más grande para hacerlo más visible
+          size={24} 
           color={darkMode ? "#ccc" : "#A0A0A0"}
-          style={[styles.filterIcon,{padding: 5}]} // Agregamos estilo para posicionarlo mejor
+          style={[styles.filterIcon,{padding: 5}]} 
         />
         </Pressable>
       </View>

@@ -30,42 +30,37 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const modo = darkMode ? "Modo Claro" : "Modo Oscuro";
+  const modo = darkMode ? "Light Mode" : "Dark Mode";
 
-  // Función para cerrar sesión
   const handleLogout = async () => {
     try {
-      // Obtener el token almacenado
       const token = await SecureStore.getItemAsync("userToken");
       const email = await SecureStore.getItemAsync("email");
 
       if (!token) {
-        Alert.alert("Error", "No hay sesión activa.");
+        Alert.alert("Error", "There is no active session.");
         return;
       }
 
-      // Enviar petición de logout a la API
       const response = await fetch("http://44.220.1.21:8080/api/auth/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Enviar el token en el header
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ email, token }), // Enviar datos en el body
+        body: JSON.stringify({ email, token }),
       });
 
       if (response.ok) {
-        // Eliminar el token y email de SecureStore
         await SecureStore.deleteItemAsync("userToken");
         await SecureStore.deleteItemAsync("email");
 
-        Alert.alert("Éxito", "Cierre de sesión exitoso");
+        Alert.alert("Éxito", "Successful logout");
 
-        // Redirigir al usuario a la pantalla de Login limpiando la pila
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Login" }], // Asegúrate de que "Login" es el nombre correcto de la pantalla
+            routes: [{ name: "Login" }], 
           })
         );
       } else {
@@ -73,14 +68,14 @@ export default function HomeScreen() {
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Login" }], // Asegúrate de que "Login" es el nombre correcto de la pantalla
+            routes: [{ name: "Login" }], 
           })
         );
-        Alert.alert("Error", responseText || `Error ${response.status}: No se pudo cerrar sesión correctamente`);
+        Alert.alert("Error", responseText || `Error ${response.status}: Failed to log out successfully`);
       }
     } catch (error) {
-      Alert.alert("Error", "Error en la conexión con el servidor");
-      console.error("Error en el logout:", error);
+      Alert.alert("Error", "Error connecting to server");
+      console.error("Error on logout:", error);
     }
   };
 
@@ -111,12 +106,11 @@ export default function HomeScreen() {
                 <Ionicons name="people-outline" size={PixelRatio.getPixelSizeForLayoutSize(12)} color={darkMode ? "white" : "black"} />
               </TouchableOpacity>
 
-              {/* Botón "+" más grande */}
+             
               <TouchableOpacity onPress={() => navigation.navigate("Crear Intercambios")} style={styles.addButton}>
                 <Ionicons name="add-circle-outline" size={PixelRatio.getPixelSizeForLayoutSize(12)} color={darkMode ? "white" : "black"} />
               </TouchableOpacity>
 
-              {/* Menú de opciones */}
               <TouchableOpacity onPress={() => setMenuVisible(!menuVisible)} style={styles.menuButton}>
                 <Ionicons name="ellipsis-vertical" size={PixelRatio.getPixelSizeForLayoutSize(8)} color={darkMode ? "white" : "black"} />
               </TouchableOpacity>
@@ -172,13 +166,13 @@ const styles = StyleSheet.create({
     marginRight: width * 0.03,
   },
   addButton: {
-    marginRight: width * 0.05, // Espacio entre "+" y el menú
+    marginRight: width * 0.05,
   },
   groupButton:{
     marginRight: width * 0.05,
   },
   menuButton: {
-    padding: width * 0.015, // Aumenta el área táctil sin afectar diseño
+    padding: width * 0.015, 
   },
   menuContainer: {
     position: "relative",

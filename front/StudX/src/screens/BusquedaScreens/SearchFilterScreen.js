@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Platform, ScrollView, Pressable } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useFilters } from "../../context/FiltersContext"; // Importamos el context
+import { useFilters } from "../../context/FiltersContext"; 
 import Toast from 'react-native-toast-message';
-import LanguageSelector from "../../components/LanguageSelector"; // Asegúrate de que el selector también tenga los mismos estilos
+import LanguageSelector from "../../components/LanguageSelector"; 
 
 export default function SearchFilterScreen(props) {
   const { filters, updateFilter } = useFilters();
@@ -17,20 +17,20 @@ export default function SearchFilterScreen(props) {
   const [university, setUniversity] = useState(filters.university);
 
   const handleSaveFilters = () => {
-    // Actualizamos el contexto con los filtros seleccionados
+
     updateFilter("nativeLanguage", nativeLanguage);
     updateFilter("targetLanguage", targetLanguage);
-    updateFilter("academicLevel", academicLevel); // Actualizamos academicLevel
+    updateFilter("academicLevel", academicLevel); 
     updateFilter("beginDate", beginDate);
     updateFilter("endDate", endDate);
     updateFilter("quantityStudentsMin", quantityStudentsMin);
     updateFilter("quantityStudentsMax", quantityStudentsMax);
     updateFilter("university", university);
     Toast.show({
-        type: 'success', // Tipo de toast (puedes personalizarlo con 'error', 'info', 'success', etc.)
-        position: 'bottom', // Posición del toast
-        text1: 'Filtros Guardados', // Título del toast
-        text2: 'Los filtros se han guardado correctamente.' // Texto adicional del toast
+        type: 'success', 
+        position: 'bottom',
+        text1: 'Filtros Guardados', 
+        text2: 'Los filtros se han guardado correctamente.'
       });
     props.navigation.goBack();
   };
@@ -50,14 +50,13 @@ export default function SearchFilterScreen(props) {
     >
       <Text style={styles.title}>Filtros</Text>
 
-      {/* LanguageSelector para nativeLanguage */}
+
       <LanguageSelector onLanguageChange={handleLanguageNative} name="native" style={styles.languageSelector} />
 
 
-      {/* LanguageSelector para targetLanguage */}
+ 
       <LanguageSelector onLanguageChange={handleLanguageTarget} name="target" style={styles.languageSelector} />
 
-      {/* Picker para academicLevel con niveles A1, A2, B1, B2, etc. */}
       <Picker
         selectedValue={academicLevel}
         style={styles.input}
@@ -72,7 +71,6 @@ export default function SearchFilterScreen(props) {
         <Picker.Item label="C2" value="C2" />
       </Picker>
 
-      {/* Input para beginDate */}
       <TextInput
         placeholder="Begin Date (YYYY-MM-DD)"
         style={styles.input}
@@ -80,7 +78,6 @@ export default function SearchFilterScreen(props) {
         onChangeText={setBeginDate}
       />
 
-      {/* Input para endDate */}
       <TextInput
         placeholder="End Date (YYYY-MM-DD)"
         style={styles.input}
@@ -88,7 +85,6 @@ export default function SearchFilterScreen(props) {
         onChangeText={setEndDate}
       />
 
-      {/* Input para quantityStudentsMin */}
       <TextInput
         placeholder="Min. Students"
         style={styles.input}
@@ -97,7 +93,6 @@ export default function SearchFilterScreen(props) {
         keyboardType="numeric"
       />
 
-      {/* Input para quantityStudentsMax */}
       <TextInput
         placeholder="Max. Students"
         style={styles.input}
@@ -106,7 +101,6 @@ export default function SearchFilterScreen(props) {
         keyboardType="numeric"
       />
 
-      {/* Input para university */}
       <TextInput
         placeholder="University"
         style={styles.input}
@@ -132,11 +126,11 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     padding: 10,
-    marginBottom: 10, // Todos los elementos ahora tienen el mismo margen inferior
+    marginBottom: 10, 
     borderRadius: 5,
     fontSize: 16,
   },
   languageSelector: {
-    marginBottom: 10, // Asegura que haya un espaciado uniforme entre los selectores de idioma y los demás elementos
+    marginBottom: 10,
   }
 });

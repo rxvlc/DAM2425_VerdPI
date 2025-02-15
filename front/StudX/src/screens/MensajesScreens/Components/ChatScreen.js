@@ -12,7 +12,7 @@ const images = {
   "MariaRodriguezLopez.webp": require("../../../images/FotosPerfil/MariaRodriguezLopez.webp"),
   "CarlosFernandezMartinez.webp": require("../../../images/FotosPerfil/CarlosFernandezMartinez.webp"),
   "AnaSanchezRuiz.webp": require("../../../images/FotosPerfil/AnaSanchezRuiz.webp"),
-  "default": require("../../../images/FotosPerfil/img1.jpg") // Imagen por defecto
+  "default": require("../../../images/FotosPerfil/img1.jpg") 
 };
 
 const getImageSource = (imageName) => {
@@ -40,7 +40,7 @@ export default function ChatScreen({ route }) {
   const solicitarPermisos = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permiso necesario', 'Se requieren permisos para acceder a la galería');
+      Alert.alert('Permission required', 'Permissions are required to access the gallery');
       return false;
     }
     return true;
