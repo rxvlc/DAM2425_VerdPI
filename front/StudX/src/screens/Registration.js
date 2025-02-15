@@ -8,15 +8,15 @@ export default function Registration({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [university, setUniversity] = useState("");
-  const [loading, setLoading] = useState(false); // Estado para mostrar el indicador de carga
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     if (!username || !email || !password || !university) {
-      Alert.alert("Error", "Todos los campos son obligatorios");
+      Alert.alert("Error","All fields are required");
       return;
     }
 
-    setLoading(true); // Mostrar indicador de carga
+    setLoading(true); 
 
     const userData = {
       name: username,
@@ -38,11 +38,11 @@ export default function Registration({ navigation }) {
         Toast.show({
           type: 'success',
           position: 'bottom',
-          text1: 'Éxito',
-          text2: 'Registro completado. Ahora puedes iniciar sesión.',
+          text1: 'Succes',
+          text2: 'Register completed. Now you can login.',
         });
 
-        // 🔥 Redirigir a Login después del registro exitoso
+        
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -51,13 +51,13 @@ export default function Registration({ navigation }) {
         );
       } else {
         const responseText = await response.text();
-        Alert.alert("Error", responseText || `Error ${response.status}: No se pudo registrar`);
+        Alert.alert("Error", responseText || `Error ${response.status}:Failed to register`);
       }
     } catch (error) {
-      Alert.alert("Error", "Error en la conexión con el servidor. Verifica tu conexión.");
+      Alert.alert("Error", "Error connecting to server. Check your connection.");
       console.error("Error en el registro:", error);
     } finally {
-      setLoading(false); // Ocultar indicador de carga después de finalizar
+      setLoading(false); 
     }
   };
 
@@ -68,10 +68,10 @@ export default function Registration({ navigation }) {
         <Image source={require("../images/logoIndividual.png")} style={styles.image} />
       </View>
       <View style={styles.zonaUsuariContrasenya}>
-        <TextInput style={styles.input} placeholder="Usuario" placeholderTextColor="#888" value={username} onChangeText={setUsername} />
+        <TextInput style={styles.input} placeholder="User" placeholderTextColor="#888" value={username} onChangeText={setUsername} />
         <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" value={email} onChangeText={setEmail} keyboardType="email-address" />
-        <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" value={password} onChangeText={setPassword} secureTextEntry />
-        <TextInput style={styles.input} placeholder="Universidad" placeholderTextColor="#888" value={university} onChangeText={setUniversity} />
+        <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" value={password} onChangeText={setPassword} secureTextEntry />
+        <TextInput style={styles.input} placeholder="University/School" placeholderTextColor="#888" value={university} onChangeText={setUniversity} />
       </View>
       <View style={styles.zonaBoton}>
         {loading ? (
