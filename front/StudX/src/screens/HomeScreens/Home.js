@@ -38,7 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     // navigation.navigate("Login");
-  },[])
+  }, [])
 
   const fetchUserData = async () => {
     try {
@@ -120,6 +120,11 @@ export default function Home() {
     fetchMyExchanges();
   };
 
+  const handleDeleteSuccess = (deletedId) => {
+    setMyExchanges((prev) => prev.filter((ex) => ex.id !== deletedId));
+    fetchExchanges();  
+  };
+
   return (
     <View
       style={[
@@ -186,11 +191,13 @@ export default function Home() {
               horizontal
               renderItem={({ item }) => (
                 <OwnExchangesTarget
-                  alumnos={item.quantityStudents}
-                  nivel={item.academicLevel.toString()}
-                  idiomaDeseado={item.targetLanguage}
-                  idioma={item.nativeLanguage}
-                />
+                alumnos={item.quantityStudents}
+                nivel={item.academicLevel.toString()}
+                idiomaDeseado={item.targetLanguage}
+                idioma={item.nativeLanguage}
+                exchangeId={item.id}
+                onDeleteSuccess={handleDeleteSuccess}  
+              />
               )}
               contentContainerStyle={styles.listContent}
               showsHorizontalScrollIndicator={false}
@@ -198,6 +205,7 @@ export default function Home() {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
             />
+
           </View>
         )}
       </ScrollView>
