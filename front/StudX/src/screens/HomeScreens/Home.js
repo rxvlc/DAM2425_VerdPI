@@ -38,7 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     // navigation.navigate("Login");
-  }, [])
+  }, []);
 
   const fetchUserData = async () => {
     try {
@@ -77,9 +77,7 @@ export default function Home() {
       setExchanges(data);
       setError(false);
     } catch (error) {
-      console.log(
-        "⚠ Could not connect to server to get exchanges."
-      );
+      console.log("⚠ Could not connect to server to get exchanges.");
       setError(true);
     } finally {
       setLoading(false);
@@ -92,10 +90,7 @@ export default function Home() {
     try {
       const response = await fetch(`${API_URL}?userId=${userEmail}`);
       if (!response.ok) {
-        console.log(
-          "⚠ Error getting user exchanges:",
-          response.status
-        );
+        console.log("⚠ Error getting user exchanges:", response.status);
         throw new Error("Error in server response");
       }
       const data = await response.json();
@@ -191,13 +186,13 @@ export default function Home() {
               horizontal
               renderItem={({ item }) => (
                 <OwnExchangesTarget
-                alumnos={item.quantityStudents}
-                nivel={item.academicLevel.toString()}
-                idiomaDeseado={item.targetLanguage}
-                idioma={item.nativeLanguage}
-                exchangeId={item.id}
-                onDeleteSuccess={handleDeleteSuccess}  
-              />
+                  alumnos={item.quantityStudents}
+                  nivel={item.academicLevel.toString()}
+                  idiomaDeseado={item.targetLanguage}
+                  idioma={item.nativeLanguage}
+                  exchangeId={item.id}
+                  onDeleteSuccess={handleDeleteSuccess}
+                />
               )}
               contentContainerStyle={styles.listContent}
               showsHorizontalScrollIndicator={false}
@@ -205,7 +200,6 @@ export default function Home() {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
             />
-
           </View>
         )}
       </ScrollView>
