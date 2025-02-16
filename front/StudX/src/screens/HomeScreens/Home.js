@@ -218,6 +218,7 @@ export default function Home() {
                     idioma={item.nativeLanguage}
                     exchangeId={item.id}
                     onDeleteSuccess={handleDeleteSuccess}
+                    onRefresh={onRefresh}
                   />
                 )}
                 contentContainerStyle={styles.listContent}

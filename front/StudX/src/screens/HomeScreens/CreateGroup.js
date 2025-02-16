@@ -13,7 +13,8 @@ import * as SecureStore from "expo-secure-store";
 export default function CreateGroup({ onClose }) {
   const [name, setName] = useState("");
   const [nivel, setNivel] = useState(null);
-  const [quantity, setQuantity] = useState(1);
+  // Guardamos la cantidad como texto para permitir que el usuario borre todo
+  const [quantity, setQuantity] = useState("");
   const [language, setLanguage] = useState("");
   const [token, setToken] = useState(null);
 
@@ -22,7 +23,7 @@ export default function CreateGroup({ onClose }) {
       try {
         const storedToken = await SecureStore.getItemAsync("userToken");
         if (!storedToken) {
-          Alert.alert("Error", "there is no active session.");
+          Alert.alert("Error", "There is no active session.");
           return;
         }
         setToken(storedToken);
@@ -33,8 +34,15 @@ export default function CreateGroup({ onClose }) {
     fetchToken();
   }, []);
 
+  /**
+   * Lógica para alternar entre A1→A2→null, B1→B2→null, C1→C2→null
+   * de forma similar a CreatedExchange.
+   */
   const handleNivelPress = (selectedNivel) => {
     if (nivel === selectedNivel) {
+      // Si ya estamos en A1 y pulsamos otra vez A1 → pasamos a A2
+      // Si ya estamos en A2 y pulsamos A1 → pasamos a null
+      // (Idéntico para B1/B2 y C1/C2)
       switch (selectedNivel) {
         case "A1":
           setNivel("A2");
@@ -58,50 +66,81 @@ export default function CreateGroup({ onClose }) {
           setNivel(null);
       }
     } else {
+      // Si estamos en un nivel diferente o en null, al pulsar A1 pasamos a "A1"
+      // (similar para B1 y C1)
       setNivel(selectedNivel);
     }
   };
 
   const handleSave = async () => {
+    // Validaciones
     if (!name || !language || !nivel) {
       Alert.alert("Error", "All fields are required.");
       return;
     }
-
     if (!token) {
       Alert.alert("Error", "Could not get authentication token.");
+      return;
+    }
+
+    // Convertimos el texto de quantity a número
+    const numStudents = parseInt(quantity, 10);
+    if (!numStudents || numStudents <= 0) {
+      Alert.alert("Error", "Number of students must be greater than 0.");
       return;
     }
 
     const apiUrl = "http://44.220.1.21:8080/api/groups";
     const data = {
       name,
+      // A1 / A2 / B1 / B2 / C1 / C2 (o null)
       level: nivel,
-      quantity,
+      quantity: numStudents,
       language,
       token,
     };
 
     try {
-      console.log("Enviando datos:", data);
+      console.log("Sending data:", data);
 
       const response = await fetch(apiUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        Alert.alert("Succes", "Group created successfully");
-        onClose();
+        Alert.alert("Success", "Group created successfully");
+        onClose(); // Cierra la pantalla/modal
       } else {
         const errorData = await response.json();
         Alert.alert("Error", errorData.message || "Could not create group");
       }
     } catch (error) {
       Alert.alert("Connection error", error.message);
+    }
+  };
+
+  // Determina si la burbuja de A/B/C está en su 1er o 2do nivel
+  // y asigna el color correspondiente
+  const getCircleStyle = (type) => {
+    // type: "A", "B", "C"
+    // Compara con nivel para ver si estamos en A1, A2, etc.
+    switch (type) {
+      case "A":
+        if (nivel === "A1") return styles.lightGreenA1; // Verde clarito
+        if (nivel === "A2") return styles.lightGreenA2; // Verde más oscuro
+        return {}; // #ccc
+      case "B":
+        if (nivel === "B1") return styles.lightYellowB1; // Amarillo clarito
+        if (nivel === "B2") return styles.lightYellowB2; // Amarillo más oscuro
+        return {};
+      case "C":
+        if (nivel === "C1") return styles.lightRedC1; // Rojo clarito
+        if (nivel === "C2") return styles.lightRedC2; // Rojo más oscuro
+        return {};
+      default:
+        return {};
     }
   };
 
@@ -116,18 +155,57 @@ export default function CreateGroup({ onClose }) {
           placeholder="Enter the group name"
         />
 
-        <Text style={styles.label}>Level {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
+        <Text style={styles.label}>
+          Level {nivel ? `(${nivel.toUpperCase()})` : ""}
+        </Text>
         <View style={styles.trafficLight}>
-          <TouchableOpacity style={[styles.light, nivel === "A1" && styles.lightGreen]} onPress={() => handleNivelPress("A1")} />
-          <TouchableOpacity style={[styles.light, nivel === "B1" && styles.lightYellow]} onPress={() => handleNivelPress("B1")} />
-          <TouchableOpacity style={[styles.light, nivel === "C1" && styles.lightRed]} onPress={() => handleNivelPress("C1")} />
+          {/* Al pulsar la burbuja "A", si estamos en A1 o A2, sigue la secuencia, si no, pasa a A1 */}
+          <TouchableOpacity
+            style={[styles.light, getCircleStyle("A")]}
+            onPress={() => {
+              if (nivel === "A1" || nivel === "A2") {
+                handleNivelPress(nivel);
+              } else {
+                handleNivelPress("A1");
+              }
+            }}
+          />
+
+          {/* B */}
+          <TouchableOpacity
+            style={[styles.light, getCircleStyle("B")]}
+            onPress={() => {
+              if (nivel === "B1" || nivel === "B2") {
+                handleNivelPress(nivel);
+              } else {
+                handleNivelPress("B1");
+              }
+            }}
+          />
+
+          {/* C */}
+          <TouchableOpacity
+            style={[styles.light, getCircleStyle("C")]}
+            onPress={() => {
+              if (nivel === "C1" || nivel === "C2") {
+                handleNivelPress(nivel);
+              } else {
+                handleNivelPress("C1");
+              }
+            }}
+          />
         </View>
 
-        <Text style={styles.label}>Nº of Students</Text>
+        <Text style={styles.label}>Number of Students</Text>
         <TextInput
           style={styles.input}
-          value={quantity.toString()}
-          onChangeText={(text) => setQuantity(parseInt(text) || 1)}
+          value={quantity}
+          onChangeText={(text) => {
+            // Solo permitimos dígitos y dejamos que el usuario borre
+            const sanitized = text.replace(/[^0-9]/g, "");
+            setQuantity(sanitized);
+          }}
+          placeholder="Enter number of students"
           keyboardType="numeric"
         />
 
@@ -147,6 +225,7 @@ export default function CreateGroup({ onClose }) {
   );
 }
 
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -170,6 +249,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 20,
+    marginBottom: 15,
   },
   light: {
     width: 50,
@@ -177,15 +257,32 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: "#ccc",
   },
-  lightGreen: {
+
+  // Verde clarito A1
+  lightGreenA1: {
+    backgroundColor: "#A8E6A2",
+  },
+  // Verde oscuro A2
+  lightGreenA2: {
     backgroundColor: "#4CAF50",
   },
-  lightYellow: {
+  // Amarillo clarito B1
+  lightYellowB1: {
+    backgroundColor: "#FFEE99",
+  },
+  // Amarillo oscuro B2
+  lightYellowB2: {
     backgroundColor: "#FFCC00",
   },
-  lightRed: {
+  // Rojo clarito C1
+  lightRedC1: {
+    backgroundColor: "#FFB3B3",
+  },
+  // Rojo oscuro C2
+  lightRedC2: {
     backgroundColor: "#FF3B30",
   },
+
   saveButton: {
     backgroundColor: "#000",
     padding: 15,

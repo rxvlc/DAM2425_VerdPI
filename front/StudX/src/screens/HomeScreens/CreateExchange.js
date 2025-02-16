@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { 
+  StyleSheet, 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  Alert 
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import LanguageSelector from "../../components/LanguageSelector";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+// Importa useNavigation para poder navegar
+import { useNavigation } from "@react-navigation/native";
 
 export default function CreatedExchange({ onClose }) {
+  const navigation = useNavigation();
+
   const [nombreGrupo, setNombreGrupo] = useState("");
   const [nivel, setNivel] = useState(null);
   const [nativeLanguage, setNativeLanguage] = useState(null);
@@ -17,7 +28,7 @@ export default function CreatedExchange({ onClose }) {
   const [university, setUniversity] = useState("");
   const [token, setToken] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [isStartDate, setIsStartDate] = useState(true);  // Variable para determinar si es la fecha de inicio o fin
+  const [isStartDate, setIsStartDate] = useState(true); // Determines if it's the start or end date
 
   const showDatePicker = (isStart) => {
     setIsStartDate(isStart);
@@ -30,7 +41,7 @@ export default function CreatedExchange({ onClose }) {
 
   const handleConfirm = (date) => {
     if (isStartDate) {
-      setFechaInicio(date.toISOString().split("T")[0]); // Formato YYYY-MM-DD
+      setFechaInicio(date.toISOString().split("T")[0]); // Format YYYY-MM-DD
     } else {
       setFechaFin(date.toISOString().split("T")[0]);
     }
@@ -42,8 +53,8 @@ export default function CreatedExchange({ onClose }) {
       try {
         const tokenFromSecureStore = await SecureStore.getItemAsync("userToken");
         if (!tokenFromSecureStore) {
-          console.log("No hay token guardado.");
-          Alert.alert("Error", "No se ha encontrado una sesión activa.");
+          console.log("No token found.");
+          Alert.alert("Error", "No active session found.");
           return;
         }
         setToken(tokenFromSecureStore);
@@ -51,12 +62,12 @@ export default function CreatedExchange({ onClose }) {
         const response = await fetch(`http://44.220.1.21:8080/api/users/me?token=${tokenFromSecureStore}`);
         if (response.ok) {
           const data = await response.json();
-          setUniversity(data.university || "No disponible");
+          setUniversity(data.university || "Not available");
         } else {
-          console.log("Error al obtener los datos del usuario");
+          console.log("Error fetching user data");
         }
       } catch (error) {
-        console.log("Error al obtener el token o datos del usuario:", error);
+        console.log("Error fetching token or user data:", error);
       }
     };
     fetchTokenAndUserData();
@@ -93,7 +104,7 @@ export default function CreatedExchange({ onClose }) {
 
   const handleSave = async () => {
     if (!token) {
-      Alert.alert("Error", "No se pudo encontrar el token.");
+      Alert.alert("Error", "Token not found.");
       return;
     }
 
@@ -111,7 +122,7 @@ export default function CreatedExchange({ onClose }) {
     };
 
     console.log("Token:", token);
-    console.log("Datos a enviar:", JSON.stringify(data, null, 2));
+    console.log("Data to send:", JSON.stringify(data, null, 2));
 
     try {
       const response = await fetch(apiUrl, {
@@ -123,16 +134,24 @@ export default function CreatedExchange({ onClose }) {
       });
 
       const responseText = await response.text();
-      console.log("Código de respuesta:", response.status);
-      console.log("Respuesta del servidor:", responseText);
+      console.log("Response code:", response.status);
+      console.log("Server response:", responseText);
 
       if (response.ok) {
-        Alert.alert("Éxito", "Grupo creado exitosamente");
+        // Al pulsar "OK", volvemos a la pantalla anterior
+        Alert.alert("Success", "Exchange created successfully.", [
+          {
+            text: "OK",
+            onPress: () => {
+              navigation.goBack(); // Retorna a la pantalla anterior
+            }
+          }
+        ]);
       } else {
-        Alert.alert("Error", `No se pudo guardar: ${responseText}`);
+        Alert.alert("Error", `Could not save: ${responseText}`);
       }
     } catch (error) {
-      Alert.alert("Error de conexión", error.message);
+      Alert.alert("Connection error", error.message);
     }
   };
 
@@ -146,49 +165,72 @@ export default function CreatedExchange({ onClose }) {
     <View style={styles.container}>
       <ScrollView>
         <Text style={styles.label}>Group Name</Text>
-        <TextInput placeholder="Enter the group name" onChangeText={setNombreGrupo} />
+        <TextInput 
+          placeholder="Enter the group name" 
+          onChangeText={setNombreGrupo} 
+        />
 
-        <Text style={styles.label}>Level {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
+        <Text style={styles.label}>
+          Level {nivel ? `(${nivel.toUpperCase()})` : ""}
+        </Text>
         <View style={styles.trafficLight}>
           <TouchableOpacity
-            style={[styles.light, nivel === "A1" && styles.lightGreenA1, nivel === "A2" && styles.lightGreenA2]}
+            style={[
+              styles.light,
+              nivel === "A1" && styles.lightGreenA1,
+              nivel === "A2" && styles.lightGreenA2
+            ]}
             onPress={() => handleNivelPress("A1")}
           />
           <TouchableOpacity
-            style={[styles.light, nivel === "B1" && styles.lightYellowB1, nivel === "B2" && styles.lightYellowB2]}
+            style={[
+              styles.light,
+              nivel === "B1" && styles.lightYellowB1,
+              nivel === "B2" && styles.lightYellowB2
+            ]}
             onPress={() => handleNivelPress("B1")}
           />
           <TouchableOpacity
-            style={[styles.light, nivel === "C1" && styles.lightRedC1, nivel === "C2" && styles.lightRedC2]}
+            style={[
+              styles.light,
+              nivel === "C1" && styles.lightRedC1,
+              nivel === "C2" && styles.lightRedC2
+            ]}
             onPress={() => handleNivelPress("C1")}
           />
         </View>
 
         <Text style={styles.label}>Native Language</Text>
-        <LanguageSelector name="nativo" onLanguageChange={setNativeLanguage} />
+        <LanguageSelector name="native" onLanguageChange={setNativeLanguage} />
 
         <Text style={styles.label}>Target Language</Text>
-        <LanguageSelector name="intercambio" onLanguageChange={setTargetLanguage} />
+        <LanguageSelector name="target" onLanguageChange={setTargetLanguage} />
 
-        <Text style={styles.label}>Nº Of Students</Text>
-        <TextInput keyboardType="numeric" onChangeText={(text) => setNumAlumnos(Number(text))} />
+        <Text style={styles.label}>Number of Students</Text>
+        <TextInput 
+          keyboardType="numeric" 
+          onChangeText={(text) => setNumAlumnos(Number(text))} 
+        />
 
         <Text style={styles.label}>Educational Level</Text>
-        <TextInput placeholder="Ex: Bachelor" onChangeText={setAcademicLevel} />
+        <TextInput 
+          placeholder="E.g.: Bachelor" 
+          onChangeText={setAcademicLevel} 
+        />
 
-        <Text style={styles.label}>Fecha de inicio</Text>
+        <Text style={styles.label}>Start Date</Text>
         <TouchableOpacity onPress={() => showDatePicker(true)}>
           <TextInput
-           placeholder="Press for selecting begin date"
+            placeholder="Tap to select start date"
             value={fechaInicio}
             editable={false}
           />
         </TouchableOpacity>
 
-        <Text style={styles.label}>Fecha de fin</Text>
+        <Text style={styles.label}>End Date</Text>
         <TouchableOpacity onPress={() => showDatePicker(false)}>
           <TextInput
-            placeholder="Press for selecting end date"
+            placeholder="Tap to select end date"
             value={fechaFin}
             editable={false}
           />

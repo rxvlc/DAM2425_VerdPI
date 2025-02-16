@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,47 +14,44 @@ import { useTheme } from "../../../context/ThemeContext";
 const { width } = Dimensions.get("window");
 
 const flags = {
-  Spanish: { img: require("../../../images/Banderas/ES.png"), emoji: "🇪🇸" }, // Español
-  English: { img: require("../../../images/Banderas/GB.png"), emoji: "🇬🇧" }, // Inglés
-  French: { img: require("../../../images/Banderas/FR.png"), emoji: "🇫🇷" }, // Francés
-  German: { img: require("../../../images/Banderas/DE.png"), emoji: "🇩🇪" }, // Alemán
-  Italian: { img: require("../../../images/Banderas/IT.png"), emoji: "🇮🇹" }, // Italiano
-  Portuguese: { img: require("../../../images/Banderas/PT.png"), emoji: "🇵🇹" }, // Portugués
-  Dutch: { img: require("../../../images/Banderas/NL.png"), emoji: "🇳🇱" }, // Holandés
-  Russian: { img: require("../../../images/Banderas/RU.png"), emoji: "🇷🇺" }, // Ruso
-  Chinese: { img: require("../../../images/Banderas/CN.png"), emoji: "🇨🇳" }, // Chino
-  Japanese: { img: require("../../../images/Banderas/JP.png"), emoji: "🇯🇵" }, // Japonés
-  Korean: { img: require("../../../images/Banderas/KR.png"), emoji: "🇰🇷" }, // Coreano
-  Arabic: { img: require("../../../images/Banderas/SA.png"), emoji: "🇸🇦" }, // Árabe
-  Turkish: { img: require("../../../images/Banderas/TR.png"), emoji: "🇹🇷" }, // Turco
-  Bulgarian: { img: require("../../../images/Banderas/BG.png"), emoji: "🇧🇬" }, // Búlgaro
-  Czech: { img: require("../../../images/Banderas/CZ.png"), emoji: "🇨🇿" }, // Checo
-  Danish: { img: require("../../../images/Banderas/DK.png"), emoji: "🇩🇰" }, // Danés
-  Finnish: { img: require("../../../images/Banderas/FI.png"), emoji: "🇫🇮" }, // Finlandés
-  Greek: { img: require("../../../images/Banderas/GR.png"), emoji: "🇬🇷" }, // Griego
-  Hungarian: { img: require("../../../images/Banderas/HU.png"), emoji: "🇭🇺" }, // Húngaro
-  Indonesian: { img: require("../../../images/Banderas/ID.png"), emoji: "🇮🇩" }, // Indonesio
-  Hebrew: { img: require("../../../images/Banderas/IL.png"), emoji: "🇮🇱" }, // Hebreo
-  Hindi: { img: require("../../../images/Banderas/IN.png"), emoji: "🇮🇳" }, // Hindi
-  Persian: { img: require("../../../images/Banderas/IR.png"), emoji: "🇮🇷" }, // Persa
-  Malay: { img: require("../../../images/Banderas/MY.png"), emoji: "🇲🇾" }, // Malayo
-  Norwegian: { img: require("../../../images/Banderas/NO.png"), emoji: "🇳🇴" }, // Noruego
-  Filipino: { img: require("../../../images/Banderas/PH.png"), emoji: "🇵🇭" }, // Filipino
-  Polish: { img: require("../../../images/Banderas/PL.png"), emoji: "🇵🇱" }, // Polaco
-  Romanian: { img: require("../../../images/Banderas/RO.png"), emoji: "🇷🇴" }, // Rumano
-  Swedish: { img: require("../../../images/Banderas/SE.png"), emoji: "🇸🇪" }, // Sueco
-  Thai: { img: require("../../../images/Banderas/TH.png"), emoji: "🇹🇭" }, // Tailandés
-  Ukrainian: { img: require("../../../images/Banderas/UA.png"), emoji: "🇺🇦" }, // Ucraniano
-  Vietnamese: { img: require("../../../images/Banderas/VN.png"), emoji: "🇻🇳" }, // Vietnamita
+  Spanish: { img: require("../../../images/Banderas/ES.png") }, // Español
+  English: { img: require("../../../images/Banderas/GB.png") }, // Inglés
+  French: { img: require("../../../images/Banderas/FR.png") }, // Francés
+  German: { img: require("../../../images/Banderas/DE.png") }, // Alemán
+  Italian: { img: require("../../../images/Banderas/IT.png") }, // Italiano
+  Portuguese: { img: require("../../../images/Banderas/PT.png") }, // Portugués
+  Dutch: { img: require("../../../images/Banderas/NL.png") }, // Holandés
+  Russian: { img: require("../../../images/Banderas/RU.png") }, // Ruso
+  Chinese: { img: require("../../../images/Banderas/CN.png") }, // Chino
+  Japanese: { img: require("../../../images/Banderas/JP.png") }, // Japonés
+  Korean: { img: require("../../../images/Banderas/KR.png") }, // Coreano
+  Arabic: { img: require("../../../images/Banderas/SA.png") }, // Árabe
+  Turkish: { img: require("../../../images/Banderas/TR.png") }, // Turco
+  Bulgarian: { img: require("../../../images/Banderas/BG.png") }, // Búlgaro
+  Czech: { img: require("../../../images/Banderas/CZ.png") }, // Checo
+  Danish: { img: require("../../../images/Banderas/DK.png") }, // Danés
+  Finnish: { img: require("../../../images/Banderas/FI.png") }, // Finlandés
+  Greek: { img: require("../../../images/Banderas/GR.png") }, // Griego
+  Hungarian: { img: require("../../../images/Banderas/HU.png") }, // Húngaro
+  Indonesian: { img: require("../../../images/Banderas/ID.png") }, // Indonesio
+  Hebrew: { img: require("../../../images/Banderas/IL.png") }, // Hebreo
+  Hindi: { img: require("../../../images/Banderas/IN.png") }, // Hindi
+  Persian: { img: require("../../../images/Banderas/IR.png") }, // Persa
+  Malay: { img: require("../../../images/Banderas/MY.png") }, // Malayo
+  Norwegian: { img: require("../../../images/Banderas/NO.png") }, // Noruego
+  Filipino: { img: require("../../../images/Banderas/PH.png") }, // Filipino
+  Polish: { img: require("../../../images/Banderas/PL.png") }, // Polaco
+  Romanian: { img: require("../../../images/Banderas/RO.png") }, // Rumano
+  Swedish: { img: require("../../../images/Banderas/SE.png") }, // Sueco
+  Thai: { img: require("../../../images/Banderas/TH.png") }, // Tailandés
+  Ukrainian: { img: require("../../../images/Banderas/UA.png") }, // Ucraniano
+  Vietnamese: { img: require("../../../images/Banderas/VN.png") }  // Vietnamita
 };
 
-
-
 const learningImg = require("../../../images/LogosExchanges/Studying.png");
-const speak = require("../../../images/LogosExchanges/Speak.png")
-const level = require("../../../images/LogosExchanges/Nivel.png")
-const students = require("../../../images/LogosExchanges/Estudiante.png")
-
+const speak = require("../../../images/LogosExchanges/Speak.png");
+const level = require("../../../images/LogosExchanges/Nivel.png");
+const students = require("../../../images/LogosExchanges/Estudiante.png");
 
 const levelColors = {
   A1: "#A5D6A7",
@@ -67,7 +64,7 @@ const levelColors = {
 
 export default function ExchangeTarget({
   centro,
-  profesor,
+  profesor,    
   alumnos,
   nivel,
   profesorImagen,
@@ -77,8 +74,39 @@ export default function ExchangeTarget({
 }) {
   const { darkMode } = useTheme();
 
-  const flagInfo = flags[idiomaDeseado] || { img: require("../../../images/Banderas/Grey.jpg")};
-  const flagInfo2 = flags[idioma] || { img: require("../../../images/Banderas/Grey.jpg")};
+  const [teacherImage, setTeacherImage] = useState(profesorImagen);
+
+  useEffect(() => {
+    console.log("ExchangeTarget useEffect:", { teacherImage, profesor });
+    if (!teacherImage && profesor) {
+      const apiUrl = `http://44.220.1.21:8080/api/users/image?email=${encodeURIComponent(profesor)}`;
+      console.log("Fetching teacher image from:", apiUrl);
+
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Error en la respuesta de la red");
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Datos recibidos de la API:", data);
+          if (data.urlProfilePicture) {
+            let secureUrl = data.urlProfilePicture;
+            if (secureUrl.startsWith("http://")) {
+              secureUrl = secureUrl.replace("http://", "https://");
+            }
+            setTeacherImage({ uri: secureUrl });
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching teacher image:", error);
+        });
+    }
+  }, [profesor, teacherImage]);
+
+  const flagInfo = flags[idiomaDeseado] || { img: require("../../../images/Banderas/Grey.jpg") };
+  const flagInfo2 = flags[idioma] || { img: require("../../../images/Banderas/Grey.jpg") };
 
   return (
     <ImageBackground
@@ -86,14 +114,20 @@ export default function ExchangeTarget({
       style={[styles.card, { width: width * 0.56, maxWidth: 250 }]}
       resizeMode="cover"
     >
-      <View style={[styles.overlay, { backgroundColor: darkMode ? "#242323" : "white" },{ borderColor: darkMode ? null : "#d6d4d4" }]}>
+      <View
+        style={[
+          styles.overlay,
+          { backgroundColor: darkMode ? "#242323" : "white" },
+          { borderColor: darkMode ? null : "#d6d4d4" }
+        ]}
+      >
         <Text style={[styles.title, { color: darkMode ? "white" : "black" }]} numberOfLines={1} ellipsizeMode="tail">
           {centro}
         </Text>
 
         <View style={styles.profesorContainer}>
-          {profesorImagen ? (
-            <Image source={profesorImagen} style={styles.profesorImage} />
+          {teacherImage ? (
+            <Image source={teacherImage} style={styles.profesorImage} />
           ) : (
             <Ionicons name="person-circle-outline" size={40} color="gray" />
           )}
@@ -103,21 +137,25 @@ export default function ExchangeTarget({
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Image source={learningImg} style={styles.studyIcon} />
+          <Image source={learningImg} style={styles.studyIcon} />
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Learning: </Text>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idiomaDeseado} </Text>
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>
+            {idiomaDeseado}{" "}
+          </Text>
           <Image source={flagInfo.img} style={styles.flag} />
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Image source={speak} style={styles.studyIcon} />
+          <Image source={speak} style={styles.studyIcon} />
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Speak: </Text>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{idioma} </Text>
-               <Image source={flagInfo2.img} style={styles.flag} />
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>
+            {idioma}{" "}
+          </Text>
+          <Image source={flagInfo2.img} style={styles.flag} />
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Image source={level} style={styles.studyIcon} />
+          <Image source={level} style={styles.studyIcon} />
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Level: </Text>
           <View style={[styles.highlightContainer, { backgroundColor: levelColors[nivel] || "#A5D6A7" }]}>
             <Text style={styles.highlightText}>{nivel.toUpperCase()}</Text>
@@ -125,9 +163,11 @@ export default function ExchangeTarget({
         </View>
 
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Image source={students} style={styles.studyIcon} />
+          <Image source={students} style={styles.studyIcon} />
           <Text style={{ color: darkMode ? "white" : "black", fontSize: 12 }}> Students: </Text>
-          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>{alumnos}</Text>
+          <Text style={{ color: darkMode ? "white" : "black", fontSize: 12, fontWeight: "bold" }}>
+            {alumnos}
+          </Text>
         </View>
 
         <View style={styles.buttonContainer}>
@@ -142,7 +182,6 @@ export default function ExchangeTarget({
             </View>
           </TouchableOpacity>
         </View>
-
       </View>
     </ImageBackground>
   );
@@ -153,19 +192,18 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
     marginHorizontal: 10,
-    elevation: 8, 
+    elevation: 8,
     shadowColor: "black",
-    shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 4, 
-    shadowRadius: 6, 
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 4,
+    shadowRadius: 6,
     alignSelf: "center",
     overflow: "hidden",
   },
-
   overlay: {
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.92)", 
+    backgroundColor: "rgba(255, 255, 255, 0.92)",
     borderColor: "#d6d4d4",
     borderWidth: 0.5,
   },
@@ -185,10 +223,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 5,
   },
-  text: {
+  profesorText: {
     fontSize: 12,
-    marginBottom: 4,
-    textAlign: "left"
   },
   highlightContainer: {
     backgroundColor: "#A5D6A7",
@@ -203,7 +239,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
-   flag: {
+  flag: {
     width: 20,
     height: 15,
     marginRight: 5,
@@ -233,9 +269,6 @@ const styles = StyleSheet.create({
   chatButton: {
     backgroundColor: "#1E88E5",
   },
-  solicitudButton: {
-    backgroundColor: "#FF5722",
-  },
   buttonContent: {
     alignItems: "center",
     justifyContent: "center",
@@ -243,6 +276,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 12,
-    marginTop: 2, 
+    marginTop: 2,
   },
 });
