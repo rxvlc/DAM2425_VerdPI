@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   FlatList,
@@ -11,11 +11,12 @@ import {
   PixelRatio,
   RefreshControl,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../../context/ThemeContext";
-import ExchangeTarget from "./components/ExchangeTarget";
-import OwnExchangesTarget from "./components/OwnExchangesTarget";
+import ExchangeTarget from "./components/ExchangeTarget"; 
+import OwnExchangesTarget from "./components/OwnExchangesTarget"; 
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -40,8 +41,13 @@ export default function Home() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // navigation.navigate("Login");
+    fetchUserData();
+    fetchExchanges();
   }, []);
+
+  useEffect(() => {
+    fetchMyExchanges();
+  }, [userEmail]);
 
   const fetchUserData = async () => {
     try {
@@ -103,15 +109,6 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    fetchUserData();
-    fetchExchanges();
-  }, []);
-
-  useEffect(() => {
-    fetchMyExchanges();
-  }, [userEmail]);
-
   const onRefresh = () => {
     setRefreshing(true);
     fetchExchanges();
@@ -122,6 +119,39 @@ export default function Home() {
     setMyExchanges((prev) => prev.filter((ex) => ex.id !== deletedId));
     fetchExchanges();
   };
+
+
+  const renderExchangeItem = useCallback(({ item }) => {
+    return (
+      <ExchangeTarget
+        centro={item.university}
+        profesor={item.idTeacherCreator}
+        alumnos={item.quantityStudents}
+        nivel={item.academicLevel.toString()}
+        idiomaDeseado={item.targetLanguage}
+        idioma={item.nativeLanguage}
+        onChatPress={() =>
+          navigation.navigate("Mensajes", {
+            profesor: item.idTeacherCreator,
+          })
+        }
+      />
+    );
+  }, [navigation]);
+
+  const renderMyExchangeItem = useCallback(({ item }) => {
+    return (
+      <OwnExchangesTarget
+        alumnos={item.quantityStudents}
+        nivel={item.academicLevel.toString()}
+        idiomaDeseado={item.targetLanguage}
+        idioma={item.nativeLanguage}
+        exchangeId={item.id}
+        onDeleteSuccess={handleDeleteSuccess}
+        onRefresh={onRefresh}
+      />
+    );
+  }, [handleDeleteSuccess, onRefresh]);
 
   return (
     <View
@@ -142,11 +172,7 @@ export default function Home() {
         </Animated.View>
 
         {loading ? (
-          <ActivityIndicator
-            size="large"
-            color="#ffffff"
-            style={styles.loader}
-          />
+          <ActivityIndicator size="large" color="#ffffff" style={styles.loader} />
         ) : error ? (
           <View style={styles.errorContainer}>
             <Text style={[styles.errorText, { color: darkMode ? "white" : "black" }]}>
@@ -158,27 +184,17 @@ export default function Home() {
             <Text style={[styles.exchangesAvailable, { color: darkMode ? "white" : "black" }]}>
               Exchanges Available
             </Text>
+
             <FlatList
               data={[...exchanges].reverse()}
               keyExtractor={(item) => item.id}
               horizontal
-              renderItem={({ item }) => (
-                <ExchangeTarget
-                  centro={item.university}
-                  profesor={item.idTeacherCreator}
-                  alumnos={item.quantityStudents}
-                  nivel={item.academicLevel.toString()}
-                  idiomaDeseado={item.targetLanguage}
-                  idioma={item.nativeLanguage}
-                  onChatPress={() =>
-                    navigation.navigate("Mensajes", {
-                      profesor: item.idTeacherCreator,
-                    })
-                  }
-                />
-              )}
+              renderItem={renderExchangeItem} 
               contentContainerStyle={styles.listContent}
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={5}
+              windowSize={3}
+              maxToRenderPerBatch={5}
             />
 
             <Text style={[styles.exchangesAvailable, { color: darkMode ? "white" : "black" }]}>
@@ -210,25 +226,15 @@ export default function Home() {
                 data={[...myExchanges].reverse()}
                 keyExtractor={(item) => item.id}
                 horizontal
-                renderItem={({ item }) => (
-                  <OwnExchangesTarget
-                    alumnos={item.quantityStudents}
-                    nivel={item.academicLevel.toString()}
-                    idiomaDeseado={item.targetLanguage}
-                    idioma={item.nativeLanguage}
-                    exchangeId={item.id}
-                    onDeleteSuccess={handleDeleteSuccess}
-                    onRefresh={onRefresh}
-                  />
-                )}
+                renderItem={renderMyExchangeItem} 
                 contentContainerStyle={styles.listContent}
                 showsHorizontalScrollIndicator={false}
                 refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
+                initialNumToRender={5}
+                windowSize={3}
+                maxToRenderPerBatch={5}
               />
             )}
           </View>
@@ -291,6 +297,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
-  createButton: {
+  createButton: {},
+  loader: {
+    marginTop: 20,
   },
 });
