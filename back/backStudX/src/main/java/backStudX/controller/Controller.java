@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,8 +18,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.catalina.connector.Response;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -39,15 +42,16 @@ import backStudX.SendEmail;
 import backStudX.Util;
 import backStudX.Services.CloudinaryService;
 import backStudX.Services.ExchangeService;
+import backStudX.Services.MessageService;
 import backStudX.model.Exchange;
 import backStudX.model.Group;
 import backStudX.model.Token;
 import backStudX.model.User;
-import backStudX.model.Notification;
+import backStudX.model.Message;
 import backStudX.model.Preferences;
 import backStudX.repository.ExchangeRepository;
 import backStudX.repository.GroupRepository;
-import backStudX.repository.NotificationsRepository;
+import backStudX.repository.MessageRepository;
 import backStudX.repository.PreferencesRepository;
 import backStudX.repository.TokenRepository;
 import backStudX.repository.UserRepository;
@@ -65,9 +69,6 @@ public class Controller {
 	ExchangeRepository exchangeRepository;
 
 	@Autowired
-	NotificationsRepository notificationsRepository;
-
-	@Autowired
 	GroupRepository groupRepository;
 
 	@Autowired
@@ -78,6 +79,10 @@ public class Controller {
 
 	@Autowired
 	private CloudinaryService cloudinaryService;
+	
+	@Autowired MessageService messageService;
+	
+	@Autowired MessageRepository messageRepository;
 
 	@PostMapping("/api/auth/register")
 	ResponseEntity<String> registerUser(@RequestBody String userData) {
@@ -285,89 +290,135 @@ public class Controller {
 		return ResponseEntity.ok().body(exchangeRepository.findById(exchangeId));
 	}
 
-	@GetMapping("/api/notifications")
-	public ResponseEntity<List<Notification>> getUserNotifications(
-			@RequestParam(value = "idUserRec") String idUserRecipient, @RequestParam(value = "token") String token) {
-		// Validar el token
-		Token t = tokenRepository.findToken(token);
-
-		if (t == null || t.isExpired()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // El token es inválido o expirado
-		}
-
-		// Obtener las notificaciones del destinatario
-		List<Notification> notifications = notificationsRepository.findUserRecipient(idUserRecipient);
-
-		if (notifications.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // No hay notificaciones
-		}
-
-		// Devolver las notificaciones encontradas
-		return ResponseEntity.ok(notifications);
-	}
-
-	@PutMapping("/api/notifications/read")
-	public ResponseEntity<?> updateReadedNotification(@RequestParam String updatedInfo) {
-		try {
-			JSONObject readedMessage = new JSONObject(updatedInfo);
-
-			String id = readedMessage.getString("id");
-			String token = readedMessage.getString("token");
-			Token t = tokenRepository.findToken(token);
-
-			if (t == null || t.isExpired()) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado.");
-			}
-
-			Optional<Notification> notificationSearched = notificationsRepository.findById(id);
-			Notification notificationSelected = notificationSearched.get();
-
-			if (readedMessage.has("messageReaded")) {
-				notificationSelected.setMessageReaded(true);
-			}
-
-			notificationsRepository.save(notificationSelected);
-			return ResponseEntity.ok(notificationSelected);
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body("Error al actualizar el intercambio: " + e.getMessage());
-		}
-	}
-	
-	@PutMapping("/api/notifications/{id}/read")
-	public ResponseEntity<String> markNotificationAsRead(
-	        @PathVariable("id") String notificationId, 
-	        @RequestParam("token") String token) {
+	@GetMapping("/api/messages")
+	public ResponseEntity<List<Message>> getUserChats(
+	        @RequestParam(value = "idUser") String idUser,
+	        @RequestParam(value = "token") String token) {
 
 	    // Validar el token
 	    Token t = tokenRepository.findToken(token);
 	    if (t == null || t.isExpired()) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                .body("Invalid or expired token.");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Token inválido o expirado
 	    }
 
-	    // Buscar la notificación por ID
-	    Optional<Notification> notificationOpt = notificationsRepository.findById(notificationId);
-	    if (!notificationOpt.isPresent()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                .body("Notification not found.");
+		// Obtener los últimos mensajes por chat del usuario
+	    List<Message> lastMessagesByUser = messageService.getLastMessagesGroupedByUser(idUser);
+
+	    if (lastMessagesByUser.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // No tiene chats
 	    }
 
-	    // Obtener la notificación
-	    Notification notification = notificationOpt.get();
-
-	    // Marcar la notificación como leída
-	    notification.setMessageReaded(true);
-
-	    // Guardar la notificación actualizada
-	    notificationsRepository.save(notification);
-
-	    // Devolver respuesta exitosa
-	    return ResponseEntity.ok("Notification marked as read.");
+	    return ResponseEntity.ok(lastMessagesByUser);
 	}
 
+	
+	@PostMapping("/api/messages")
+	public ResponseEntity<?> sendMessage(@RequestBody String body) {
+	    try {
+	        JSONObject msj = new JSONObject(body);
+
+	        String idUserSender = msj.getString("idUserSender");
+	        String idUserRecipient = msj.getString("idUserRecipient");
+	        String message = msj.getString("message");
+	        String typeMessage = msj.optString("typeMessage", "text"); // Por defecto "text"
+	        String token = msj.getString("token");
+
+	        // Validar token
+	        Token t = tokenRepository.findToken(token);
+	        if (t == null || t.isExpired()) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado");
+	        }
+
+	        // Crear mensaje
+	        Message newMessage = new Message();
+	        newMessage.setIdUserSender(idUserSender);
+	        newMessage.setIdUserRecipient(idUserRecipient);
+	        newMessage.setMessage(message);
+	        newMessage.setTypeMessage(typeMessage);
+	        newMessage.setMessageReaded(false);
+	        newMessage.setCreatedAt(LocalDateTime.now());
+
+	        // Guardar mensaje
+	        messageRepository.save(newMessage);
+
+	        return ResponseEntity.status(HttpStatus.CREATED).body(newMessage);
+	    } catch (JSONException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en el cuerpo de la solicitud: " + e.getMessage());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno: " + e.getMessage());
+	    }
+	}
+
+
+	@PutMapping("/api/notifications/read")
+	public ResponseEntity<?> markConversationAsRead(@RequestBody String updatedInfo) {
+	    try {
+	        JSONObject data = new JSONObject(updatedInfo);
+
+	        String idUserSender = data.getString("idUserSender");
+	        String idUserRecipient = data.getString("idUserRecipient");
+	        String token = data.getString("token");
+
+	        // Validar el token
+	        Token t = tokenRepository.findToken(token);
+	        if (t == null || t.isExpired()) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado.");
+	        }
+
+	        // Buscar los mensajes entre ambos usuarios
+	        List<Message> conversationMessages = messageRepository.findByUsers(
+	        	    idUserSender, 
+	        	    idUserRecipient, 
+	        	    Sort.by(Sort.Order.asc("createdAt")) 
+	        	);
+
+	        if (conversationMessages.isEmpty()) {
+	            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay mensajes entre estos usuarios.");
+	        }
+
+	        // Marcar como leídos todos los mensajes del remitente hacia el destinatario
+	        conversationMessages.forEach(message -> {
+	            if (!message.isMessageReaded()) { // Solo si no está leído
+	                message.setMessageReaded(true);
+	            }
+	        });
+
+	        // Guardar todos los mensajes actualizados
+	        messageRepository.saveAll(conversationMessages);
+
+	        return ResponseEntity.ok("Mensajes marcados como leídos.");
+
+	    } catch (JSONException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en el formato JSON: " + e.getMessage());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar los mensajes: " + e.getMessage());
+	    }
+	}
+	
+	@GetMapping("/api/messages/conversation")
+	public ResponseEntity<List<Message>> getConversation(
+	        @RequestParam String idUserSender,
+	        @RequestParam String idUserRecipient,
+	        @RequestParam String token) {
+
+	    // Validar token
+	    Token t = tokenRepository.findToken(token);
+	    if (t == null || t.isExpired()) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	    }
+
+	    List<Message> conversationMessages = messageRepository.findByUsers(
+	            idUserSender,
+	            idUserRecipient,
+	            Sort.by(Sort.Order.asc("createdAt"))
+	    );
+
+	    if (conversationMessages.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	    }
+
+	    return ResponseEntity.ok(conversationMessages);
+	}
 
 	@PutMapping("/api/exchanges/")
 	public ResponseEntity<?> updateExchange(@RequestParam String id, @RequestBody String exchangeJson) {
