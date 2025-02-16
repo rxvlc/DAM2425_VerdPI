@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import backStudX.controller.Controller;
 import backStudX.model.Message;
 import backStudX.repository.MessageRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnOpen;
@@ -21,9 +22,17 @@ import jakarta.websocket.Session;
 @Component
 public class WebSocketServer {
 
-	@Autowired
-	MessageRepository messageRepository;
+	 @Autowired
+	    private MessageRepository messageRepository;
 
+	    @PostConstruct
+	    public void init() {
+	        if (messageRepository == null) {
+	            System.out.println("messageRepository no fue inyectado correctamente.");
+	        } else {
+	            System.out.println("messageRepository inyectado correctamente.");
+	        }
+	    }
 	
 	@jakarta.websocket.OnMessage
 	public void onMessage(String message, Session session) {
@@ -36,8 +45,8 @@ public class WebSocketServer {
 		newMessage.setCreatedAt(LocalDateTime.now());
 		newMessage.setTypeMessage("text"); // Asumimos que es texto, pero puede ser diferente según el caso
 
-		Controller c = new Controller();
-		c.saveMessage(newMessage);
+        messageRepository.save(newMessage);
+
 
 		// Enviar el mensaje al receptor
 		sendMessageToRecipient(newMessage.getIdUserRecipient(), message);
