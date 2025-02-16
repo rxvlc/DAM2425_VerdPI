@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TextInput, Pressable, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import SearchedExchange from "../../components/SearchedExchange";
@@ -66,9 +65,13 @@ export default function Busquedas(props) {
   
   
   const navigation = useNavigation();
-  navigation.setOptions({
-    headerTitle: "Search"});
 
+    useEffect(() => {
+      navigation.setOptions({
+        headerTitle: "Search",
+      });
+    }, [navigation]);
+    
   return (
     <View style={[styles.container, darkMode && styles.containerDark]}>
       <View style={styles.zonaBusqueda}>
