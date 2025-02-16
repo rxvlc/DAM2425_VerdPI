@@ -66,22 +66,27 @@ export default function OwnExchangesTarget({
   const [selectedNativeLanguage, setSelectedNativeLanguage] = useState(idioma);
   const [selectedTargetLanguage, setSelectedTargetLanguage] =
     useState(idiomaDeseado);
-  const [editedQuantityStudents, setEditedQuantityStudents] = useState(alumnos);
 
+  // ALMACENAMOS LA CADENA DE texto en lugar de número,
+  // para permitir borrar y dejarlo vacío sin que se ponga '0'.
+  // Si 'alumnos' es mayor que 0, mostramos ese número; sino, vacío.
+  const [studentsInput, setStudentsInput] = useState(
+    alumnos > 0 ? String(alumnos) : ""
+  );
+
+  // Fechas
   const [beginDate, setBeginDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [showBeginPicker, setShowBeginPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
-
+  // Modals de idioma con búsqueda
   const [nativeModalVisible, setNativeModalVisible] = useState(false);
   const [nativeSearch, setNativeSearch] = useState("");
-
-
   const [targetModalVisible, setTargetModalVisible] = useState(false);
   const [targetSearch, setTargetSearch] = useState("");
 
-
+  // Filtra la lista de idiomas según el texto
   const filteredLanguagesNative = Object.keys(flags).filter((lang) =>
     lang.toLowerCase().includes(nativeSearch.toLowerCase())
   );
@@ -100,6 +105,7 @@ export default function OwnExchangesTarget({
     return `${day}-${month}-${year}`;
   }
 
+  // Eliminar Exchange
   const handleDelete = async () => {
     setModalVisible(false);
 
@@ -131,6 +137,7 @@ export default function OwnExchangesTarget({
     }
   };
 
+  // Editar Exchange
   const handleEdit = async () => {
     try {
       const token = await SecureStore.getItemAsync("userToken");
@@ -142,6 +149,13 @@ export default function OwnExchangesTarget({
         return;
       }
 
+      // Convertimos a número y validamos que sea > 0
+      const quantityNum = parseInt(studentsInput, 10);
+      if (!quantityNum || quantityNum <= 0) {
+        Alert.alert("Error", "The number of students must be > 0.");
+        return;
+      }
+
       const apiUrl = `http://44.220.1.21:8080/api/exchanges/?id=${exchangeId}`;
 
       const bodyData = {
@@ -149,7 +163,7 @@ export default function OwnExchangesTarget({
         nativeLanguage: selectedNativeLanguage,
         targetLanguage: selectedTargetLanguage,
         academicLevel: selectedLevel,
-        quantityStudents: editedQuantityStudents,
+        quantityStudents: quantityNum,
         beginDate: formatDateDDMMYYYY(beginDate),
         endDate: formatDateDDMMYYYY(endDate),
       };
@@ -167,13 +181,13 @@ export default function OwnExchangesTarget({
       console.log("Respuesta del servidor PUT:", responseText);
 
       if (response.ok) {
-        Alert.alert("Éxito", "El intercambio ha sido editado correctamente.");
+        Alert.alert("Succes", "The exchange has been successfully edited.");
         setEditModalVisible(false);
       } else {
-        Alert.alert("Error", "No se pudo editar: " + responseText);
+        Alert.alert("Error", "Could not edit:" + responseText);
       }
     } catch (error) {
-      Alert.alert("Error de conexión", error.message);
+      Alert.alert("Connection error", error.message);
     }
   };
 
@@ -185,6 +199,13 @@ export default function OwnExchangesTarget({
     setShowEndPicker(false);
     if (selectedDate) setEndDate(selectedDate);
   };
+
+
+  const handleStudentsChange = (text) => {
+    const numericText = text.replace(/[^0-9]/g, "");
+    setStudentsInput(numericText);
+  };
+
 
   const renderNativeItem = ({ item }) => (
     <Pressable
@@ -314,7 +335,6 @@ export default function OwnExchangesTarget({
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-
         <Pressable
           style={styles.modalOverlay}
           onPress={() => setModalVisible(false)}
@@ -342,7 +362,6 @@ export default function OwnExchangesTarget({
         visible={editModalVisible}
         onRequestClose={() => setEditModalVisible(false)}
       >
-
         <Pressable
           style={styles.modalOverlay}
           onPress={() => setEditModalVisible(false)}
@@ -408,7 +427,7 @@ export default function OwnExchangesTarget({
             </Pressable>
 
             <Text style={styles.label}>
-              Begin Date (beginDate): {formatDateDDMMYYYY(beginDate)}
+              Begin Date: {formatDateDDMMYYYY(beginDate)}
             </Text>
             <Pressable
               style={styles.dateButton}
@@ -426,7 +445,7 @@ export default function OwnExchangesTarget({
             )}
 
             <Text style={styles.label}>
-              End Date (endDate): {formatDateDDMMYYYY(endDate)}
+              End Date: {formatDateDDMMYYYY(endDate)}
             </Text>
             <Pressable
               style={styles.dateButton}
@@ -443,13 +462,12 @@ export default function OwnExchangesTarget({
               />
             )}
 
-          
             <Text style={styles.label}>Nº Of Students:</Text>
             <TextInput
               style={styles.input}
-              placeholder="12"
-              value={editedQuantityStudents.toString()}
-              onChangeText={(value) => setEditedQuantityStudents(Number(value))}
+              placeholder="Nº of Students"
+              value={studentsInput}
+              onChangeText={handleStudentsChange}
               keyboardType="numeric"
             />
 
@@ -468,6 +486,7 @@ export default function OwnExchangesTarget({
         </Pressable>
       </Modal>
 
+    
       <Modal
         transparent={true}
         visible={nativeModalVisible}
@@ -477,18 +496,17 @@ export default function OwnExchangesTarget({
           style={styles.modalOverlay}
           onPress={() => {
             setNativeModalVisible(false);
-            setNativeSearch(""); 
+            setNativeSearch("");
           }}
         >
           <Pressable
             style={styles.searchLangModal}
             onPress={(e) => e.stopPropagation()}
           >
-            <Text style={styles.editTitle}>Seleccionar Idioma Nativo</Text>
-
+            <Text style={styles.editTitle}>Select Native Language</Text>
             <TextInput
               style={styles.input}
-              placeholder="seek a language..."
+              placeholder="search a language..."
               value={nativeSearch}
               onChangeText={setNativeSearch}
             />
@@ -503,6 +521,7 @@ export default function OwnExchangesTarget({
         </Pressable>
       </Modal>
 
+   
       <Modal
         transparent={true}
         visible={targetModalVisible}
@@ -519,11 +538,10 @@ export default function OwnExchangesTarget({
             style={styles.searchLangModal}
             onPress={(e) => e.stopPropagation()}
           >
-            <Text style={styles.editTitle}>Seleccionar Idioma Deseado</Text>
-
+            <Text style={styles.editTitle}>Select Target Language</Text>
             <TextInput
               style={styles.input}
-              placeholder="Busca un idioma..."
+              placeholder="search a language..."
               value={targetSearch}
               onChangeText={setTargetSearch}
             />
@@ -706,7 +724,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-
   searchLangModal: {
     backgroundColor: "white",
     padding: 20,

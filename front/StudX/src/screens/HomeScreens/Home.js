@@ -8,13 +8,16 @@ import {
   Animated,
   Dimensions,
   ScrollView,
+  PixelRatio,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../../context/ThemeContext";
 import ExchangeTarget from "./components/ExchangeTarget";
 import OwnExchangesTarget from "./components/OwnExchangesTarget";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 const API_URL = "http://44.220.1.21:8080/api/exchanges";
 const USER_API_URL = "http://44.220.1.21:8080/api/users/me";
@@ -117,7 +120,7 @@ export default function Home() {
 
   const handleDeleteSuccess = (deletedId) => {
     setMyExchanges((prev) => prev.filter((ex) => ex.id !== deletedId));
-    fetchExchanges();  
+    fetchExchanges();
   };
 
   return (
@@ -133,7 +136,7 @@ export default function Home() {
         }
       >
         <Animated.View style={[styles.welcomeContainer, { opacity: fadeAnim }]}>
-          <Text style={[styles.welcomeText, { color: darkMode? "white":"black" }]}>
+          <Text style={[styles.welcomeText, { color: darkMode ? "white" : "black" }]}>
             ¡Welcome <Text style={styles.userName}>{userName}</Text>!
           </Text>
         </Animated.View>
@@ -146,13 +149,15 @@ export default function Home() {
           />
         ) : error ? (
           <View style={styles.errorContainer}>
-            <Text style={[styles.errorText,{color: darkMode?"white":"black"}]}>
-            There is no connection to the server.
+            <Text style={[styles.errorText, { color: darkMode ? "white" : "black" }]}>
+              There is no connection to the server.
             </Text>
           </View>
         ) : (
           <View style={styles.listContainer}>
-            <Text style={[styles.exchangesAvailable,{color:darkMode?"white":"black"}]}>Exchanges Available</Text>
+            <Text style={[styles.exchangesAvailable, { color: darkMode ? "white" : "black" }]}>
+              Exchanges Available
+            </Text>
             <FlatList
               data={[...exchanges].reverse()}
               keyExtractor={(item) => item.id}
@@ -174,32 +179,57 @@ export default function Home() {
               )}
               contentContainerStyle={styles.listContent}
               showsHorizontalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
             />
 
-            <Text style={[styles.exchangesAvailable,{color:darkMode?"white":"black"}]}>My Exchanges</Text>
-            <FlatList
-              data={[...myExchanges].reverse()}
-              keyExtractor={(item) => item.id}
-              horizontal
-              renderItem={({ item }) => (
-                <OwnExchangesTarget
-                  alumnos={item.quantityStudents}
-                  nivel={item.academicLevel.toString()}
-                  idiomaDeseado={item.targetLanguage}
-                  idioma={item.nativeLanguage}
-                  exchangeId={item.id}
-                  onDeleteSuccess={handleDeleteSuccess}
-                />
-              )}
-              contentContainerStyle={styles.listContent}
-              showsHorizontalScrollIndicator={false}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-            />
+            <Text style={[styles.exchangesAvailable, { color: darkMode ? "white" : "black" }]}>
+              My Exchanges
+            </Text>
+            {myExchanges.length === 0 ? (
+              <View style={styles.noExchangesContainer}>
+                <Text
+                  style={[
+                    styles.noExchangesText,
+                    { color: darkMode ? "#FFF" : "#000" },
+                  ]}
+                >
+                  You don't have exchanges, create one!
+                </Text>
+                <TouchableOpacity
+                  style={styles.createButton}
+                  onPress={() => navigation.navigate("Crear Intercambios")}
+                >
+                  <Ionicons
+                    name="add-circle-outline"
+                    size={PixelRatio.getPixelSizeForLayoutSize(12)}
+                    color={darkMode ? "white" : "black"}
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <FlatList
+                data={[...myExchanges].reverse()}
+                keyExtractor={(item) => item.id}
+                horizontal
+                renderItem={({ item }) => (
+                  <OwnExchangesTarget
+                    alumnos={item.quantityStudents}
+                    nivel={item.academicLevel.toString()}
+                    idiomaDeseado={item.targetLanguage}
+                    idioma={item.nativeLanguage}
+                    exchangeId={item.id}
+                    onDeleteSuccess={handleDeleteSuccess}
+                  />
+                )}
+                contentContainerStyle={styles.listContent}
+                showsHorizontalScrollIndicator={false}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
+              />
+            )}
           </View>
         )}
       </ScrollView>
@@ -234,7 +264,6 @@ const styles = StyleSheet.create({
   exchangesAvailable: {
     fontSize: scaleFont(22),
     fontWeight: "bold",
-    color: "black",
     marginBottom: 10,
     alignSelf: "flex-start",
     marginLeft: 18,
@@ -250,6 +279,17 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: scaleFont(18),
     fontWeight: "bold",
-    color: "white",
+  },
+  noExchangesContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 20,
+  },
+  noExchangesText: {
+    fontSize: scaleFont(16),
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  createButton: {
   },
 });
