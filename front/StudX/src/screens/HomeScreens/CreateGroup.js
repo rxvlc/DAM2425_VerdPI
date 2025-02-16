@@ -22,12 +22,12 @@ export default function CreateGroup({ onClose }) {
       try {
         const storedToken = await SecureStore.getItemAsync("userToken");
         if (!storedToken) {
-          Alert.alert("Error", "No se ha encontrado una sesión activa.");
+          Alert.alert("Error", "there is no active session.");
           return;
         }
         setToken(storedToken);
       } catch (error) {
-        console.log("Error obteniendo el token:", error);
+        console.log("Error getting token:", error);
       }
     };
     fetchToken();
@@ -64,12 +64,12 @@ export default function CreateGroup({ onClose }) {
 
   const handleSave = async () => {
     if (!name || !language || !nivel) {
-      Alert.alert("Error", "Todos los campos son obligatorios.");
+      Alert.alert("Error", "All fields are required.");
       return;
     }
 
     if (!token) {
-      Alert.alert("Error", "No se pudo obtener el token de autenticación.");
+      Alert.alert("Error", "Could not get authentication token.");
       return;
     }
 
@@ -94,36 +94,36 @@ export default function CreateGroup({ onClose }) {
       });
 
       if (response.ok) {
-        Alert.alert("Éxito", "Grupo creado exitosamente");
+        Alert.alert("Succes", "Group created successfully");
         onClose();
       } else {
         const errorData = await response.json();
-        Alert.alert("Error", errorData.message || "No se pudo crear el grupo");
+        Alert.alert("Error", errorData.message || "Could not create group");
       }
     } catch (error) {
-      Alert.alert("Error de conexión", error.message);
+      Alert.alert("Connection error", error.message);
     }
   };
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Text style={styles.label}>Nombre del Grupo</Text>
+        <Text style={styles.label}>Group Name</Text>
         <TextInput
           style={styles.input}
           value={name}
           onChangeText={setName}
-          placeholder="Ingrese el nombre del grupo"
+          placeholder="Enter the group name"
         />
 
-        <Text style={styles.label}>Nivel {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
+        <Text style={styles.label}>Level {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
         <View style={styles.trafficLight}>
           <TouchableOpacity style={[styles.light, nivel === "A1" && styles.lightGreen]} onPress={() => handleNivelPress("A1")} />
           <TouchableOpacity style={[styles.light, nivel === "B1" && styles.lightYellow]} onPress={() => handleNivelPress("B1")} />
           <TouchableOpacity style={[styles.light, nivel === "C1" && styles.lightRed]} onPress={() => handleNivelPress("C1")} />
         </View>
 
-        <Text style={styles.label}>Cantidad de Alumnos</Text>
+        <Text style={styles.label}>Nº of Students</Text>
         <TextInput
           style={styles.input}
           value={quantity.toString()}
@@ -131,16 +131,16 @@ export default function CreateGroup({ onClose }) {
           keyboardType="numeric"
         />
 
-        <Text style={styles.label}>Idioma</Text>
+        <Text style={styles.label}>Language</Text>
         <TextInput
           style={styles.input}
           value={language}
           onChangeText={setLanguage}
-          placeholder="Ingrese el idioma"
+          placeholder="Enter the Language"
         />
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Guardar</Text>
+          <Text style={styles.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

@@ -145,10 +145,10 @@ export default function CreatedExchange({ onClose }) {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Text style={styles.label}>Nombre del Grupo</Text>
-        <TextInput placeholder="Ingrese el nombre del grupo" onChangeText={setNombreGrupo} />
+        <Text style={styles.label}>Group Name</Text>
+        <TextInput placeholder="Enter the group name" onChangeText={setNombreGrupo} />
 
-        <Text style={styles.label}>Nivel {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
+        <Text style={styles.label}>Level {nivel ? `(${nivel.toUpperCase()})` : ""}</Text>
         <View style={styles.trafficLight}>
           <TouchableOpacity
             style={[styles.light, nivel === "A1" && styles.lightGreenA1, nivel === "A2" && styles.lightGreenA2]}
@@ -164,17 +164,17 @@ export default function CreatedExchange({ onClose }) {
           />
         </View>
 
-        <Text style={styles.label}>Idioma Nativo</Text>
+        <Text style={styles.label}>Native Language</Text>
         <LanguageSelector name="nativo" onLanguageChange={setNativeLanguage} />
 
-        <Text style={styles.label}>Idioma De Intercambios</Text>
+        <Text style={styles.label}>Target Language</Text>
         <LanguageSelector name="intercambio" onLanguageChange={setTargetLanguage} />
 
-        <Text style={styles.label}>Número de alumnos</Text>
+        <Text style={styles.label}>Nº Of Students</Text>
         <TextInput keyboardType="numeric" onChangeText={(text) => setNumAlumnos(Number(text))} />
 
-        <Text style={styles.label}>Nivel Educacional</Text>
-        <TextInput placeholder="Ej: Bachiller" onChangeText={setAcademicLevel} />
+        <Text style={styles.label}>Educational Level</Text>
+        <TextInput placeholder="Ex: Bachelor" onChangeText={setAcademicLevel} />
 
         <Text style={styles.label}>Fecha de inicio</Text>
         <TouchableOpacity onPress={() => showDatePicker(true)}>
@@ -203,7 +203,7 @@ export default function CreatedExchange({ onClose }) {
         />
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Guardar</Text>
+          <Text style={styles.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
