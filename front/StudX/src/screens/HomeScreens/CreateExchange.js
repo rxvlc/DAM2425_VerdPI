@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import LanguageSelector from "../../components/LanguageSelector";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 
 export default function CreatedExchange({ onClose }) {
   const [nombreGrupo, setNombreGrupo] = useState("");
@@ -14,6 +16,26 @@ export default function CreatedExchange({ onClose }) {
   const [academicLevel, setAcademicLevel] = useState("");
   const [university, setUniversity] = useState("");
   const [token, setToken] = useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isStartDate, setIsStartDate] = useState(true);  // Variable para determinar si es la fecha de inicio o fin
+
+  const showDatePicker = (isStart) => {
+    setIsStartDate(isStart);
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    if (isStartDate) {
+      setFechaInicio(date.toISOString().split("T")[0]); // Formato YYYY-MM-DD
+    } else {
+      setFechaFin(date.toISOString().split("T")[0]);
+    }
+    hideDatePicker();
+  };
 
   useEffect(() => {
     const fetchTokenAndUserData = async () => {
@@ -106,7 +128,6 @@ export default function CreatedExchange({ onClose }) {
 
       if (response.ok) {
         Alert.alert("Éxito", "Grupo creado exitosamente");
-        onClose();
       } else {
         Alert.alert("Error", `No se pudo guardar: ${responseText}`);
       }
@@ -156,10 +177,30 @@ export default function CreatedExchange({ onClose }) {
         <TextInput placeholder="Ej: Bachiller" onChangeText={setAcademicLevel} />
 
         <Text style={styles.label}>Fecha de inicio</Text>
-        <TextInput placeholder="YYYY-MM-DD" onChangeText={setFechaInicio} />
+        <TouchableOpacity onPress={() => showDatePicker(true)}>
+          <TextInput
+           placeholder="Press for selecting begin date"
+            value={fechaInicio}
+            editable={false}
+          />
+        </TouchableOpacity>
 
         <Text style={styles.label}>Fecha de fin</Text>
-        <TextInput placeholder="YYYY-MM-DD" onChangeText={setFechaFin} />
+        <TouchableOpacity onPress={() => showDatePicker(false)}>
+          <TextInput
+            placeholder="Press for selecting end date"
+            value={fechaFin}
+            editable={false}
+          />
+        </TouchableOpacity>
+
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+          date={new Date()}
+        />
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Guardar</Text>

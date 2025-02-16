@@ -1,14 +1,62 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 
-export default function SearchedExchange({ exchange }) {
+export default function SearchedExchange({ exchange, searchParams }) {
+  // Function to format the date into YYYY-MM-DD
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');  // Months are 0-based
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Verificar si hay coincidencia en cada campo y aplicar el estilo basado en 'source'
+  const isNativeLanguageMatched = searchParams?.nativeLanguage && searchParams.nativeLanguage === exchange.nativeLanguage;
+  const isTargetLanguageMatched = searchParams?.targetLanguage && searchParams.targetLanguage === exchange.targetLanguage;
+  const isEducationalLevelMatched = searchParams?.educationalLevel && searchParams.educationalLevel === exchange.educationalLevel;
+  const isAcademicLevelMatched = searchParams?.academicLevel && searchParams.academicLevel === exchange.academicLevel;
+  const isBeginDateMatched = searchParams?.beginDate && searchParams.beginDate === exchange.beginDate;
+  const isEndDateMatched = searchParams?.endDate && searchParams.endDate === exchange.endDate;
+  const isQuantityStudentsMatched = searchParams?.quantityStudentsMin <= exchange.quantityStudents && searchParams?.quantityStudentsMax >= exchange.quantityStudents;
+  const isUniversityMatched = searchParams?.university && searchParams.university === exchange.university;
+  const isUserIdMatched = searchParams?.userId && searchParams.userId === exchange.idTeacherCreator;
+
+  // Asumiendo que 'source' es la propiedad que indica de qué búsqueda proviene el intercambio
+  const isSourceMatched = (sourceField) => {
+    return exchange.source === sourceField;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{exchange.university}</Text>
-        <Text>{exchange.educationalLevel} - {exchange.academicLevel}</Text>
-        <Text>Estudiantes: {exchange.quantityStudents}</Text>
-        <Text>Estado: {exchange.status}</Text>
+
+        {/* Resaltar en rojo si hay coincidencia */}
+        <Text style={isSourceMatched('nativeLanguage') ? styles.highlightedText : null}>
+          Native Language: {exchange.nativeLanguage}
+        </Text>
+        <Text style={isSourceMatched('targetLanguage') ? styles.highlightedText : null}>
+          Target Language: {exchange.targetLanguage}
+        </Text>
+        <Text style={isSourceMatched('educationalLevel') ? styles.highlightedText : null}>
+          Educational Level: {exchange.educationalLevel}
+        </Text>
+        <Text style={isSourceMatched('academicLevel') ? styles.highlightedText : null}>
+          Academic Level: {exchange.academicLevel}
+        </Text>
+        <Text style={isSourceMatched('beginDate') ? styles.highlightedText : null}>
+          Start Date: {formatDate(exchange.beginDate)}
+        </Text>
+        <Text style={isSourceMatched('endDate') ? styles.highlightedText : null}>
+          End Date: {formatDate(exchange.endDate)}
+        </Text>
+        <Text style={isSourceMatched('quantityStudents') ? styles.highlightedText : null}>
+          Students: {exchange.quantityStudents}
+        </Text>
+        <Text style={isSourceMatched('userId') ? styles.highlightedText : null}>
+          Teacher: {exchange.idTeacherCreator}
+        </Text>
       </View>
       <TouchableOpacity
         style={[styles.button, styles.chatButton]}
@@ -36,11 +84,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     flexDirection: 'row',
-    justifyContent: 'space-between',  // Alinea el contenido de manera que el texto esté a la izquierda y el botón a la derecha
-    alignItems: 'center', // Asegura que todo el contenido esté centrado verticalmente
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   textContainer: {
-    flex: 1, // Permite que el texto ocupe el espacio disponible
+    flex: 1,
   },
   title: {
     fontWeight: 'bold',
@@ -69,5 +117,9 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     marginTop: 2, 
+  },
+  highlightedText: {
+    color: 'red',  // Texto en rojo cuando hay coincidencia
+    fontWeight: 'bold',
   },
 });

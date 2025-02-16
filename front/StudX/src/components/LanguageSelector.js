@@ -5,23 +5,17 @@ import { SelectList } from "react-native-dropdown-select-list";
 const LanguageSelector = ({ name, onLanguageChange }) => {
   const [selectedLanguage, setSelectedLanguage] = useState("");
 
-  const languages = [
-    { key: "es", value: "Español" },
-    { key: "en", value: "Inglés" },
-    { key: "fr", value: "Francés" },
-    { key: "de", value: "Alemán" },
-    { key: "it", value: "Italiano" },
-    { key: "pt", value: "Portugués" },
-  ];
+  const languages = require("../../languages.json");
 
   return (
     <View style={styles.container}>
       <SelectList
         data={languages}
         setSelected={(val) => {
-          setSelectedLanguage(val);
-          const selectedObj = languages.find((lang) => lang.value === val);
-          onLanguageChange(selectedObj ? selectedObj.key : "");
+          setSelectedLanguage(val); // Establecer el idioma seleccionado
+          const selectedObj = languages.find((lang) => lang.key === val); // Buscar el objeto con la clave
+          onLanguageChange(selectedObj ? selectedObj.value : ""); // Pasar la clave seleccionada al padre
+          console.log("Idioma seleccionado:", selectedObj ? selectedObj.value : "");
         }}
         boxStyles={styles.dropdownBox}
         placeholder="Select a Language"

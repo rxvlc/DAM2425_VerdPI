@@ -8,26 +8,10 @@ export const useFilters = () => {
 };
 
 export const FiltersProvider = ({ children }) => {
-  const [filters, setFilters] = useState({
-    nativeLanguage: "",
-    targetLanguage: "",
-    academicLevel: "", // Solo mantenemos academicLevel
-    beginDate: "",
-    endDate: "",
-    quantityStudentsMin: 0,
-    quantityStudentsMax: 0,
-    university: "",
-  });
-
-  const updateFilter = (filterName, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterName]: value,
-    }));
-  };
+  const [filters, setFilters] = useState({});
 
   return (
-    <FiltersContext.Provider value={{ filters, updateFilter }}>
+    <FiltersContext.Provider value={{ filters, setFilters }}>
       {children}
     </FiltersContext.Provider>
   );
