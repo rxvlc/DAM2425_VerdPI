@@ -24,9 +24,9 @@ const LanguageSelector = ({ name, onLanguageChange }) => {
           onLanguageChange(selectedObj ? selectedObj.key : "");
         }}
         boxStyles={styles.dropdownBox}
-        placeholder="Selecciona un idioma"
+        placeholder="Select a Language"
         search={true}
-        searchPlaceholder="Escribe un idioma"
+        searchPlaceholder="Search a Language"
       />
     </View>
   );

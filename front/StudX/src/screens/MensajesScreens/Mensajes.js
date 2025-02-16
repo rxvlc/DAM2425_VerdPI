@@ -86,7 +86,7 @@ export default function Mensajes({ route }) {
       });
     } else {
       navigation.setOptions({
-        headerTitle: "Mensajes",
+        headerTitle: "Messages",
         headerLeft: null,
         headerRight: null,
       });
@@ -151,7 +151,7 @@ export default function Mensajes({ route }) {
                   {item.name}
                 </Text>
                 <Text style={[styles.lastMessage, darkMode ? styles.darkSubText : styles.lightSubText]}>
-                  {item.messages.length > 0 ? item.messages[item.messages.length - 1]?.text : "Nuevo chat"}
+                  {item.messages.length > 0 ? item.messages[item.messages.length - 1]?.text : "New Chat"}
                 </Text>
               </View>
             </TouchableOpacity>

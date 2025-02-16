@@ -29,8 +29,8 @@ export default function SearchFilterScreen(props) {
     Toast.show({
         type: 'success', 
         position: 'bottom',
-        text1: 'Filtros Guardados', 
-        text2: 'Los filtros se han guardado correctamente.'
+        text1: 'Filters saved', 
+        text2: 'The filters have been saved successfully.'
       });
     props.navigation.goBack();
   };
@@ -48,7 +48,7 @@ export default function SearchFilterScreen(props) {
     <View 
       style={styles.container}
     >
-      <Text style={styles.title}>Filtros</Text>
+      <Text style={styles.title}>Filters</Text>
 
 
       <LanguageSelector onLanguageChange={handleLanguageNative} name="native" style={styles.languageSelector} />
@@ -108,7 +108,7 @@ export default function SearchFilterScreen(props) {
         onChangeText={setUniversity}
       />
 
-      <Button title="Guardar Filtros" onPress={handleSaveFilters} />
+      <Button title="Save Filters" onPress={handleSaveFilters} />
     </View>
   );
 }

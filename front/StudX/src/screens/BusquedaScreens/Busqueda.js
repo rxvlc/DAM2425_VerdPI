@@ -1,12 +1,16 @@
-import { StyleSheet, Text, View, TextInput, Pressable } from "react-native";
+import { StyleSheet, Text, View, TextInput, Pressable, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { useNavigation } from '@react-navigation/native';
 
 export default function Busquedas(props) {
   const { darkMode } = useTheme();
   const [query, setQuery] = useState("");
   const [resultados, setResultados] = useState([]);
+  const navigation = useNavigation();
+  navigation.setOptions({
+    headerTitle: "Search"});
 
   return (
     <View style={[styles.container, darkMode && styles.containerDark]}>
@@ -46,7 +50,7 @@ export default function Busquedas(props) {
             </Text>
           ))
         ) : (
-          <Text style={darkMode && styles.textDark}>No hay resultados</Text>
+          <Text style={darkMode && styles.textDark}>No results</Text>
         )}
       </View>
     </View>

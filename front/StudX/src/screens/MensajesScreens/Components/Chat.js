@@ -15,7 +15,7 @@ export default function Chat({ chat, onPress, onLongPress }) {
 
   const lastMessage = chat.messages.length > 0 
     ? chat.messages[chat.messages.length - 1].text 
-    : 'No hay mensajes';
+    : 'There are no messages';
 
   return (
     <TouchableOpacity 
