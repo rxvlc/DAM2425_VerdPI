@@ -829,6 +829,20 @@ public class Controller {
 	    }
 	}
 
+	@GetMapping("/api/users/image")
+public ResponseEntity<String> getUserImage(@RequestParam String email) {
+    User user = userRepository.findUserMail(email);
+    
+    if (user == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+    }
+    
+    // Crear un objeto JSON con la URL de la imagen de perfil
+    JSONObject responseJson = new JSONObject();
+    responseJson.put("urlProfilePicture", user.getUrlProfilePicture());
+    
+    return ResponseEntity.ok(responseJson.toString());
+}
 
 	
 }
