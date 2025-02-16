@@ -36,8 +36,6 @@ public class WebSocketServer {
 		newMessage.setCreatedAt(LocalDateTime.now());
 		newMessage.setTypeMessage("text"); // Asumimos que es texto, pero puede ser diferente según el caso
 
-		// Guardar el mensaje en la base de datos
-		messageRepository.save(newMessage);
 		Controller c = new Controller();
 		c.saveMessage(newMessage);
 
