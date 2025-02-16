@@ -844,5 +844,8 @@ public ResponseEntity<String> getUserImage(@RequestParam String email) {
     return ResponseEntity.ok(responseJson.toString());
 }
 
+	public void saveMessage(Message m) {
+	messageRepository.save(m);	
+	}
 	
 }

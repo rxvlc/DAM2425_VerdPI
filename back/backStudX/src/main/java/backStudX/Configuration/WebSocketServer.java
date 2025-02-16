@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import backStudX.controller.Controller;
 import backStudX.model.Message;
 import backStudX.repository.MessageRepository;
 import jakarta.websocket.OnClose;
@@ -23,6 +24,7 @@ public class WebSocketServer {
 	@Autowired
 	MessageRepository messageRepository;
 
+	
 	@jakarta.websocket.OnMessage
 	public void onMessage(String message, Session session) {
 		// Crear el mensaje en base a la estructura que tienes
@@ -36,6 +38,8 @@ public class WebSocketServer {
 
 		// Guardar el mensaje en la base de datos
 		messageRepository.save(newMessage);
+		Controller c = new Controller();
+		c.saveMessage(newMessage);
 
 		// Enviar el mensaje al receptor
 		sendMessageToRecipient(newMessage.getIdUserRecipient(), message);
