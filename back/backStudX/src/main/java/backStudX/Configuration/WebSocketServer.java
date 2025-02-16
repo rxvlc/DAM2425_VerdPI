@@ -3,6 +3,7 @@ package backStudX.Configuration;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -59,14 +60,26 @@ public class WebSocketServer {
 		return userSessions;
 	}
 
-	// Método para agregar una nueva sesión
 	@OnOpen
 	public void onOpen(Session session) {
-		String userId = session.getRequestParameterMap().get("userId").get(0); // Supón que recibimos el ID del usuario
-																				// al abrir la sesión
-		userSessions.put(userId, session);
-		System.out.println("Conexión abierta: " + session.getId() + " para el usuario: " + userId);
+	    Map<String, List<String>> requestParams = session.getRequestParameterMap();
+	    List<String> userIdList = requestParams.get("userId");
+
+	    if (userIdList != null && !userIdList.isEmpty()) {
+	        String userId = userIdList.get(0); // Obtener el ID del usuario de la lista
+	        userSessions.put(userId, session);
+	        System.out.println("Conexión abierta: " + session.getId() + " para el usuario: " + userId);
+	    } else {
+	        System.out.println("No se encontró el parámetro 'userId' al abrir la sesión.");
+	        // Puedes cerrar la sesión si el userId no es válido o tomar otro tipo de acción
+	        try {
+	            session.close();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
+
 
 	// Método para eliminar la sesión cuando se cierra la conexión
 	@OnClose
