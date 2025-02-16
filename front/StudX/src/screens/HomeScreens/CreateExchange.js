@@ -11,8 +11,8 @@ import {
 import * as SecureStore from "expo-secure-store";
 import LanguageSelector from "../../components/LanguageSelector";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-// Importa useNavigation para poder navegar
 import { useNavigation } from "@react-navigation/native";
+import { TextInput as PaperTextInput } from "react-native-paper";
 
 export default function CreatedExchange({ onClose }) {
   const navigation = useNavigation();
@@ -28,7 +28,7 @@ export default function CreatedExchange({ onClose }) {
   const [university, setUniversity] = useState("");
   const [token, setToken] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [isStartDate, setIsStartDate] = useState(true); // Determines if it's the start or end date
+  const [isStartDate, setIsStartDate] = useState(true);
 
   const showDatePicker = (isStart) => {
     setIsStartDate(isStart);
@@ -41,7 +41,7 @@ export default function CreatedExchange({ onClose }) {
 
   const handleConfirm = (date) => {
     if (isStartDate) {
-      setFechaInicio(date.toISOString().split("T")[0]); // Format YYYY-MM-DD
+      setFechaInicio(date.toISOString().split("T")[0]);
     } else {
       setFechaFin(date.toISOString().split("T")[0]);
     }
@@ -138,12 +138,11 @@ export default function CreatedExchange({ onClose }) {
       console.log("Server response:", responseText);
 
       if (response.ok) {
-        // Al pulsar "OK", volvemos a la pantalla anterior
         Alert.alert("Success", "Exchange created successfully.", [
           {
             text: "OK",
             onPress: () => {
-              navigation.goBack(); // Retorna a la pantalla anterior
+              navigation.goBack(); 
             }
           }
         ]);
@@ -165,9 +164,13 @@ export default function CreatedExchange({ onClose }) {
     <View style={styles.container}>
       <ScrollView>
         <Text style={styles.label}>Group Name</Text>
-        <TextInput 
-          placeholder="Enter the group name" 
-          onChangeText={setNombreGrupo} 
+        <PaperTextInput
+          placeholder="Enter the group name"
+          onChangeText={setNombreGrupo}
+          mode="flat"
+          style={styles.paperInput}
+          underlineColor="transparent"
+          theme={{ colors: { text: "#000" } }}
         />
 
         <Text style={styles.label}>
@@ -207,15 +210,26 @@ export default function CreatedExchange({ onClose }) {
         <LanguageSelector name="target" onLanguageChange={setTargetLanguage} />
 
         <Text style={styles.label}>Number of Students</Text>
-        <TextInput 
-          keyboardType="numeric" 
-          onChangeText={(text) => setNumAlumnos(Number(text))} 
+        
+        <PaperTextInput
+          placeholder="Nº"
+          keyboardType="numeric"
+          onChangeText={(text) => setNumAlumnos(Number(text))}
+          mode="flat"
+          style={[styles.paperInput, styles.numInput]}
+          underlineColor="transparent"
+          theme={{ colors: { text: "#000" } }}
         />
 
         <Text style={styles.label}>Educational Level</Text>
-        <TextInput 
-          placeholder="E.g.: Bachelor" 
-          onChangeText={setAcademicLevel} 
+        {/* PaperTextInput para "Educational Level" */}
+        <PaperTextInput
+          placeholder="E.g.: Bachelor"
+          onChangeText={setAcademicLevel}
+          mode="flat"
+          style={styles.paperInput}
+          underlineColor="transparent"
+          theme={{ colors: { text: "#000" } }}
         />
 
         <Text style={styles.label}>Start Date</Text>
@@ -290,5 +304,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  paperInput: {
+    backgroundColor: "#fff",
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  numInput: {
+    width: "25%", 
+    alignSelf: "flex-start",
   },
 });
