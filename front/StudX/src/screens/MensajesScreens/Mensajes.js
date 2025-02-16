@@ -1,80 +1,82 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { 
-  View, 
-  FlatList, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Text, 
-  TouchableWithoutFeedback, 
-  Image 
-} from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from "react";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  TouchableWithoutFeedback,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { useTheme } from "../../context/ThemeContext";
-import { useNavigation } from '@react-navigation/native';
-import { MaterialIcons } from '@expo/vector-icons';
-import profesores from "../../BDD/Profesores"; 
-
-
-const images = {
-  "JuanPerezGomez.webp": require("../../images/FotosPerfil/JuanPerezGomez.webp"),
-  "MariaRodriguezLopez.webp": require("../../images/FotosPerfil/MariaRodriguezLopez.webp"),
-  "CarlosFernandezMartinez.webp": require("../../images/FotosPerfil/CarlosFernandezMartinez.webp"),
-  "AnaSanchezRuiz.webp": require("../../images/FotosPerfil/AnaSanchezRuiz.webp"),
-  "default": require("../../images/FotosPerfil/img1.jpg") 
-};
-
-const getImageSource = (imageName) => {
-  return images[imageName] || images["default"];
-};
+import { useNavigation } from "@react-navigation/native";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as SecureStore from "expo-secure-store";
 
 export default function Mensajes({ route }) {
   const { darkMode } = useTheme();
   const navigation = useNavigation();
   const [selectedChatIds, setSelectedChatIds] = useState(new Set());
+  const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
- 
-  const [chats, setChats] = useState(
-    profesores.map((profesor) => ({
-      id: profesor.id,
-      name: profesor.nombre,
-      image: profesor.imagen,
-      messages: [], 
-    }))
-  );
-
- 
   useEffect(() => {
-    if (route.params?.profesor) {
-      const profesorNombre = route.params.profesor;
-      const profesorData = profesores.find((p) => p.nombre === profesorNombre);
-
-      const chatExistente = chats.find((chat) => chat.name === profesorNombre);
-
-      if (!chatExistente && profesorData) {
-        const nuevoChat = {
-          id: `${Date.now()}`, 
-          name: profesorNombre,
-          image: profesorData.imagen, 
-          messages: [], 
-        };
-
-        setChats([...chats, nuevoChat]);
-
-        setTimeout(() => {
-          navigation.navigate("ChatScreen", { chat: nuevoChat });
-        }, 100);
-      } else {
-        navigation.navigate("ChatScreen", { chat: chatExistente });
+    const fetchChats = async () => {
+      const token = await SecureStore.getItemAsync("userToken");
+      console.log("Token obtenido:", token); // Agrega este log
+      if (!token) {
+        console.error("No se encontró el token");
+        setLoading(false);
+        return;
       }
-    }
-  }, [route.params]);
 
+      try {
+        const response = await fetch(
+          `http://44.220.1.21:8080/api/messages?token=${token}`
+        );
+
+        if (!response.ok) {
+          console.error("Error en la respuesta del servidor:", response.status);
+          return;
+        }
+
+        if (response.status === 204) {
+          setChats([]);
+          return;
+        }
+
+        const textResponse = await response.text();
+
+        if (textResponse.trim() === "") {
+          setChats([]);
+          return;
+        }
+
+        const data = JSON.parse(textResponse);
+        console.log("Datos recibidos:", data);
+
+        setChats(data);
+        console.log(chats.chats);
+      } catch (error) {
+        console.error("Error fetching chats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChats();
+  }, []);
 
   useLayoutEffect(() => {
     if (selectedChatIds.size > 0) {
       navigation.setOptions({
         headerTitle: `${selectedChatIds.size} seleccionado(s)`,
         headerLeft: () => (
-          <TouchableOpacity onPress={() => setSelectedChatIds(new Set())} style={{ marginLeft: 15 }}>
+          <TouchableOpacity
+            onPress={() => setSelectedChatIds(new Set())}
+            style={{ marginLeft: 15 }}
+          >
             <MaterialIcons name="close" size={28} color="black" />
           </TouchableOpacity>
         ),
@@ -97,7 +99,7 @@ export default function Mensajes({ route }) {
     if (selectedChatIds.size > 0) {
       toggleChatSelection(chat.id);
     } else {
-      navigation.navigate("ChatScreen", { chat });
+      navigation.navigate("ChatScreen", { profesor :  chat.userId });
     }
   };
 
@@ -122,12 +124,37 @@ export default function Mensajes({ route }) {
     setSelectedChatIds(new Set());
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <TouchableWithoutFeedback onPress={() => setSelectedChatIds(new Set())}>
-      <View style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}>
+      <View
+        style={[
+          styles.container,
+          darkMode ? styles.darkContainer : styles.lightContainer,
+        ]}
+      >
         <FlatList
-          data={chats}
+          data={chats?.chats?.length > 0 ? chats.chats : null}
           keyExtractor={(item) => item.id}
+          ListEmptyComponent={
+            <View style={styles.emptyMessageContainer}>
+              <Text
+                style={[
+                  styles.emptyMessage,
+                  darkMode ? styles.darkText : styles.lightText,
+                ]}
+              >
+                No hay chats disponibles.
+              </Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => handleChatPress(item)}
@@ -135,11 +162,14 @@ export default function Mensajes({ route }) {
               style={[
                 styles.chatWrapper,
                 darkMode ? styles.darkChatWrapper : styles.lightChatWrapper,
-                selectedChatIds.has(item.id) && styles.selectedChat
+                selectedChatIds.has(item.id) && styles.selectedChat,
               ]}
             >
               <View style={styles.imageContainer}>
-                <Image source={getImageSource(item.image)} style={styles.profileImage} />
+                <Image
+                  source={{ uri: item.userProfilePicture }}
+                  style={styles.profileImage}
+                />
                 {selectedChatIds.has(item.id) && (
                   <View style={styles.checkOverlay}>
                     <MaterialIcons name="check" size={24} color="white" />
@@ -147,11 +177,22 @@ export default function Mensajes({ route }) {
                 )}
               </View>
               <View style={styles.chatTextContainer}>
-                <Text style={[styles.chatTitle, darkMode ? styles.darkText : styles.lightText]}>
-                  {item.name}
+                <Text
+                  style={[
+                    styles.chatTitle,
+                    darkMode ? styles.darkText : styles.lightText,
+                  ]}
+                >
+                  {item.userName}
                 </Text>
-                <Text style={[styles.lastMessage, darkMode ? styles.darkSubText : styles.lightSubText]}>
-                  {item.messages.length > 0 ? item.messages[item.messages.length - 1]?.text : "New Chat"}
+                <Text
+                  style={[
+                    styles.lastMessage,
+                    darkMode ? styles.darkSubText : styles.lightSubText,
+                  ]}
+                >
+                  {item.lastMessage}
+                  {/* {item.messages.length > 0 ? item.messages[item.messages.length - 1]?.text : "New Chat"} */}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -163,16 +204,9 @@ export default function Mensajes({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  darkContainer: {
-    backgroundColor: "#111",
-  },
-  lightContainer: {
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, padding: 10 },
+  darkContainer: { backgroundColor: "#111" },
+  lightContainer: { backgroundColor: "#fff" },
   chatWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -180,25 +214,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderRadius: 8,
   },
-  darkChatWrapper: {
-    backgroundColor: "#222",
-    borderBottomColor: "#555",
-  },
-  lightChatWrapper: {
-    backgroundColor: "white",
-    borderBottomColor: "#ccc",
-  },
-  selectedChat: {
-    backgroundColor: "tomato",
-  },
-  imageContainer: {
-    position: "relative",
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
+  darkChatWrapper: { backgroundColor: "#222", borderBottomColor: "#555" },
+  lightChatWrapper: { backgroundColor: "white", borderBottomColor: "#ccc" },
+  selectedChat: { backgroundColor: "tomato" },
+  imageContainer: { position: "relative" },
+  profileImage: { width: 50, height: 50, borderRadius: 25 },
   checkOverlay: {
     position: "absolute",
     top: 0,
@@ -207,30 +227,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 2,
   },
-  chatTextContainer: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  chatTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  lastMessage: {
-    fontSize: 14,
-  },
-  darkText: {
-    color: "white",
-  },
-  lightText: {
-    color: "black",
-  },
-  darkSubText: {
-    color: "lightgray",
-  },
-  lightSubText: {
-    color: "gray",
-  },
-  iconButton: {
-    marginHorizontal: 10,
-  },
+  chatTextContainer: { flex: 1, marginLeft: 10 },
+  chatTitle: { fontSize: 16, fontWeight: "bold" },
+  lastMessage: { fontSize: 14 },
+  darkText: { color: "white" },
+  lightText: { color: "black" },
+  darkSubText: { color: "lightgray" },
+  lightSubText: { color: "gray" },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  iconButton: { marginHorizontal: 10 },
 });

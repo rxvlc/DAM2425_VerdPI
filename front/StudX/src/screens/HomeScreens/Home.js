@@ -171,7 +171,7 @@ export default function Home() {
                   idiomaDeseado={item.targetLanguage}
                   idioma={item.nativeLanguage}
                   onChatPress={() =>
-                    navigation.navigate("Mensajes", {
+                    navigation.navigate("ChatScreen", {
                       profesor: item.idTeacherCreator,
                     })
                   }

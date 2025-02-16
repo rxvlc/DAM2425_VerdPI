@@ -26,6 +26,12 @@ export default function Login({ navigation }) {
   
       if (response.ok) {
         console.log('Login succesfull');
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "HomeScreen" }],
+          })
+        );
         return true;
       } else {
         console.log('Failed login');
