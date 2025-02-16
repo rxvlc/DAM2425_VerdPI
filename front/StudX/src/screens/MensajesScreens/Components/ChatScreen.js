@@ -90,7 +90,7 @@ export default function ChatScreen({ route }) {
         </TouchableOpacity>
         <TextInput
           style={[styles.input, { backgroundColor: darkMode ? '#333' : '#fff', borderColor: darkMode ? "#555" : "#ccc", color: darkMode ? "white" : "black" }]}
-          placeholder="Escribe un mensaje..."
+          placeholder="Write a message..."
           placeholderTextColor={darkMode ? "#aaa" : "#888"}
           value={nuevoMensaje}
           onChangeText={setNuevoMensaje}

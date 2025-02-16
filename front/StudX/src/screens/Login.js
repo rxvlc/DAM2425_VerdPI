@@ -104,7 +104,7 @@ export default function Login({ navigation }) {
       </View>
     );
   }
-
+ 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
@@ -113,16 +113,16 @@ export default function Login({ navigation }) {
       </View>
       <View style={styles.zonaUsuariContrasenya}>
         <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" value={email} onChangeText={setEmail} keyboardType="email-address" />
-        <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
+        <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
       </View>
       <View style={styles.zonaBoton}>
         <TouchableOpacity style={styles.boton} onPress={handleLogin}>
-          <Text style={styles.botonTexto}>Iniciar Sesión</Text>
+          <Text style={styles.botonTexto}>Login</Text>
         </TouchableOpacity>
         <Text style={styles.text}>
-          Si no tienes cuenta puedes{" "}
+          If you dont have account you can{" "}
           <TouchableOpacity onPress={() => navigation.navigate("Registration")}>
-            <Text style={{ color: "blue" }}> Registrarte</Text>
+            <Text style={{ color: "blue" }}> Register</Text>
           </TouchableOpacity>
         </Text>
       </View>

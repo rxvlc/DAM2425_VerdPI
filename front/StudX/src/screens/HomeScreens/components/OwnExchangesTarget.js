@@ -327,10 +327,10 @@ export default function OwnExchangesTarget({
                 setEditModalVisible(true);
               }}
             >
-              <Text style={styles.menuText}>✏️ Edit</Text>
+              <Text style={styles.menuText}>Edit</Text>
             </Pressable>
             <Pressable style={styles.menuItem} onPress={handleDelete}>
-              <Text style={styles.menuText}>🗑️ Delete</Text>
+              <Text style={styles.menuText}>Delete</Text>
             </Pressable>
           </View>
         </Pressable>
@@ -351,9 +351,9 @@ export default function OwnExchangesTarget({
             style={styles.editModalContainer}
             onPress={(e) => e.stopPropagation()}
           >
-            <Text style={styles.editTitle}>Editar Exchange</Text>
+            <Text style={styles.editTitle}>Edit Exchange</Text>
 
-            <Text style={styles.label}>Nivel Académico:</Text>
+            <Text style={styles.label}>Academic Level:</Text>
             <View style={styles.levelOptionsContainer}>
               {levels.map((lvl) => (
                 <Pressable
@@ -383,38 +383,38 @@ export default function OwnExchangesTarget({
 
             <View style={styles.selectedLevelContainer}>
               <Text style={styles.label}>
-                Seleccionado: {selectedLevel.toUpperCase()}
+                Selected: {selectedLevel.toUpperCase()}
               </Text>
             </View>
 
-            <Text style={styles.label}>Idioma Nativo:</Text>
+            <Text style={styles.label}>Native Language:</Text>
             <Pressable
               style={styles.languagePressable}
               onPress={() => setNativeModalVisible(true)}
             >
               <Text style={styles.languagePressableText}>
-                {`Seleccionar: ${selectedNativeLanguage}`}
+                {`Select: ${selectedNativeLanguage}`}
               </Text>
             </Pressable>
 
-            <Text style={styles.label}>Idioma Deseado:</Text>
+            <Text style={styles.label}>Target Language:</Text>
             <Pressable
               style={styles.languagePressable}
               onPress={() => setTargetModalVisible(true)}
             >
               <Text style={styles.languagePressableText}>
-                {`Seleccionar: ${selectedTargetLanguage}`}
+                {`Select: ${selectedTargetLanguage}`}
               </Text>
             </Pressable>
 
             <Text style={styles.label}>
-              Fecha de inicio (beginDate): {formatDateDDMMYYYY(beginDate)}
+              Begin Date (beginDate): {formatDateDDMMYYYY(beginDate)}
             </Text>
             <Pressable
               style={styles.dateButton}
               onPress={() => setShowBeginPicker(true)}
             >
-              <Text style={styles.dateButtonText}>Seleccionar Fecha Inicio</Text>
+              <Text style={styles.dateButtonText}>Select Begin Date</Text>
             </Pressable>
             {showBeginPicker && (
               <DateTimePicker
@@ -426,13 +426,13 @@ export default function OwnExchangesTarget({
             )}
 
             <Text style={styles.label}>
-              Fecha de fin (endDate): {formatDateDDMMYYYY(endDate)}
+              End Date (endDate): {formatDateDDMMYYYY(endDate)}
             </Text>
             <Pressable
               style={styles.dateButton}
               onPress={() => setShowEndPicker(true)}
             >
-              <Text style={styles.dateButtonText}>Seleccionar Fecha Fin</Text>
+              <Text style={styles.dateButtonText}>Select End Date</Text>
             </Pressable>
             {showEndPicker && (
               <DateTimePicker
@@ -444,7 +444,7 @@ export default function OwnExchangesTarget({
             )}
 
           
-            <Text style={styles.label}>Cantidad de Estudiantes:</Text>
+            <Text style={styles.label}>Nº Of Students:</Text>
             <TextInput
               style={styles.input}
               placeholder="12"
@@ -455,13 +455,13 @@ export default function OwnExchangesTarget({
 
             <View style={styles.editButtonsContainer}>
               <Pressable style={styles.saveButton} onPress={handleEdit}>
-                <Text style={styles.saveButtonText}>Guardar</Text>
+                <Text style={styles.saveButtonText}>Save</Text>
               </Pressable>
               <Pressable
                 style={[styles.saveButton, { backgroundColor: "#aaa" }]}
                 onPress={() => setEditModalVisible(false)}
               >
-                <Text style={styles.saveButtonText}>Cancelar</Text>
+                <Text style={styles.saveButtonText}>Cancel</Text>
               </Pressable>
             </View>
           </Pressable>
@@ -488,7 +488,7 @@ export default function OwnExchangesTarget({
 
             <TextInput
               style={styles.input}
-              placeholder="Busca un idioma..."
+              placeholder="seek a language..."
               value={nativeSearch}
               onChangeText={setNativeSearch}
             />

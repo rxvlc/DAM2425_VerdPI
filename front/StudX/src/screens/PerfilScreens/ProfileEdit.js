@@ -57,7 +57,7 @@ const ProfileEdit = (props) => {
       try {
         const token = await SecureStore.getItemAsync("userToken");
         if (!token) {
-          console.log("No hay sesión activa.");
+          console.log("There is no active session.");
           setUserData(null);
           return;
         }
@@ -72,11 +72,11 @@ const ProfileEdit = (props) => {
           
           setUserData(data);
         } else {
-          console.log("Error: No se pudo obtener la información del usuario.");
+          console.log("Error: Could not get user information.");
           setUserData(null);
         }
       } catch (error) {
-        console.log("Error al obtener datos del usuario:", error);
+        console.log("Error getting user data:", error);
         setUserData(null);
       } finally {
         setLoading(false);
@@ -128,11 +128,11 @@ const ProfileEdit = (props) => {
         });
 
         if (!uploadResponse.ok) {
-          throw new Error("Error al subir la imagen");
+          throw new Error("Error uploading the immage");
         }
 
         const imageUrl = await uploadResponse.text();
-        console.log("URL de la imagen subida:", imageUrl);
+        console.log("URL of uploaded image:", imageUrl);
 
         // Obtener el token (ajusta esto según cómo almacenes el token)
         const token = await SecureStore.getItemAsync("userToken");
@@ -203,11 +203,11 @@ const ProfileEdit = (props) => {
         });
   
         if (!uploadResponse.ok) {
-          throw new Error("Error al subir la imagen");
+          throw new Error("Error uploading the image");
         }
   
         const imageUrl = await uploadResponse.text();
-        console.log("URL de la imagen subida:", imageUrl);
+        console.log("URL of uploaded image:", imageUrl);
   
         // Obtener el token de usuario
         const token = await SecureStore.getItemAsync("userToken");
@@ -261,7 +261,7 @@ const ProfileEdit = (props) => {
       const token = await SecureStore.getItemAsync("userToken");
   
       if (!token) {
-        console.log("No hay sesión activa.");
+        console.log("There is no active session.");
         return;
       }
   
@@ -330,7 +330,7 @@ const ProfileEdit = (props) => {
 
       <View style={[styles.infoContainer, { backgroundColor: darkMode ? "#111" : "#fff" }]}>
         <ScrollView>
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Nombre</Text>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Name</Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
             value={name}
@@ -338,7 +338,7 @@ const ProfileEdit = (props) => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Correo</Text>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Email</Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
             value={email}

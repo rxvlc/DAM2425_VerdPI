@@ -133,7 +133,7 @@ export default function Home() {
         }
       >
         <Animated.View style={[styles.welcomeContainer, { opacity: fadeAnim }]}>
-          <Text style={[styles.welcomeText, { color: "black" }]}>
+          <Text style={[styles.welcomeText, { color: darkMode? "white":"black" }]}>
             ¡Welcome <Text style={styles.userName}>{userName}</Text>!
           </Text>
         </Animated.View>
@@ -146,13 +146,13 @@ export default function Home() {
           />
         ) : error ? (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>
-              No hay conexión con el servidor.
+            <Text style={[styles.errorText,{color: darkMode?"white":"black"}]}>
+            There is no connection to the server.
             </Text>
           </View>
         ) : (
           <View style={styles.listContainer}>
-            <Text style={styles.exchangesAvailable}>Exchanges Available</Text>
+            <Text style={[styles.exchangesAvailable,{color:darkMode?"white":"black"}]}>Exchanges Available</Text>
             <FlatList
               data={[...exchanges].reverse()}
               keyExtractor={(item) => item.id}
@@ -179,7 +179,7 @@ export default function Home() {
               }
             />
 
-            <Text style={styles.exchangesAvailable}>My Exchanges</Text>
+            <Text style={[styles.exchangesAvailable,{color:darkMode?"white":"black"}]}>My Exchanges</Text>
             <FlatList
               data={[...myExchanges].reverse()}
               keyExtractor={(item) => item.id}

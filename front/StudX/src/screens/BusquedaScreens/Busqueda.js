@@ -8,9 +8,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useEffect, useState } from "react";
+import { StyleSheet, Text, View, TextInput, Pressable, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import SearchedExchange from "../../components/SearchedExchange";
+import { useNavigation } from '@react-navigation/native';
 
 export default function Busquedas(props) {
   const { darkMode } = useTheme();
@@ -63,6 +65,9 @@ export default function Busquedas(props) {
   };
   
   
+  const navigation = useNavigation();
+  navigation.setOptions({
+    headerTitle: "Search"});
 
   return (
     <View style={[styles.container, darkMode && styles.containerDark]}>
@@ -114,7 +119,7 @@ export default function Busquedas(props) {
             <SearchedExchange key={index} exchange={exchange} />
           ))
         ) : (
-          <Text style={darkMode && styles.textDark}>No hay resultados</Text>
+          <Text style={darkMode && styles.textDark}>No results</Text>
         )}
       </ScrollView>
     </View>

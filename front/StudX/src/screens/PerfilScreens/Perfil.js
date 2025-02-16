@@ -6,11 +6,18 @@ import { useTheme } from "../../context/ThemeContext";
 import { Avatar, IconButton } from 'react-native-paper';
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { useNavigation } from '@react-navigation/native';
+
+
 
 
 const { width, height } = Dimensions.get("window");
 
 export default function Perfil(props) {
+ const navigation = useNavigation();
+  navigation.setOptions({
+    headerTitle: "Profile"});
+
   const [fotoPerfil, setFotoPerfil] = useState(
     require('../../images/fotoPerfil.jpg')
   );
@@ -33,7 +40,7 @@ export default function Perfil(props) {
     try {
       const token = await SecureStore.getItemAsync("userToken");
       if (!token) {
-        console.log("No hay sesión activa.");
+        console.log("There is no active session.");
         setUserData(null);
         return;
       }
@@ -48,11 +55,11 @@ export default function Perfil(props) {
         
         setUserData(data);
       } else {
-        console.log("Error: No se pudo obtener la información del usuario.");
+        console.log("Error: Could not get user information.");
         setUserData(null);
       }
     } catch (error) {
-      console.log("Error al obtener datos del usuario:", error);
+      console.log("Error getting user data:", error);
       setUserData(null);
     } finally {
       setLoading(false);
@@ -104,12 +111,12 @@ export default function Perfil(props) {
 
       <View style={[styles.infoContainer, { backgroundColor: darkMode ? "#111" : "#fff" }]}>
         <ScrollView>
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Nombre</Text>
-          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.name || "No disponible"}</Text>
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Correo</Text>
-          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.email || "No disponible"}</Text>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Name</Text>
+          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.name || "Not available"}</Text>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Email</Text>
+          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.email || "Not available"}</Text>
           <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>University</Text>
-          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.university || "No disponible"}</Text>
+          <Text style={[styles.info, { color: darkMode ? "#BBB" : "#666" }]}>{userData?.university || "Not available"}</Text>
           <TouchableOpacity
             onPress={() => {
               setEditProfileOpened(true);
