@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import backStudX.model.Message;
@@ -19,6 +20,7 @@ import jakarta.websocket.Session;
 @Component
 public class WebSocketServer {
 
+	@Autowired
 	MessageRepository messageRepository;
 
 	@jakarta.websocket.OnMessage
