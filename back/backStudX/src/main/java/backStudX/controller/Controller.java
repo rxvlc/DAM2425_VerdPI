@@ -12,8 +12,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -291,25 +294,60 @@ public class Controller {
 	}
 
 	@GetMapping("/api/messages")
-	public ResponseEntity<List<Message>> getUserChats(
-	        @RequestParam(value = "idUser") String idUser,
+	public ResponseEntity<Map<String, Object>> getUserChats(
 	        @RequestParam(value = "token") String token) {
 
-	    // Validar el token
+	    // Validar el token y obtener el usuario
 	    Token t = tokenRepository.findToken(token);
 	    if (t == null || t.isExpired()) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Token inválido o expirado
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	    }
 
-		// Obtener los últimos mensajes por chat del usuario
+	    String idUser = t.getUserId(); // Sacamos el idUser directamente del token
+
+	    User loggedUser = userRepository.findUserMail(idUser);
+
 	    List<Message> lastMessagesByUser = messageService.getLastMessagesGroupedByUser(idUser);
 
 	    if (lastMessagesByUser.isEmpty()) {
-	        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // No tiene chats
+	        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	    }
 
-	    return ResponseEntity.ok(lastMessagesByUser);
+	    List<Map<String, Object>> chats = new ArrayList<>();
+
+	    for (Message message : lastMessagesByUser) {
+	        // Comprobar quién es el otro usuario en el chat (puede ser sender o receiver)
+	        String otherUserId = message.getIdUserSender().equals(idUser) ? message.getIdUserRecipient() : message.getIdUserSender();
+
+	        User otherUser = userRepository.findUserMail(otherUserId);
+	        if (otherUser == null) {
+	            continue;
+	        }
+
+	        // Construir la info del chat
+	        Map<String, Object> chatInfo = new HashMap<>();
+	        chatInfo.put("userId", otherUser.getEmail());
+	        chatInfo.put("userName", otherUser.getName());
+	        chatInfo.put("userProfilePicture", otherUser.getUrlProfilePicture());
+	        chatInfo.put("lastMessage", message.getMessage());
+	        chatInfo.put("lastMessageDate", message.getCreatedAt());
+
+	        chats.add(chatInfo);
+	    }
+
+	    // Construir la respuesta final
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("loggedUser", Map.of(
+	            "email", loggedUser.getEmail(),
+	            "name", loggedUser.getName(),
+	            "urlProfilePicture", loggedUser.getUrlProfilePicture(),
+	            "urlHeaderPicture", loggedUser.getUrlHeaderPicture()
+	    ));
+	    response.put("chats", chats);
+
+	    return ResponseEntity.ok(response);
 	}
+
 
 	
 	@PostMapping("/api/messages")

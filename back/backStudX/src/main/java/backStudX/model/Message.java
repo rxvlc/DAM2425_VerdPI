@@ -97,4 +97,8 @@ public class Message {
 		this.idUserRecipient = idUserRecipient;
 	}
 
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
 }
