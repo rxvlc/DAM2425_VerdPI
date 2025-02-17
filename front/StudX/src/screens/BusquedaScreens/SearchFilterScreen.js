@@ -42,7 +42,7 @@ const examplePrompts = [
   },
 ];
 
-const OPENAI_API_KEY = require("../../../api.json").key;
+const OPENAI_API_KEY = require("../../api.json").key;
 
 export default function ChatScreen({ navigation, route }) {
   const [userInput, setUserInput] = useState(""); // State to store user input

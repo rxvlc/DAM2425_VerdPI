@@ -98,10 +98,6 @@ export default function Registration({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
       <ScrollView 
         contentContainerStyle={{ flexGrow: 1 }} 
         keyboardShouldPersistTaps="handled"
@@ -193,7 +189,6 @@ export default function Registration({ navigation }) {
           </View>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
   );
 }
 
