@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Picker } from '@react-native-picker/picker';
-import * as ImageManipulator from 'expo-image-manipulator';
-
-import {
+import { 
   View,
   Image,
   StyleSheet,
@@ -12,32 +9,33 @@ import {
   Text,
   TextInput,
   ImageBackground,
+  Dimensions
 } from 'react-native';
 import { Avatar, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
-import { Dimensions } from 'react-native';
-import { useTheme } from "../../context/ThemeContext";
 import * as SecureStore from "expo-secure-store";
-
+import * as ImageManipulator from 'expo-image-manipulator';
+import { useTheme } from "../../context/ThemeContext";
+// Importa useNavigation
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-const ProfileEdit = (props) => {
-  const [fotoPerfil, setFotoPerfil] = useState(
-    require('../../images/fotoPerfil.jpg')
-  );
-  const { darkMode } = useTheme();
+export default function ProfileEdit() {
+  const navigation = useNavigation(); // <--- Aquí obtienes 'navigation'
+  const [fotoPerfil, setFotoPerfil] = useState(require('../../images/fotoPerfil.jpg'));
   const [fotoFondo, setFotoFondo] = useState(require('../../images/fotoFondo.jpg'));
   const [hasPermission, setHasPermission] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [university, setUniversity] = useState('');
-
+  const [password, setPassword] = useState('');
   const [isSecure, setIsSecure] = useState(true);
   const [userData, setUserData] = useState(null);
-  
+  const [loading, setLoading] = useState(true);
+
+  const { darkMode } = useTheme();
 
   const toggleSecureEntry = () => {
     setIsSecure(!isSecure);
@@ -51,45 +49,43 @@ const ProfileEdit = (props) => {
   }, []);
 
   useEffect(() => {
-        fetchUserData();
-    }, [])
-    const fetchUserData = async () => {
-      try {
-        const token = await SecureStore.getItemAsync("userToken");
-        if (!token) {
-          console.log("There is no active session.");
-          setUserData(null);
-          return;
-        }
-  
-        const response = await fetch(
-          `http://44.220.1.21:8080/api/users/me?token=${token}`
-        );
-  
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          
-          setUserData(data);
-        } else {
-          console.log("Error: Could not get user information.");
-          setUserData(null);
-        }
-      } catch (error) {
-        console.log("Error getting user data:", error);
-        setUserData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetchUserData();
+  }, []);
 
-    useEffect(() => {
-      if (userData) {
-        setName(userData.name || '');
-        setEmail(userData.email || '');
-        setUniversity(userData.university || '');
+  const fetchUserData = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("userToken");
+      if (!token) {
+        console.log("There is no active session.");
+        setUserData(null);
+        return;
       }
-    }, [userData]);
+
+      const response = await fetch(`http://44.220.1.21:8080/api/users/me?token=${token}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setUserData(data);
+      } else {
+        console.log("Error: Could not get user information.");
+        setUserData(null);
+      }
+    } catch (error) {
+      console.log("Error getting user data:", error);
+      setUserData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userData) {
+      setName(userData.name || '');
+      setEmail(userData.email || '');
+      setUniversity(userData.university || '');
+      // No actualizamos password porque normalmente no se muestra ni se edita directamente
+    }
+  }, [userData]);
 
   const openCamera = async () => {
     const result = await ImagePicker.launchCameraAsync({
@@ -103,67 +99,52 @@ const ProfileEdit = (props) => {
 
       const compressedImage = await ImageManipulator.manipulateAsync(
         uri,
-        [{ resize: { width: 800 } }],  // Redimensionar a 800px (ajustable)
-        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // Comprimir al 70%
+        [{ resize: { width: 800 } }],  // Redimensionar
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
       );
 
       setFotoPerfil({ uri: compressedImage.uri });
 
-      // Crear el objeto FormData para enviar el archivo
       const formData = new FormData();
       formData.append("file", {
         uri: compressedImage.uri,
-        name: "photo.jpg", // Nombre del archivo
-        type: "image/jpeg", // Tipo de archivo
+        name: "photo.jpg",
+        type: "image/jpeg",
       });
 
       try {
-        // Subir la imagen
         const uploadResponse = await fetch("http://44.220.1.21:8080/api/upload", {
           method: "POST",
           body: formData,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         });
 
         if (!uploadResponse.ok) {
-          throw new Error("Error uploading the immage");
+          throw new Error("Error uploading the image");
         }
 
         const imageUrl = await uploadResponse.text();
         console.log("URL of uploaded image:", imageUrl);
 
-        // Obtener el token (ajusta esto según cómo almacenes el token)
         const token = await SecureStore.getItemAsync("userToken");
-
-        // Crear el objeto con la nueva URL
         const updateData = {
           token: token,
           urlProfilePicture: imageUrl,
         };
 
-        console.log(token);
-        console.log(imageUrl);
-        // Hacer la petición PUT para actualizar el perfil
         const updateResponse = await fetch("http://44.220.1.21:8080/api/auth/update", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updateData),
         });
 
-
         const updateResult = await updateResponse.text();
-        console.log("Respuesta de actualización:", updateResult);
+        console.log("Update response:", updateResult);
       } catch (error) {
-        console.error("Error en el proceso:", error);
+        console.error("Error in process:", error);
       }
     }
   };
-
-
 
   const openGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -171,73 +152,58 @@ const ProfileEdit = (props) => {
       aspect: [1, 1],
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-  
-      // Redimensionar y comprimir la imagen
+
       const compressedImage = await ImageManipulator.manipulateAsync(
         uri,
-        [{ resize: { width: 800 } }], // Redimensionar a 800px
-        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG } // Comprimir al 70%
+        [{ resize: { width: 800 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
       );
-  
+
       setFotoFondo({ uri: compressedImage.uri });
-  
-      // Crear el objeto FormData para enviar el archivo
+
       const formData = new FormData();
       formData.append("file", {
         uri: compressedImage.uri,
         name: "background.jpg",
         type: "image/jpeg",
       });
-  
+
       try {
-        // Subir la imagen al servidor
         const uploadResponse = await fetch("http://44.220.1.21:8080/api/upload", {
           method: "POST",
           body: formData,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         });
-  
+
         if (!uploadResponse.ok) {
           throw new Error("Error uploading the image");
         }
-  
+
         const imageUrl = await uploadResponse.text();
         console.log("URL of uploaded image:", imageUrl);
-  
-        // Obtener el token de usuario
+
         const token = await SecureStore.getItemAsync("userToken");
-  
-        // Crear el objeto con la nueva URL de fondo
         const updateData = {
           token: token,
-          urlHeaderPicture: imageUrl, // Guardar la imagen como fondo
+          urlHeaderPicture: imageUrl,
         };
-  
-        console.log(token);
-        console.log(imageUrl);
-  
-        // Hacer la petición PUT para actualizar el perfil
+
         const updateResponse = await fetch("http://44.220.1.21:8080/api/auth/update", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updateData),
         });
-  
+
         const updateResult = await updateResponse.text();
-        console.log("Respuesta de actualización:", updateResult);
+        console.log("Update response:", updateResult);
       } catch (error) {
-        console.error("Error en el proceso:", error);
+        console.error("Error in process:", error);
       }
     }
   };
-  
 
   if (hasPermission === null) {
     return <View />;
@@ -259,66 +225,52 @@ const ProfileEdit = (props) => {
   const handleSave = async () => {
     try {
       const token = await SecureStore.getItemAsync("userToken");
-  
       if (!token) {
         console.log("There is no active session.");
         return;
       }
-  
+
       const updateData = {
         token: token,
         name: name,
         email: email,
         university: university,
       };
-  
+
       const response = await fetch("http://44.220.1.21:8080/api/auth/update", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
       });
-  
+
       if (response.ok) {
-        console.log("Perfil actualizado con éxito.");
-        fetchUserData(); // Vuelve a cargar los datos actualizados
+        console.log("Profile updated successfully.");
+        fetchUserData(); // Vuelve a cargar los datos
       } else {
-        console.log("Error al actualizar el perfil.");
+        console.log("Error updating profile.");
       }
     } catch (error) {
-      console.error("Error en la actualización:", error);
+      console.error("Error on update:", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.fotosContainer}>
-        <Image source={fotoFondo} style={styles.coverImage} />
-        <TouchableOpacity style={styles.cameraIconFondo} onPress={openGallery}>
-          <IconButton icon="upload" size={25} />
-        </TouchableOpacity>
-        <View style={styles.avatarContainer}>
-          <Avatar.Image size={150} source={fotoPerfil} />
-          <TouchableOpacity
-            style={styles.cameraIconPerfil}
-            onPress={openCamera}>
-            <IconButton icon="camera" size={25} />
-          </TouchableOpacity>
-        </View>
-      </View> */}
-
       <View style={styles.fotosContainer}>
-        {console.log(userData)
-        }
-        <ImageBackground source={{uri: userData?.urlHeaderPicture || "https://via.placeholder.com/800x400"}} style={styles.coverImage}>
+        <ImageBackground
+          source={{ uri: userData?.urlHeaderPicture || "https://via.placeholder.com/800x400" }}
+          style={styles.coverImage}
+        >
           <TouchableOpacity style={styles.cameraIconFondo} onPress={openGallery}>
             <IconButton icon="upload" size={25} />
           </TouchableOpacity>
           <View style={styles.avatarWrapper}>
-            <Avatar.Image size={width * 0.3} source={{
+            <Avatar.Image
+              size={width * 0.3}
+              source={{
                 uri: userData?.urlProfilePicture || "https://picsum.photos/200/200"
-              }} />
+              }}
+            />
             <TouchableOpacity style={styles.cameraIconPerfil} onPress={openCamera}>
               <IconButton icon="camera" size={25} />
             </TouchableOpacity>
@@ -326,11 +278,11 @@ const ProfileEdit = (props) => {
         </ImageBackground>
       </View>
 
-
-
       <View style={[styles.infoContainer, { backgroundColor: darkMode ? "#111" : "#fff" }]}>
         <ScrollView>
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Name</Text>
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>
+            Name
+          </Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
             value={name}
@@ -338,7 +290,10 @@ const ProfileEdit = (props) => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Email</Text>
+
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>
+            Email
+          </Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
             value={email}
@@ -346,7 +301,10 @@ const ProfileEdit = (props) => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>University</Text>
+
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>
+            University
+          </Text>
           <TextInput
             style={[styles.input, isFocused && styles.inputFocused]}
             value={university}
@@ -354,11 +312,14 @@ const ProfileEdit = (props) => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
-          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>Password</Text>
+
+          <Text style={[styles.label, { color: darkMode ? "white" : "black", width: width * 0.9, maxWidth: 400 }]}>
+            Password
+          </Text>
           <View style={styles.passwordContainer}>
             <TextInput
               style={[styles.textInput, isFocused && styles.inputFocused]}
-              value={userData?.password || "No disponible"}
+              value={userData?.password || "Not available"}
               onChangeText={setPassword}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
@@ -368,7 +329,15 @@ const ProfileEdit = (props) => {
               <IconButton icon="eye" size={25} color="grey" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => {handleSave(); navigation.goBack()}}>
+
+          <TouchableOpacity
+            onPress={() => {
+              handleSave();
+              // Uso de navigation -> import { useNavigation } from '@react-navigation/native'
+              // y define: const navigation = useNavigation();
+              // luego se hace: navigation.goBack();
+            }}
+          >
             <View style={styles.save}>
               <Text style={styles.saveButt}>Save</Text>
             </View>
@@ -378,6 +347,7 @@ const ProfileEdit = (props) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -398,11 +368,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     justifyContent: 'center',
   },
-  avatarContainer: {
-    borderWidth: 6,
-    borderRadius: 100,
-    borderColor: '#4CAF50',
-  },
   avatarWrapper: {
     position: 'absolute',
     left: 0,
@@ -410,7 +375,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     padding: 10,
   },
-
   cameraIconPerfil: {
     position: 'absolute',
     bottom: 10,
@@ -440,7 +404,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
-
   label: {
     fontSize: 16,
     color: '#000',
@@ -473,14 +436,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'grey',
   },
-  picker: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
-    color: 'grey',
-  },
   save: {
     marginTop: 120,
     marginBottom: 70,
@@ -496,7 +451,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
 });
 
-export default ProfileEdit;
