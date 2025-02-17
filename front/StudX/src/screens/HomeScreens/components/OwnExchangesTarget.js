@@ -21,19 +21,38 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 const { width } = Dimensions.get("window");
 
 const flags = {
-  Spanish: { img: require("../../../images/Banderas/ES.png") },
-  English: { img: require("../../../images/Banderas/GB.png") },
-  French: { img: require("../../../images/Banderas/FR.png") },
-  German: { img: require("../../../images/Banderas/DE.png") },
-  Italian: { img: require("../../../images/Banderas/IT.png") },
-  Portuguese: { img: require("../../../images/Banderas/PT.png") },
-  Dutch: { img: require("../../../images/Banderas/NL.png") },
-  Russian: { img: require("../../../images/Banderas/RU.png") },
-  Chinese: { img: require("../../../images/Banderas/CN.png") },
-  Japanese: { img: require("../../../images/Banderas/JP.png") },
-  Korean: { img: require("../../../images/Banderas/KR.png") },
-  Arabic: { img: require("../../../images/Banderas/SA.png") },
-  Turkish: { img: require("../../../images/Banderas/TR.png") },
+  Spanish: { img: require("../../../images/Banderas/ES.png")}, // Español
+  English: { img: require("../../../images/Banderas/GB.png")}, // Inglés
+  French: { img: require("../../../images/Banderas/FR.png")}, // Francés
+  German: { img: require("../../../images/Banderas/DE.png")}, // Alemán
+  Italian: { img: require("../../../images/Banderas/IT.png")}, // Italiano
+  Portuguese: { img: require("../../../images/Banderas/PT.png")}, // Portugués
+  Dutch: { img: require("../../../images/Banderas/NL.png")}, // Holandés
+  Russian: { img: require("../../../images/Banderas/RU.png")}, // Ruso
+  Chinese: { img: require("../../../images/Banderas/CN.png")}, // Chino
+  Japanese: { img: require("../../../images/Banderas/JP.png")}, // Japonés
+  Korean: { img: require("../../../images/Banderas/KR.png")}, // Coreano
+  Arabic: { img: require("../../../images/Banderas/SA.png")}, // Árabe
+  Turkish: { img: require("../../../images/Banderas/TR.png")}, // Turco
+  Bulgarian: { img: require("../../../images/Banderas/BG.png")}, // Búlgaro
+  Czech: { img: require("../../../images/Banderas/CZ.png")}, // Checo
+  Danish: { img: require("../../../images/Banderas/DK.png")}, // Danés
+  Finnish: { img: require("../../../images/Banderas/FI.png")}, // Finlandés
+  Greek: { img: require("../../../images/Banderas/GR.png")}, // Griego
+  Hungarian: { img: require("../../../images/Banderas/HU.png")}, // Húngaro
+  Indonesian: { img: require("../../../images/Banderas/ID.png")}, // Indonesio
+  Hebrew: { img: require("../../../images/Banderas/IL.png")}, // Hebreo
+  Hindi: { img: require("../../../images/Banderas/IN.png")}, // Hindi
+  Persian: { img: require("../../../images/Banderas/IR.png")}, // Persa
+  Malay: { img: require("../../../images/Banderas/MY.png")}, // Malayo
+  Norwegian: { img: require("../../../images/Banderas/NO.png")}, // Noruego
+  Filipino: { img: require("../../../images/Banderas/PH.png")}, // Filipino
+  Polish: { img: require("../../../images/Banderas/PL.png")}, // Polaco
+  Romanian: { img: require("../../../images/Banderas/RO.png")}, // Rumano
+  Swedish: { img: require("../../../images/Banderas/SE.png")}, // Sueco
+  Thai: { img: require("../../../images/Banderas/TH.png") }, // Tailandés
+  Ukrainian: { img: require("../../../images/Banderas/UA.png") }, // Ucraniano
+  Vietnamese: { img: require("../../../images/Banderas/VN.png")}, // Vietnamita
 };
 
 const levelColors = {
@@ -57,6 +76,7 @@ export default function OwnExchangesTarget({
   idioma,
   exchangeId,
   onDeleteSuccess,
+  onRefresh
 }) {
   const { darkMode } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
@@ -67,26 +87,22 @@ export default function OwnExchangesTarget({
   const [selectedTargetLanguage, setSelectedTargetLanguage] =
     useState(idiomaDeseado);
 
-  // ALMACENAMOS LA CADENA DE texto en lugar de número,
-  // para permitir borrar y dejarlo vacío sin que se ponga '0'.
-  // Si 'alumnos' es mayor que 0, mostramos ese número; sino, vacío.
   const [studentsInput, setStudentsInput] = useState(
     alumnos > 0 ? String(alumnos) : ""
   );
 
-  // Fechas
+
   const [beginDate, setBeginDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [showBeginPicker, setShowBeginPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
-  // Modals de idioma con búsqueda
+
   const [nativeModalVisible, setNativeModalVisible] = useState(false);
   const [nativeSearch, setNativeSearch] = useState("");
   const [targetModalVisible, setTargetModalVisible] = useState(false);
   const [targetSearch, setTargetSearch] = useState("");
 
-  // Filtra la lista de idiomas según el texto
   const filteredLanguagesNative = Object.keys(flags).filter((lang) =>
     lang.toLowerCase().includes(nativeSearch.toLowerCase())
   );
@@ -105,7 +121,6 @@ export default function OwnExchangesTarget({
     return `${day}-${month}-${year}`;
   }
 
-  // Eliminar Exchange
   const handleDelete = async () => {
     setModalVisible(false);
 
@@ -137,7 +152,7 @@ export default function OwnExchangesTarget({
     }
   };
 
-  // Editar Exchange
+
   const handleEdit = async () => {
     try {
       const token = await SecureStore.getItemAsync("userToken");
@@ -149,7 +164,6 @@ export default function OwnExchangesTarget({
         return;
       }
 
-      // Convertimos a número y validamos que sea > 0
       const quantityNum = parseInt(studentsInput, 10);
       if (!quantityNum || quantityNum <= 0) {
         Alert.alert("Error", "The number of students must be > 0.");
@@ -183,6 +197,7 @@ export default function OwnExchangesTarget({
       if (response.ok) {
         Alert.alert("Succes", "The exchange has been successfully edited.");
         setEditModalVisible(false);
+        onRefresh();
       } else {
         Alert.alert("Error", "Could not edit:" + responseText);
       }
@@ -250,6 +265,7 @@ export default function OwnExchangesTarget({
             style={[
               styles.overlay,
               { backgroundColor: darkMode ? "#242323" : "white" },
+              { borderColor: darkMode ? null : "#d6d4d4" }
             ]}
           >
             <View style={styles.row}>

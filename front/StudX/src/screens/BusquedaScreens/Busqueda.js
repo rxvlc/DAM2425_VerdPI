@@ -70,6 +70,8 @@ export default function Busquedas(props) {
         );
     }, []);
 
+    
+
   const buscarExchanges = () => {
     if (query == "") {
       fetch("http://44.220.1.21:8080/api/exchanges")
@@ -178,7 +180,7 @@ export default function Busquedas(props) {
           </View>
         ) : resultados.length > 0 ? (
           resultados.map((exchange, index) => (
-            <SearchedExchange key={index} exchange={exchange} />
+            <SearchedExchange key={index} exchange={exchange} navigation={navigation}/>
           ))
         ) : (
           <Text style={darkMode && styles.textDark}>No results</Text>

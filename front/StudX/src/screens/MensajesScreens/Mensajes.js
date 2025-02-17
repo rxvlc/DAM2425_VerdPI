@@ -24,7 +24,6 @@ export default function Mensajes({ route }) {
   useEffect(() => {
     const fetchChats = async () => {
       const token = await SecureStore.getItemAsync("userToken");
-      console.log("Token obtenido:", token); // Agrega este log
       if (!token) {
         console.error("No se encontró el token");
         setLoading(false);
@@ -53,11 +52,12 @@ export default function Mensajes({ route }) {
           return;
         }
 
-        const data = JSON.parse(textResponse);
-        console.log("Datos recibidos:", data);
+        const data = JSON.parse(textResponse); // Parseamos el JSON
+        const sortedMessages = data.chats.sort(
+          (a, b) => new Date(b.lastMessageDate) - new Date(a.lastMessageDate)
+        );        
 
-        setChats(data);
-        console.log(chats.chats);
+        setChats({"chats" : sortedMessages});
       } catch (error) {
         console.error("Error fetching chats:", error);
       } finally {
@@ -66,6 +66,12 @@ export default function Mensajes({ route }) {
     };
 
     fetchChats();
+
+    const intervalId = setInterval(fetchChats, 2000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -99,7 +105,7 @@ export default function Mensajes({ route }) {
     if (selectedChatIds.size > 0) {
       toggleChatSelection(chat.id);
     } else {
-      navigation.navigate("ChatScreen", { profesor :  chat.userId });
+      navigation.navigate("ChatScreen", { profesor: chat.userId });
     }
   };
 
@@ -155,8 +161,9 @@ export default function Mensajes({ route }) {
               </Text>
             </View>
           }
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <TouchableOpacity
+              key={index}
               onPress={() => handleChatPress(item)}
               onLongPress={() => handleChatLongPress(item.id)}
               style={[

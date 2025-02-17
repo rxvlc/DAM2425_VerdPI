@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 
-export default function SearchedExchange({ exchange, searchParams }) {
+export default function SearchedExchange({ exchange, searchParams, navigation}) {
   // Function to format the date into YYYY-MM-DD
   const formatDate = (date) => {
     const d = new Date(date);
@@ -60,7 +60,9 @@ export default function SearchedExchange({ exchange, searchParams }) {
       </View>
       <TouchableOpacity
         style={[styles.button, styles.chatButton]}
-        onPress={null}
+        onPress={() => navigation.navigate("ChatScreen", {
+          profesor: exchange.idTeacherCreator,
+        })}
         activeOpacity={0.7}
       >
         <View style={styles.buttonContent}>
