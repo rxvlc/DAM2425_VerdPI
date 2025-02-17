@@ -293,6 +293,10 @@ public class Controller {
 		return ResponseEntity.ok().body(exchangeRepository.findById(exchangeId));
 	}
 
+	 private Date convertLocalDateTimeToDate(LocalDateTime localDateTime) {
+	        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	    }
+	
 	@GetMapping("/api/messages")
 	public ResponseEntity<Map<String, Object>> getUserChats(
 	        @RequestParam(value = "token") String token) {
@@ -330,7 +334,7 @@ public class Controller {
 	        chatInfo.put("userName", otherUser.getName());
 	        chatInfo.put("userProfilePicture", otherUser.getUrlProfilePicture());
 	        chatInfo.put("lastMessage", message.getMessage());
-	        chatInfo.put("lastMessageDate", message.getCreatedAt());
+	        chatInfo.put("lastMessageDate", convertLocalDateTimeToDate(message.getCreatedAt()));
 
 	        chats.add(chatInfo);
 	    }
