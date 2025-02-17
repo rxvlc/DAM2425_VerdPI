@@ -72,7 +72,7 @@ export default function Mensajes({ route }) {
   useLayoutEffect(() => {
     if (selectedChatIds.size > 0) {
       navigation.setOptions({
-        headerTitle: `${selectedChatIds.size} seleccionado(s)`,
+        headerTitle: `${selectedChatIds.size} selected`,
         headerLeft: () => (
           <TouchableOpacity onPress={() => setSelectedChatIds(new Set())} style={{ marginLeft: 15 }}>
             <MaterialIcons name="close" size={28} color="black" />
