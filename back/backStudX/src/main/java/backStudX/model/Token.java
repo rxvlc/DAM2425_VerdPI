@@ -34,4 +34,8 @@ public class Token {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
+	
+	public boolean isExpired() {
+	    return expirationDate != null && Instant.now().isAfter(expirationDate);
+	}
 }
