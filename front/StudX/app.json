@@ -16,19 +16,37 @@
       "supportsTablet": true
     },
     "android": {
-      "permissions" : ["INTERNET"],
+      "permissions": [
+        "INTERNET"
+      ],
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/StudX.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.cgpt1a.StudX"
+      "package": "com.cgpt1a.StudX",
+      "networkSecurityConfig": {
+        "domainConfigs": [
+          {
+            "domain": "44.220.1.21",
+            "cleartextTrafficPermitted": true
+          }
+        ]
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {

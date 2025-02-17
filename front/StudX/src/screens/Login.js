@@ -101,7 +101,7 @@ export default function Login({ navigation }) {
         Alert.alert("Error", responseText || `Error ${response.status}: Failed to log in`);
       }
     } catch (error) {
-      Alert.alert("Error", "Error connecting to server");
+      Alert.alert("Error", "Error connecting to server"+error);
       console.error("Login error:", error);
     } finally {
       setLoading(false);
