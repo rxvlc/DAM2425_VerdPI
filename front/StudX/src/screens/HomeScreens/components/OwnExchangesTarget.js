@@ -17,42 +17,43 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { useTheme } from "../../../context/ThemeContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { TextInput as PaperTextInput } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
 
 const flags = {
-  Spanish: { img: require("../../../images/Banderas/ES.png")}, // Español
-  English: { img: require("../../../images/Banderas/GB.png")}, // Inglés
-  French: { img: require("../../../images/Banderas/FR.png")}, // Francés
-  German: { img: require("../../../images/Banderas/DE.png")}, // Alemán
-  Italian: { img: require("../../../images/Banderas/IT.png")}, // Italiano
-  Portuguese: { img: require("../../../images/Banderas/PT.png")}, // Portugués
-  Dutch: { img: require("../../../images/Banderas/NL.png")}, // Holandés
-  Russian: { img: require("../../../images/Banderas/RU.png")}, // Ruso
-  Chinese: { img: require("../../../images/Banderas/CN.png")}, // Chino
-  Japanese: { img: require("../../../images/Banderas/JP.png")}, // Japonés
-  Korean: { img: require("../../../images/Banderas/KR.png")}, // Coreano
-  Arabic: { img: require("../../../images/Banderas/SA.png")}, // Árabe
-  Turkish: { img: require("../../../images/Banderas/TR.png")}, // Turco
-  Bulgarian: { img: require("../../../images/Banderas/BG.png")}, // Búlgaro
-  Czech: { img: require("../../../images/Banderas/CZ.png")}, // Checo
-  Danish: { img: require("../../../images/Banderas/DK.png")}, // Danés
-  Finnish: { img: require("../../../images/Banderas/FI.png")}, // Finlandés
-  Greek: { img: require("../../../images/Banderas/GR.png")}, // Griego
-  Hungarian: { img: require("../../../images/Banderas/HU.png")}, // Húngaro
-  Indonesian: { img: require("../../../images/Banderas/ID.png")}, // Indonesio
-  Hebrew: { img: require("../../../images/Banderas/IL.png")}, // Hebreo
-  Hindi: { img: require("../../../images/Banderas/IN.png")}, // Hindi
-  Persian: { img: require("../../../images/Banderas/IR.png")}, // Persa
-  Malay: { img: require("../../../images/Banderas/MY.png")}, // Malayo
-  Norwegian: { img: require("../../../images/Banderas/NO.png")}, // Noruego
-  Filipino: { img: require("../../../images/Banderas/PH.png")}, // Filipino
-  Polish: { img: require("../../../images/Banderas/PL.png")}, // Polaco
-  Romanian: { img: require("../../../images/Banderas/RO.png")}, // Rumano
-  Swedish: { img: require("../../../images/Banderas/SE.png")}, // Sueco
-  Thai: { img: require("../../../images/Banderas/TH.png") }, // Tailandés
-  Ukrainian: { img: require("../../../images/Banderas/UA.png") }, // Ucraniano
-  Vietnamese: { img: require("../../../images/Banderas/VN.png")}, // Vietnamita
+  Spanish: { img: require("../../../images/Banderas/ES.png") },
+  English: { img: require("../../../images/Banderas/GB.png") },
+  French: { img: require("../../../images/Banderas/FR.png") },
+  German: { img: require("../../../images/Banderas/DE.png") },
+  Italian: { img: require("../../../images/Banderas/IT.png") },
+  Portuguese: { img: require("../../../images/Banderas/PT.png") },
+  Dutch: { img: require("../../../images/Banderas/NL.png") },
+  Russian: { img: require("../../../images/Banderas/RU.png") },
+  Chinese: { img: require("../../../images/Banderas/CN.png") },
+  Japanese: { img: require("../../../images/Banderas/JP.png") },
+  Korean: { img: require("../../../images/Banderas/KR.png") },
+  Arabic: { img: require("../../../images/Banderas/SA.png") },
+  Turkish: { img: require("../../../images/Banderas/TR.png") },
+  Bulgarian: { img: require("../../../images/Banderas/BG.png") },
+  Czech: { img: require("../../../images/Banderas/CZ.png") },
+  Danish: { img: require("../../../images/Banderas/DK.png") },
+  Finnish: { img: require("../../../images/Banderas/FI.png") },
+  Greek: { img: require("../../../images/Banderas/GR.png") },
+  Hungarian: { img: require("../../../images/Banderas/HU.png") },
+  Indonesian: { img: require("../../../images/Banderas/ID.png") },
+  Hebrew: { img: require("../../../images/Banderas/IL.png") },
+  Hindi: { img: require("../../../images/Banderas/IN.png") },
+  Persian: { img: require("../../../images/Banderas/IR.png") },
+  Malay: { img: require("../../../images/Banderas/MY.png") },
+  Norwegian: { img: require("../../../images/Banderas/NO.png") },
+  Filipino: { img: require("../../../images/Banderas/PH.png") },
+  Polish: { img: require("../../../images/Banderas/PL.png") },
+  Romanian: { img: require("../../../images/Banderas/RO.png") },
+  Swedish: { img: require("../../../images/Banderas/SE.png") },
+  Thai: { img: require("../../../images/Banderas/TH.png") },
+  Ukrainian: { img: require("../../../images/Banderas/UA.png") },
+  Vietnamese: { img: require("../../../images/Banderas/VN.png") }
 };
 
 const levelColors = {
@@ -68,6 +69,8 @@ const learningImg = require("../../../images/LogosExchanges/Studying.png");
 const speak = require("../../../images/LogosExchanges/Speak.png");
 const level = require("../../../images/LogosExchanges/Nivel.png");
 const students = require("../../../images/LogosExchanges/Estudiante.png");
+const edit = require("../../../images/LogosExchanges/Editar.png");
+const deleteimg = require("../../../images/LogosExchanges/Borrar.png");
 
 export default function OwnExchangesTarget({
   alumnos,
@@ -76,7 +79,7 @@ export default function OwnExchangesTarget({
   idioma,
   exchangeId,
   onDeleteSuccess,
-  onRefresh
+  onRefresh,
 }) {
   const { darkMode } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
@@ -84,19 +87,16 @@ export default function OwnExchangesTarget({
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState(nivel);
   const [selectedNativeLanguage, setSelectedNativeLanguage] = useState(idioma);
-  const [selectedTargetLanguage, setSelectedTargetLanguage] =
-    useState(idiomaDeseado);
+  const [selectedTargetLanguage, setSelectedTargetLanguage] = useState(idiomaDeseado);
 
   const [studentsInput, setStudentsInput] = useState(
     alumnos > 0 ? String(alumnos) : ""
   );
 
-
   const [beginDate, setBeginDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [showBeginPicker, setShowBeginPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-
 
   const [nativeModalVisible, setNativeModalVisible] = useState(false);
   const [nativeSearch, setNativeSearch] = useState("");
@@ -123,14 +123,10 @@ export default function OwnExchangesTarget({
 
   const handleDelete = async () => {
     setModalVisible(false);
-
     try {
       const token = await SecureStore.getItemAsync("userToken");
       if (!exchangeId || !token) {
-        Alert.alert(
-          "Error",
-          "No se pudo obtener la información necesaria para eliminar."
-        );
+        Alert.alert("Error", "Could not get the necessary information to delete.");
         return;
       }
 
@@ -138,35 +134,31 @@ export default function OwnExchangesTarget({
       const response = await fetch(apiUrl, { method: "DELETE" });
       const responseText = await response.text();
 
-      console.log("Código de respuesta:", response.status);
-      console.log("Respuesta del servidor:", responseText);
+      console.log("Response code:", response.status);
+      console.log("Server response:", responseText);
 
       if (response.ok) {
-        Alert.alert("Éxito", "El intercambio ha sido eliminado correctamente.");
+        Alert.alert("Success", "Exchange has been successfully deleted.");
         if (onDeleteSuccess) onDeleteSuccess(exchangeId);
       } else {
-        Alert.alert("Error", `No se pudo eliminar: ${responseText}`);
+        Alert.alert("Error", `Could not delete: ${responseText}`);
       }
     } catch (error) {
-      Alert.alert("Error de conexión", error.message);
+      Alert.alert("Connection error", error.message);
     }
   };
-
 
   const handleEdit = async () => {
     try {
       const token = await SecureStore.getItemAsync("userToken");
       if (!exchangeId || !token) {
-        Alert.alert(
-          "Error",
-          "No se pudo obtener la información necesaria para editar."
-        );
+        Alert.alert("Error", "Could not get the necessary information to edit.");
         return;
       }
 
       const quantityNum = parseInt(studentsInput, 10);
       if (!quantityNum || quantityNum <= 0) {
-        Alert.alert("Error", "The number of students must be > 0.");
+        Alert.alert("Error", "The number of students must be greater than 0.");
         return;
       }
 
@@ -191,15 +183,15 @@ export default function OwnExchangesTarget({
       });
 
       const responseText = await response.text();
-      console.log("Código de respuesta PUT:", response.status);
-      console.log("Respuesta del servidor PUT:", responseText);
+      console.log("Response code (PUT):", response.status);
+      console.log("Server response (PUT):", responseText);
 
       if (response.ok) {
-        Alert.alert("Succes", "The exchange has been successfully edited.");
+        Alert.alert("Success", "The exchange has been successfully edited.");
         setEditModalVisible(false);
         onRefresh();
       } else {
-        Alert.alert("Error", "Could not edit:" + responseText);
+        Alert.alert("Error", "Could not edit: " + responseText);
       }
     } catch (error) {
       Alert.alert("Connection error", error.message);
@@ -215,12 +207,10 @@ export default function OwnExchangesTarget({
     if (selectedDate) setEndDate(selectedDate);
   };
 
-
   const handleStudentsChange = (text) => {
     const numericText = text.replace(/[^0-9]/g, "");
     setStudentsInput(numericText);
   };
-
 
   const renderNativeItem = ({ item }) => (
     <Pressable
@@ -265,14 +255,12 @@ export default function OwnExchangesTarget({
             style={[
               styles.overlay,
               { backgroundColor: darkMode ? "#242323" : "white" },
-              { borderColor: darkMode ? null : "#d6d4d4" }
+              { borderColor: darkMode ? null : "#d6d4d4" },
             ]}
           >
             <View style={styles.row}>
               <Image source={learningImg} style={styles.studyIcon} />
-              <Text
-                style={[styles.text, { color: darkMode ? "white" : "black" }]}
-              >
+              <Text style={[styles.text, { color: darkMode ? "white" : "black" }]}>
                 {" "}
                 Learning:{" "}
               </Text>
@@ -289,9 +277,7 @@ export default function OwnExchangesTarget({
 
             <View style={styles.row}>
               <Image source={speak} style={styles.studyIcon} />
-              <Text
-                style={[styles.text, { color: darkMode ? "white" : "black" }]}
-              >
+              <Text style={[styles.text, { color: darkMode ? "white" : "black" }]}>
                 {" "}
                 Speak:{" "}
               </Text>
@@ -308,9 +294,7 @@ export default function OwnExchangesTarget({
 
             <View style={styles.row}>
               <Image source={level} style={styles.studyIcon} />
-              <Text
-                style={[styles.text, { color: darkMode ? "white" : "black" }]}
-              >
+              <Text style={[styles.text, { color: darkMode ? "white" : "black" }]}>
                 {" "}
                 Level:{" "}
               </Text>
@@ -326,9 +310,7 @@ export default function OwnExchangesTarget({
 
             <View style={styles.row}>
               <Image source={students} style={styles.studyIcon} />
-              <Text
-                style={[styles.text, { color: darkMode ? "white" : "black" }]}
-              >
+              <Text style={[styles.text, { color: darkMode ? "white" : "black" }]}>
                 {" "}
                 Students:{" "}
               </Text>
@@ -363,9 +345,12 @@ export default function OwnExchangesTarget({
                 setEditModalVisible(true);
               }}
             >
+              <Image source={edit} style={styles.menuIcon} />
               <Text style={styles.menuText}>Edit</Text>
             </Pressable>
+
             <Pressable style={styles.menuItem} onPress={handleDelete}>
+              <Image source={deleteimg} style={styles.menuIcon} />
               <Text style={styles.menuText}>Delete</Text>
             </Pressable>
           </View>
@@ -442,9 +427,7 @@ export default function OwnExchangesTarget({
               </Text>
             </Pressable>
 
-            <Text style={styles.label}>
-              Begin Date: {formatDateDDMMYYYY(beginDate)}
-            </Text>
+            <Text style={styles.label}>Begin Date: {formatDateDDMMYYYY(beginDate)}</Text>
             <Pressable
               style={styles.dateButton}
               onPress={() => setShowBeginPicker(true)}
@@ -460,9 +443,7 @@ export default function OwnExchangesTarget({
               />
             )}
 
-            <Text style={styles.label}>
-              End Date: {formatDateDDMMYYYY(endDate)}
-            </Text>
+            <Text style={styles.label}>End Date: {formatDateDDMMYYYY(endDate)}</Text>
             <Pressable
               style={styles.dateButton}
               onPress={() => setShowEndPicker(true)}
@@ -478,13 +459,16 @@ export default function OwnExchangesTarget({
               />
             )}
 
-            <Text style={styles.label}>Nº Of Students:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nº of Students"
+            <Text style={styles.label}>Number of Students:</Text>
+            <PaperTextInput
+              placeholder=""
+              style={[styles.input, styles.paperNumberInput]}
               value={studentsInput}
               onChangeText={handleStudentsChange}
               keyboardType="numeric"
+              mode="flat"
+              underlineColor="transparent"
+              theme={{ colors: { text: "#000" } }}
             />
 
             <View style={styles.editButtonsContainer}>
@@ -502,7 +486,6 @@ export default function OwnExchangesTarget({
         </Pressable>
       </Modal>
 
-    
       <Modal
         transparent={true}
         visible={nativeModalVisible}
@@ -522,14 +505,25 @@ export default function OwnExchangesTarget({
             <Text style={styles.editTitle}>Select Native Language</Text>
             <TextInput
               style={styles.input}
-              placeholder="search a language..."
+              placeholder="Search a language..."
               value={nativeSearch}
               onChangeText={setNativeSearch}
             />
             <FlatList
               data={filteredLanguagesNative}
               keyExtractor={(item) => item}
-              renderItem={renderNativeItem}
+              renderItem={({ item }) => (
+                <Pressable
+                  style={styles.languageItem}
+                  onPress={() => {
+                    setSelectedNativeLanguage(item);
+                    setNativeModalVisible(false);
+                    setNativeSearch("");
+                  }}
+                >
+                  <Text style={styles.languageItemText}>{item}</Text>
+                </Pressable>
+              )}
               style={{ maxHeight: 250, width: "100%" }}
               keyboardShouldPersistTaps="handled"
             />
@@ -537,7 +531,6 @@ export default function OwnExchangesTarget({
         </Pressable>
       </Modal>
 
-   
       <Modal
         transparent={true}
         visible={targetModalVisible}
@@ -557,14 +550,25 @@ export default function OwnExchangesTarget({
             <Text style={styles.editTitle}>Select Target Language</Text>
             <TextInput
               style={styles.input}
-              placeholder="search a language..."
+              placeholder="Search a language..."
               value={targetSearch}
               onChangeText={setTargetSearch}
             />
             <FlatList
               data={filteredLanguagesTarget}
               keyExtractor={(item) => item}
-              renderItem={renderTargetItem}
+              renderItem={({ item }) => (
+                <Pressable
+                  style={styles.languageItem}
+                  onPress={() => {
+                    setSelectedTargetLanguage(item);
+                    setTargetModalVisible(false);
+                    setTargetSearch("");
+                  }}
+                >
+                  <Text style={styles.languageItemText}>{item}</Text>
+                </Pressable>
+              )}
               style={{ maxHeight: 250, width: "100%" }}
               keyboardShouldPersistTaps="handled"
             />
@@ -648,12 +652,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   menuItem: {
+    flexDirection: "row",
     paddingVertical: 10,
     width: "100%",
     alignItems: "center",
+    justifyContent: "center",
   },
   menuText: {
     fontSize: 16,
+    marginLeft: 8,
+  },
+  menuIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
   },
   editModalContainer: {
     width: "80%",
@@ -678,6 +690,14 @@ const styles = StyleSheet.create({
     padding: 8,
     marginTop: 5,
     width: "100%",
+  },
+  paperNumberInput: {
+    width: "25%",
+    height: "5%", 
+    alignSelf: "flex-start",
+    backgroundColor: "#fff",
+    marginTop: 5,
+    fontSize: 14,
   },
   editButtonsContainer: {
     flexDirection: "row",

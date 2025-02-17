@@ -55,7 +55,7 @@ export default function HomeScreen() {
         await SecureStore.deleteItemAsync("userToken");
         await SecureStore.deleteItemAsync("email");
 
-        Alert.alert("Éxito", "Successful logout");
+        Alert.alert("Succes", "Successful logout");
 
         navigation.dispatch(
           CommonActions.reset({
