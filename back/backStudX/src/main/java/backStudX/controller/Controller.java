@@ -335,6 +335,13 @@ public class Controller {
 	        chats.add(chatInfo);
 	    }
 
+	    // Ordenar los chats por la fecha del último mensaje (de más reciente a más antiguo)
+	    chats.sort((chat1, chat2) -> {
+	        Date date1 = (Date) chat1.get("lastMessageDate");
+	        Date date2 = (Date) chat2.get("lastMessageDate");
+	        return date2.compareTo(date1); // Ordenar de más reciente a más antiguo
+	    });
+
 	    // Construir la respuesta final
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("loggedUser", Map.of(
@@ -347,6 +354,7 @@ public class Controller {
 
 	    return ResponseEntity.ok(response);
 	}
+
 
 
 	
