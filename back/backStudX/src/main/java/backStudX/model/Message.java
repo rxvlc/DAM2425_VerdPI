@@ -86,7 +86,7 @@ public class Message {
 
 	public void setCreatedAt(LocalDateTime now) {
 		// TODO Auto-generated method stub
-		
+		this.createdAt = now;
 	}
 
 	public String getIdUserRecipient() {
