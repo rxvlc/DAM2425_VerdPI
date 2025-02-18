@@ -45,30 +45,30 @@ export default function ChatScreen({ route }) {
       try {
         const token = await SecureStore.getItemAsync("userToken"); // Obtén el token de SecureStore
         const email = await SecureStore.getItemAsync("email");
-    
+
         const response = await fetch(
           `http://44.220.1.21:8080/api/messages/conversation?idUserSender=${email}&idUserRecipient=${profesor}&token=${token}`
         );
-    
+
         if (!response.ok) {
           throw new Error("Error al obtener la conversación");
         }
-    
+
         // Verificar si la respuesta es vacía
         const conversationMessages = await response.text(); // Usamos .text() para evitar errores si no es JSON
-    
+
         // Si no hay mensajes, devolver un array vacío
-        if (!conversationMessages.trim()) {
-          setMensajes([]); // No hay mensajes, por lo que establecemos el estado como vacío
-          setIsLoading(false); // Marcar como no cargando
-          return;
-        }
-    
+        // if (!conversationMessages.trim()) {
+        //   setMensajes([]); // No hay mensajes, por lo que establecemos el estado como vacío
+        //   setIsLoading(false); // Marcar como no cargando
+        //   return;
+        // }
+
         // Si hay mensajes, intentar parsear como JSON
         const parsedMessages = JSON.parse(conversationMessages);
-    
+
         setMensajes(parsedMessages); // Establecer los mensajes recibidos
-    
+
         // Hacer scroll al final
         setTimeout(() => {
           flatListRef.current?.scrollToEnd({ animated: true });
@@ -80,7 +80,6 @@ export default function ChatScreen({ route }) {
         setIsLoading(false); // Marcar como no cargando
       }
     };
-    
 
     fetchConversation();
 
@@ -200,7 +199,7 @@ export default function ChatScreen({ route }) {
           })
         );
       }
-      
+
       setMensajes((prevMensajes) => [
         ...prevMensajes,
         {
@@ -248,7 +247,6 @@ export default function ChatScreen({ route }) {
         <FlatList
           ref={flatListRef}
           data={mensajes}
-          key={item.id}
           keyExtractor={(item, index) => item.id || `message-${index}`}
           renderItem={({ item }) => {
             return <Mensaje mensaje={item} darkMode={darkMode} />;
