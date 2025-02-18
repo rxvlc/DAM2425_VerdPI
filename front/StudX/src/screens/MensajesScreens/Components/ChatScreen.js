@@ -248,6 +248,7 @@ export default function ChatScreen({ route }) {
         <FlatList
           ref={flatListRef}
           data={mensajes}
+          key={item.id}
           keyExtractor={(item, index) => item.id || `message-${index}`}
           renderItem={({ item }) => {
             return <Mensaje mensaje={item} darkMode={darkMode} />;
