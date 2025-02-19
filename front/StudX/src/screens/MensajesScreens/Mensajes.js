@@ -148,7 +148,7 @@ export default function Mensajes({ route }) {
       >
         <FlatList
           data={chats?.chats?.length > 0 ? chats.chats : null}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item.id || `message-${index}`}
           ListEmptyComponent={
             <View style={styles.emptyMessageContainer}>
               <Text

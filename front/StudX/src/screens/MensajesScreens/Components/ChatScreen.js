@@ -58,11 +58,11 @@ export default function ChatScreen({ route }) {
         const conversationMessages = await response.text(); // Usamos .text() para evitar errores si no es JSON
 
         // Si no hay mensajes, devolver un array vacío
-        // if (!conversationMessages.trim()) {
-        //   setMensajes([]); // No hay mensajes, por lo que establecemos el estado como vacío
-        //   setIsLoading(false); // Marcar como no cargando
-        //   return;
-        // }
+         if (!conversationMessages.trim()) {
+           setMensajes([]); // No hay mensajes, por lo que establecemos el estado como vacío
+           setIsLoading(false); // Marcar como no cargando
+           return;
+         }
 
         // Si hay mensajes, intentar parsear como JSON
         const parsedMessages = JSON.parse(conversationMessages);
@@ -96,17 +96,19 @@ export default function ChatScreen({ route }) {
       // Event Listener para mensajes
       socketRef.current.onmessage = (event) => {
         const mensajeRecibido = JSON.parse(event.data);
-
+        
         // Actualizar el estado correctamente
-        setMensajes((prevMensajes) => [
-          ...prevMensajes,
-          {
-            id: `m${Date.now()}asd`,
-            message: mensajeRecibido.text,
-            idUserSender: profesor,
-          },
-        ]);
-
+        if (mensajeRecibido.senderUserId === profesor) {
+          // Si el mensaje corresponde al chat actual, agregarlo
+          setMensajes((prevMensajes) => [
+            ...prevMensajes,
+            {
+              id: `m${Date.now()}asd`,
+              message: mensajeRecibido.text,
+              idUserSender: profesor,
+            },
+          ]);
+        }
         // Hacer scroll al final cuando llegue un mensaje
         setTimeout(() => {
           flatListRef.current?.scrollToEnd({ animated: true });
