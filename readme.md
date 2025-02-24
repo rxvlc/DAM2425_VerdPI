@@ -1,5 +1,8 @@
 # StudX
+
+<div style="display: flex; align-items: center;">
 <iframe src="https://streamable.com/e/fqs1o0" width="100%" height="100%" frameborder="0" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;"></iframe>
+</div>
 
 ## Download
 - [Download APK](https://limewire.com/d/d7a9f432-598d-4b43-8886-f3f7ce97de7a#N3U-rM6T_fO-aqEzn8NbKJnJi7qoMuF3edMWUkeWXNM)
